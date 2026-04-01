@@ -32,7 +32,7 @@ export default function LessonDetailPage({
     await completeLesson(id)
     await updateStreak()
     setJustCompleted(true)
-    setTimeout(() => router.push("/learn"), 1500)
+    setTimeout(() => { window.location.href = "/learn" }, 1500)
   }, [id, completeLesson, updateStreak, router])
 
   if (!lesson) {
