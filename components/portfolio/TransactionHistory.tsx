@@ -1,6 +1,7 @@
 "use client"
 
 import { Badge } from "@/components/ui/badge"
+import { CoinIcon } from "@/components/shared/CoinIcon"
 import { cn } from "@/lib/utils"
 import type { Transaction } from "@/lib/db"
 
@@ -36,27 +37,30 @@ export function TransactionHistory({ transactions }: TransactionHistoryProps) {
               key={tx.id}
               className="flex items-center justify-between rounded-xl border border-border bg-card p-3"
             >
-              <div className="flex items-center gap-3">
-                <Badge
-                  variant="secondary"
-                  className={cn(
-                    "rounded-md text-xs font-semibold",
-                    tx.type === "buy"
-                      ? "bg-success/10 text-success"
-                      : "bg-danger/10 text-danger"
-                  )}
-                >
-                  {tx.type === "buy" ? "Buy" : "Sell"}
-                </Badge>
+              <div className="flex items-center gap-2.5">
+                <CoinIcon symbol={tx.asset} size="xs" />
                 <div>
-                  <p className="text-sm font-medium">
-                    {tx.amount < 0.001
-                      ? tx.amount.toFixed(6)
-                      : tx.amount < 1
-                        ? tx.amount.toFixed(4)
-                        : tx.amount.toFixed(2)}{" "}
-                    {tx.asset}
-                  </p>
+                  <div className="flex items-center gap-1.5">
+                    <Badge
+                      variant="secondary"
+                      className={cn(
+                        "rounded-md px-1.5 py-0 text-[10px] font-semibold",
+                        tx.type === "buy"
+                          ? "bg-success/10 text-success"
+                          : "bg-danger/10 text-danger"
+                      )}
+                    >
+                      {tx.type === "buy" ? "Buy" : "Sell"}
+                    </Badge>
+                    <p className="text-sm font-medium">
+                      {tx.amount < 0.001
+                        ? tx.amount.toFixed(6)
+                        : tx.amount < 1
+                          ? tx.amount.toFixed(4)
+                          : tx.amount.toFixed(2)}{" "}
+                      {tx.asset}
+                    </p>
+                  </div>
                   <p className="text-xs text-muted-foreground">
                     @ ${tx.price.toLocaleString()}
                   </p>

@@ -14,6 +14,7 @@ export interface UserProgress {
   cardsViewed: number
   simulationsRun: number
   explanationsOpened: number
+  replaysCompleted: number
   streakDays: number
   lastStreakDate: string
   confidenceScore: number
@@ -60,12 +61,21 @@ export interface PriceCacheEntry {
   timestamp: number
 }
 
+export interface CompletedReplayEntry {
+  id: string
+  userId: string
+  eventId: string
+  decision: "buy" | "sell" | "hold" | "wait"
+  completedAt: Date
+}
+
 const db = new Dexie("OnrampDB") as Dexie & {
   profiles: EntityTable<UserProfile, "id">
   progress: EntityTable<UserProgress, "userId">
   simulations: EntityTable<SimulationEntry, "id">
   portfolios: EntityTable<PracticePortfolio, "userId">
   priceCache: EntityTable<PriceCacheEntry, "id">
+  completedReplays: EntityTable<CompletedReplayEntry, "id">
 }
 
 db.version(2).stores({
@@ -74,6 +84,15 @@ db.version(2).stores({
   simulations: "id, userId, scenarioId, timestamp",
   portfolios: "userId",
   priceCache: "id",
+})
+
+db.version(3).stores({
+  profiles: "id, name",
+  progress: "userId",
+  simulations: "id, userId, scenarioId, timestamp",
+  portfolios: "userId",
+  priceCache: "id",
+  completedReplays: "id, userId, eventId",
 })
 
 export { db }

@@ -88,6 +88,10 @@ export default function ProfilePage() {
               <p className="mt-1 text-xs text-muted-foreground">Lessons completed</p>
             </div>
             <div className="rounded-2xl border border-border bg-card p-4 text-center">
+              <p className="font-heading text-2xl font-bold">{progress?.replaysCompleted ?? 0}</p>
+              <p className="mt-1 text-xs text-muted-foreground">Replays completed</p>
+            </div>
+            <div className="rounded-2xl border border-border bg-card p-4 text-center">
               <p className="font-heading text-2xl font-bold">{progress?.explanationsOpened ?? 0}</p>
               <p className="mt-1 text-xs text-muted-foreground">Explanations read</p>
             </div>

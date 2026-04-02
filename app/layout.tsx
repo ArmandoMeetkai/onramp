@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next"
 import { Inter, DM_Sans } from "next/font/google"
+import Script from "next/script"
 import { ClientShell } from "@/components/layout/ClientShell"
 import "./globals.css"
 
@@ -18,6 +19,9 @@ export const metadata: Metadata = {
   title: "Onramp",
   description: "The first safe place to think before entering crypto",
   manifest: "/manifest.json",
+  icons: {
+    apple: "/icons/icon-192.svg",
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
@@ -40,35 +44,21 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning className={`${inter.variable} ${dmSans.variable} h-full`}>
-      <head>
-        <link rel="apple-touch-icon" href="/icons/icon-192.svg" />
-        <meta name="apple-mobile-web-app-capable" content="yes" />
-        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-        <script
+      <body className="min-h-full flex flex-col antialiased" suppressHydrationWarning>
+        <Script
+          id="theme-init"
+          strategy="beforeInteractive"
           dangerouslySetInnerHTML={{
-            __html: `
-              (function() {
-                try {
-                  var theme = localStorage.getItem('onramp-theme');
-                  if (theme === 'light') {
-                    document.documentElement.classList.remove('dark');
-                  } else {
-                    document.documentElement.classList.add('dark');
-                  }
-                } catch(e) {
-                  document.documentElement.classList.add('dark');
-                }
-                if ('serviceWorker' in navigator) {
-                  window.addEventListener('load', function() {
-                    navigator.serviceWorker.register('/sw.js');
-                  });
-                }
-              })();
-            `,
+            __html: `(function(){try{var t=localStorage.getItem('onramp-theme');if(t==='light'){document.documentElement.classList.remove('dark')}else{document.documentElement.classList.add('dark')}}catch(e){document.documentElement.classList.add('dark')}})()`,
           }}
         />
-      </head>
-      <body className="min-h-full flex flex-col antialiased" suppressHydrationWarning>
+        <Script
+          id="sw-register"
+          strategy="afterInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `if('serviceWorker' in navigator){navigator.serviceWorker.register('/sw.js')}`,
+          }}
+        />
         <ClientShell>{children}</ClientShell>
       </body>
     </html>

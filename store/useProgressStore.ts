@@ -16,7 +16,8 @@ function calculateConfidence(progress: UserProgress): number {
     progress.cardsViewed * 2 +
     progress.simulationsRun * 3 +
     progress.explanationsOpened * 2 +
-    progress.lessonsCompleted.length * 5
+    progress.lessonsCompleted.length * 5 +
+    (progress.replaysCompleted ?? 0) * 4
   return Math.min(100, score)
 }
 
@@ -28,6 +29,7 @@ interface ProgressState {
   incrementSimulationsRun: () => Promise<void>
   incrementExplanationsOpened: () => Promise<void>
   completeLesson: (lessonId: string) => Promise<void>
+  incrementReplaysCompleted: () => Promise<void>
   updateStreak: () => Promise<void>
 }
 
@@ -50,6 +52,7 @@ export const useProgressStore = create<ProgressState>((set, get) => ({
       cardsViewed: 0,
       simulationsRun: 0,
       explanationsOpened: 0,
+      replaysCompleted: 0,
       streakDays: 0,
       lastStreakDate: "",
       confidenceScore: 0,
@@ -102,6 +105,18 @@ export const useProgressStore = create<ProgressState>((set, get) => ({
     const updated = {
       ...current,
       lessonsCompleted: [...current.lessonsCompleted, lessonId],
+    }
+    updated.confidenceScore = calculateConfidence(updated)
+    await db.progress.put(updated)
+    set({ progress: updated })
+  },
+
+  incrementReplaysCompleted: async () => {
+    const current = get().progress
+    if (!current) return
+    const updated = {
+      ...current,
+      replaysCompleted: (current.replaysCompleted ?? 0) + 1,
     }
     updated.confidenceScore = calculateConfidence(updated)
     await db.progress.put(updated)

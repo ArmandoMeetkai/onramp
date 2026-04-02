@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { Compass, BarChart3, MessageCircle, ChevronRight } from "lucide-react"
+import { Compass, BarChart3, MessageCircle, Clock, ChevronRight } from "lucide-react"
 import { motion } from "framer-motion"
 import { useUserStore } from "@/store/useUserStore"
 import { useProgressStore } from "@/store/useProgressStore"
@@ -41,6 +41,12 @@ const quickActions = [
     icon: BarChart3,
     title: "Practice trading",
     description: "Try buying and selling with fake money",
+  },
+  {
+    href: "/replay",
+    icon: Clock,
+    title: "Time travel",
+    description: "Relive real crypto events and decide",
   },
   {
     href: "/chat",

@@ -3,6 +3,7 @@
 import Link from "next/link"
 import { ChevronRight } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
+import { CoinIcon } from "@/components/shared/CoinIcon"
 import { cn } from "@/lib/utils"
 import type { DecisionScenario } from "@/data/scenarios"
 
@@ -32,8 +33,9 @@ export function DecisionCard({ scenario }: DecisionCardProps) {
         <div className="mt-3 flex flex-wrap gap-1.5">
           <Badge
             variant="secondary"
-            className={cn("rounded-lg px-2 py-0.5 text-[11px] font-medium", assetColors[scenario.asset])}
+            className={cn("flex items-center gap-1 rounded-lg px-1.5 py-0.5 text-[11px] font-medium", assetColors[scenario.asset])}
           >
+            <CoinIcon symbol={scenario.asset} size="xs" className="h-3.5 w-3.5 rounded-sm bg-transparent" />
             {scenario.asset}
           </Badge>
           <Badge variant="secondary" className="rounded-lg px-2 py-0.5 text-[11px] font-medium">

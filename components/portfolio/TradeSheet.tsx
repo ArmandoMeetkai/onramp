@@ -2,7 +2,8 @@
 
 import { useState, useCallback } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { Check, ArrowLeft } from "lucide-react"
+import { Check, ArrowLeft, BookOpen } from "lucide-react"
+import Link from "next/link"
 import {
   Sheet,
   SheetContent,
@@ -12,6 +13,8 @@ import {
 } from "@/components/ui/sheet"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { InfoTip } from "@/components/shared/InfoTip"
+import { CoinIcon } from "@/components/shared/CoinIcon"
 import { cn } from "@/lib/utils"
 import { usePortfolioStore } from "@/store/usePortfolioStore"
 import { useProgressStore } from "@/store/useProgressStore"
@@ -28,12 +31,33 @@ interface TradeSheetProps {
 }
 
 const assets = [
-  { symbol: "BTC", name: "Bitcoin", icon: "₿" },
-  { symbol: "ETH", name: "Ethereum", icon: "Ξ" },
-  { symbol: "SOL", name: "Solana", icon: "◎" },
+  {
+    symbol: "BTC",
+    name: "Bitcoin",
+    tagline: "The first cryptocurrency. Often called digital gold.",
+    lessonId: "what-is-bitcoin",
+  },
+  {
+    symbol: "ETH",
+    name: "Ethereum",
+    tagline: "A platform for apps and smart contracts. Powers most of DeFi.",
+    lessonId: "what-is-blockchain",
+  },
+  {
+    symbol: "SOL",
+    name: "Solana",
+    tagline: "Built for speed and low fees. Popular for apps and NFTs.",
+    lessonId: "what-is-market-cap",
+  },
 ] as const
 
 const presetAmounts = [10, 25, 50, 100]
+
+const successLearnLinks: Record<string, { lessonId: string; label: string }> = {
+  BTC: { lessonId: "what-is-bitcoin", label: "Learn about Bitcoin" },
+  ETH: { lessonId: "what-is-blockchain", label: "Learn about blockchains" },
+  SOL: { lessonId: "what-is-market-cap", label: "Learn about market cap" },
+}
 
 export function TradeSheet({ open, onOpenChange, holdings }: TradeSheetProps) {
   const [step, setStep] = useState<TradeStep>("asset")
@@ -59,7 +83,7 @@ export function TradeSheet({ open, onOpenChange, holdings }: TradeSheetProps) {
   const canProceed = (() => {
     if (usdAmount <= 0) return false
     if (action === "buy") return usdAmount <= (portfolio?.balance ?? 0)
-    return usdAmount <= maxSellAmount + 0.01 // tolerance for rounding
+    return usdAmount <= maxSellAmount + 0.01
   })()
 
   const reset = useCallback(() => {
@@ -106,6 +130,14 @@ export function TradeSheet({ open, onOpenChange, holdings }: TradeSheetProps) {
     else if (step === "confirm") setStep("amount")
   }, [step])
 
+  function formatCrypto(n: number): string {
+    if (n < 0.001) return n.toFixed(6)
+    if (n < 1) return n.toFixed(4)
+    return n.toFixed(2)
+  }
+
+  const learnLink = successLearnLinks[selectedAsset]
+
   return (
     <Sheet open={open} onOpenChange={handleOpenChange}>
       <SheetContent side="bottom" className="rounded-t-3xl px-5 pb-8 pt-4" showCloseButton={false}>
@@ -127,26 +159,33 @@ export function TradeSheet({ open, onOpenChange, holdings }: TradeSheetProps) {
             exit={{ opacity: 0, y: -8 }}
             transition={{ duration: 0.15 }}
           >
+            {/* Step 1: Pick an asset */}
             {step === "asset" && (
               <>
                 <SheetHeader className="px-0">
-                  <SheetTitle>Choose an asset</SheetTitle>
-                  <SheetDescription>What would you like to trade?</SheetDescription>
+                  <SheetTitle>Choose a cryptocurrency</SheetTitle>
+                  <SheetDescription>
+                    Not sure which to pick? Tap any option to learn more.
+                  </SheetDescription>
                 </SheetHeader>
                 <div className="mt-4 space-y-2">
-                  {assets.map(({ symbol, name, icon }) => (
+                  {assets.map(({ symbol, name, tagline }) => (
                     <button
                       key={symbol}
                       onClick={() => handleSelectAsset(symbol)}
-                      className="flex w-full items-center gap-4 rounded-2xl border border-border bg-card p-4 transition-all hover:border-primary/30 active:scale-[0.98]"
+                      className="flex w-full items-center gap-4 rounded-2xl border border-border bg-card p-4 text-left transition-all hover:border-primary/30 active:scale-[0.98]"
                     >
-                      <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-secondary text-xl font-bold">
-                        {icon}
-                      </div>
-                      <div className="text-left">
-                        <p className="font-semibold">{name}</p>
-                        <p className="text-sm text-muted-foreground">
-                          ${getPrice(symbol).toLocaleString()}
+                      <CoinIcon symbol={symbol} size="lg" />
+                      <div className="min-w-0">
+                        <div className="flex items-baseline gap-2">
+                          <p className="font-semibold">{name}</p>
+                          <p className="text-xs text-muted-foreground">{symbol}</p>
+                        </div>
+                        <p className="text-xs text-muted-foreground leading-snug">
+                          {tagline}
+                        </p>
+                        <p className="mt-0.5 text-xs font-medium">
+                          ${getPrice(symbol).toLocaleString()} per coin
                         </p>
                       </div>
                     </button>
@@ -155,6 +194,7 @@ export function TradeSheet({ open, onOpenChange, holdings }: TradeSheetProps) {
               </>
             )}
 
+            {/* Step 2: Buy or sell */}
             {step === "action" && (
               <>
                 <SheetHeader className="px-0">
@@ -183,18 +223,25 @@ export function TradeSheet({ open, onOpenChange, holdings }: TradeSheetProps) {
                     You don&apos;t have any {getName(selectedAsset)} to sell yet
                   </p>
                 )}
+
+                {/* Mini explainer */}
+                <div className="mt-4 rounded-xl bg-muted/40 px-3 py-2.5 text-xs text-muted-foreground leading-relaxed">
+                  <strong className="text-foreground">Buying</strong> means you spend some of your
+                  cash to own a piece of {getName(selectedAsset)}.{" "}
+                  <strong className="text-foreground">Selling</strong> converts it back to cash.
+                  You can own a tiny fraction — you don&apos;t need to buy a whole coin.
+                </div>
               </>
             )}
 
+            {/* Step 3: Enter amount */}
             {step === "amount" && (
               <>
                 <SheetHeader className="px-0">
-                  <SheetTitle>
-                    How much to {action}?
-                  </SheetTitle>
+                  <SheetTitle>How much to {action}?</SheetTitle>
                   <SheetDescription>
                     {action === "buy"
-                      ? `Available: $${(portfolio?.balance ?? 0).toFixed(2)}`
+                      ? `Available cash: $${(portfolio?.balance ?? 0).toFixed(2)}`
                       : `Holdings worth: $${maxSellAmount.toFixed(2)}`}
                   </SheetDescription>
                 </SheetHeader>
@@ -226,16 +273,29 @@ export function TradeSheet({ open, onOpenChange, holdings }: TradeSheetProps) {
                       </button>
                     ))}
                   </div>
+
                   {usdAmount > 0 && price > 0 && (
-                    <p className="text-center text-sm text-muted-foreground">
-                      ≈ {cryptoAmount < 0.001
-                        ? cryptoAmount.toFixed(6)
-                        : cryptoAmount < 1
-                          ? cryptoAmount.toFixed(4)
-                          : cryptoAmount.toFixed(2)}{" "}
-                      {selectedAsset}
-                    </p>
+                    <div className="rounded-xl bg-muted/40 px-3 py-2.5 text-center space-y-0.5">
+                      <p className="text-sm text-muted-foreground">
+                        You&apos;ll receive{" "}
+                        <strong className="text-foreground">
+                          {formatCrypto(cryptoAmount)} {selectedAsset}
+                        </strong>
+                      </p>
+                      <div className="flex items-center justify-center gap-1">
+                        <p className="text-xs text-muted-foreground">
+                          Fractions are totally normal in crypto
+                        </p>
+                        <InfoTip>
+                          You don&apos;t need to buy a whole Bitcoin or Ethereum.
+                          You can own <strong className="text-foreground">any fraction</strong>,
+                          down to very small amounts. The value is proportional —
+                          0.01 BTC is worth 1% of one Bitcoin.
+                        </InfoTip>
+                      </div>
+                    </div>
                   )}
+
                   <Button
                     onClick={() => setStep("confirm")}
                     disabled={!canProceed}
@@ -247,6 +307,7 @@ export function TradeSheet({ open, onOpenChange, holdings }: TradeSheetProps) {
               </>
             )}
 
+            {/* Step 4: Confirm */}
             {step === "confirm" && (
               <>
                 <SheetHeader className="px-0">
@@ -263,20 +324,15 @@ export function TradeSheet({ open, onOpenChange, holdings }: TradeSheetProps) {
                       <span className="font-semibold capitalize">{action}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-sm text-muted-foreground">Amount</span>
+                      <span className="text-sm text-muted-foreground">You spend</span>
                       <span className="font-semibold">${usdAmount.toFixed(2)}</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-sm text-muted-foreground">
-                        You&apos;ll {action === "buy" ? "get" : "return"}
+                        You {action === "buy" ? "receive" : "return"}
                       </span>
                       <span className="font-semibold">
-                        {cryptoAmount < 0.001
-                          ? cryptoAmount.toFixed(6)
-                          : cryptoAmount < 1
-                            ? cryptoAmount.toFixed(4)
-                            : cryptoAmount.toFixed(2)}{" "}
-                        {selectedAsset}
+                        {formatCrypto(cryptoAmount)} {selectedAsset}
                       </span>
                     </div>
                     <div className="flex justify-between">
@@ -297,8 +353,9 @@ export function TradeSheet({ open, onOpenChange, holdings }: TradeSheetProps) {
               </>
             )}
 
+            {/* Step 5: Success */}
             {step === "success" && (
-              <div className="flex flex-col items-center py-6">
+              <div className="flex flex-col items-center py-4">
                 <motion.div
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
@@ -311,11 +368,32 @@ export function TradeSheet({ open, onOpenChange, holdings }: TradeSheetProps) {
                   {action === "buy" ? "Purchase" : "Sale"} complete!
                 </h3>
                 <p className="mt-1 text-sm text-muted-foreground">
-                  Your practice portfolio has been updated
+                  Your practice portfolio has been updated.
                 </p>
+
+                {action === "buy" && (
+                  <div className="mt-4 w-full rounded-xl border border-border/60 bg-muted/40 px-4 py-3 text-xs text-muted-foreground leading-relaxed">
+                    💡 <strong className="text-foreground">What just happened?</strong>{" "}
+                    Some of your cash was exchanged for a fraction of{" "}
+                    {getName(selectedAsset)}. Its value will rise and fall with the
+                    market. Watch it in Your Holdings.
+                  </div>
+                )}
+
+                {learnLink && (
+                  <Link
+                    href={`/learn/${learnLink.lessonId}`}
+                    onClick={() => handleOpenChange(false)}
+                    className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl border border-border bg-card py-3 text-sm font-medium transition-colors hover:bg-muted"
+                  >
+                    <BookOpen className="h-4 w-4 text-primary" />
+                    {learnLink.label}
+                  </Link>
+                )}
+
                 <Button
                   onClick={() => handleOpenChange(false)}
-                  className="mt-6 h-12 w-full rounded-xl text-base font-semibold"
+                  className="mt-3 h-12 w-full rounded-xl text-base font-semibold"
                 >
                   Done
                 </Button>

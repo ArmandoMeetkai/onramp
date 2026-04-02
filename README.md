@@ -7,10 +7,12 @@ A beginner-friendly Progressive Web App for learning about cryptocurrency. Onram
 ## Features
 
 - **Decision Scenarios** — Explore real questions like "Should I buy Bitcoin?" with probability visualization, simulation sliders, and plain-language explanations
+- **Scenario Replay (Time Travel)** — Relive 5 real crypto events (Terra Luna crash, Bitcoin halving 2024, FTX collapse, Bitcoin ATH 2021, Ethereum Merge). Make decisions at the critical moment and see what would have happened to your money
 - **Practice Portfolio** — Buy and sell BTC, ETH, and SOL with $10,000 of simulated money. Real-time prices from CoinGecko
 - **Micro-Lessons** — 11 short lessons covering Bitcoin, blockchain, wallets, fees, DCA, and more
 - **AI Chat** — Ask anything about crypto. Powered by Claude API with guardrails to never give financial advice
 - **Confidence Score & Streaks** — Track your learning progress and build daily habits
+- **E2E Testing** — 59 Playwright tests covering all user flows end-to-end
 - **PWA** — Installable on mobile, works offline with cached data
 
 ## Tech Stack
@@ -52,7 +54,20 @@ Warm fintech aesthetic inspired by Headspace and Linear — not a crypto dashboa
 
 ## Architecture
 
-- **Client-side persistence** — All user data (profile, progress, portfolio, transactions) stored in IndexedDB via Dexie. No backend database needed.
+- **Client-side persistence** — All user data (profile, progress, portfolio, transactions, completed replays) stored in IndexedDB via Dexie. No backend database needed.
 - **Real-time prices** — CoinGecko API proxied through Next.js API routes with server-side caching (60s prices, 10min history). Falls back to mock data when offline or rate-limited.
 - **AI Chat** — Streaming responses via SSE from Claude API with a system prompt that prevents financial advice.
+- **Scenario Replay** — Hardcoded historical price data and real headlines for 5 events. Fully offline. Three-phase experience (setup, decision, outcome) with animated charts.
 - **PWA** — Service worker with stale-while-revalidate for static assets and network-first for API routes.
+
+## Testing
+
+```bash
+# Run all E2E tests
+npx playwright test
+
+# Run with UI
+npx playwright test --ui
+```
+
+59 Playwright E2E tests covering: onboarding, navigation, explore/scenarios, practice portfolio, learn/lessons, chat, profile, and scenario replay.

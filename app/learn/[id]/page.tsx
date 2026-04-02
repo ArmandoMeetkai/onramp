@@ -1,15 +1,16 @@
 "use client"
 
-import { use, useState, useCallback } from "react"
+import { use, useState, useCallback, useRef, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
-import { ArrowLeft, Check, BookOpen } from "lucide-react"
+import { ArrowLeft, Check, BookOpen, Clock, Sparkles } from "lucide-react"
 import { motion } from "framer-motion"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
+import { Progress } from "@/components/ui/progress"
 import { PageTransition } from "@/components/layout/PageTransition"
-import { getLessonById } from "@/data/lessons"
+import { getLessonById, lessons } from "@/data/lessons"
 import { getScenarioById } from "@/data/scenarios"
 import { useProgressStore } from "@/store/useProgressStore"
 
@@ -27,13 +28,34 @@ export default function LessonDetailPage({
 
   const isCompleted = progress?.lessonsCompleted.includes(id) ?? false
   const [justCompleted, setJustCompleted] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const mountedRef = useRef(true)
+
+  useEffect(() => {
+    return () => { mountedRef.current = false }
+  }, [])
+
+  const currentIndex = lessons.findIndex((l) => l.id === id)
+  const nextLesson = lessons[currentIndex + 1] ?? null
+  const lessonNumber = currentIndex + 1
+  const totalLessons = lessons.length
 
   const handleComplete = useCallback(async () => {
-    await completeLesson(id)
-    await updateStreak()
+    if (isSubmitting) return
+    setIsSubmitting(true)
     setJustCompleted(true)
-    setTimeout(() => { window.location.href = "/learn" }, 1500)
-  }, [id, completeLesson, updateStreak, router])
+
+    try {
+      await completeLesson(id)
+      await updateStreak()
+      setTimeout(() => router.push("/learn"), 1500)
+    } catch {
+      if (mountedRef.current) {
+        setIsSubmitting(false)
+        setJustCompleted(false)
+      }
+    }
+  }, [id, completeLesson, updateStreak, router, isSubmitting])
 
   if (!lesson) {
     return (
@@ -55,6 +77,8 @@ export default function LessonDetailPage({
     .map(getScenarioById)
     .filter(Boolean)
 
+  const paragraphs = lesson.content.split("\n\n")
+
   return (
     <PageTransition>
       <div className="py-4">
@@ -66,39 +90,70 @@ export default function LessonDetailPage({
           Back
         </button>
 
-        <div className="flex items-center gap-2">
-          <span className="text-3xl">{lesson.emoji}</span>
-          <div className="flex flex-wrap gap-2">
-            <Badge variant="secondary" className="rounded-md text-xs">
+        {/* Hero card */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3 }}
+          className="rounded-2xl border border-border bg-card p-6 text-center"
+        >
+          <span className="text-5xl">{lesson.emoji}</span>
+          <h1 className="mt-4 font-heading text-2xl font-bold tracking-tight leading-tight">
+            {lesson.title}
+          </h1>
+          <div className="mt-3 flex items-center justify-center gap-3 text-xs text-muted-foreground">
+            <span className="flex items-center gap-1">
+              <Clock className="h-3.5 w-3.5" />
               {lesson.duration}
-            </Badge>
-            <Badge variant="secondary" className="rounded-md text-xs">
+            </span>
+            <Badge variant="secondary" className="rounded-md px-2 py-0.5 text-[11px]">
               {lesson.difficulty === "beginner" ? "Beginner" : "Intermediate"}
             </Badge>
+            <span>Lesson {lessonNumber} of {totalLessons}</span>
           </div>
-        </div>
+          <div className="mt-4">
+            <Progress value={(lessonNumber / totalLessons) * 100} className="h-1" />
+          </div>
+        </motion.div>
 
-        <h1 className="mt-3 font-heading text-2xl font-bold tracking-tight leading-tight">
-          {lesson.title}
-        </h1>
-
-        <div className="mt-6 space-y-4 text-[16px] leading-[1.7] text-foreground/90">
-          {lesson.content.split("\n\n").map((paragraph, i) => (
-            <p key={i}>{paragraph}</p>
+        {/* Content */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.4, delay: 0.15 }}
+          className="mt-8 space-y-5"
+        >
+          {paragraphs.map((paragraph, i) => (
+            <p
+              key={i}
+              className="text-[15px] leading-[1.8] text-foreground/85"
+            >
+              {paragraph}
+            </p>
           ))}
-        </div>
+        </motion.div>
 
-        <div className="mt-8 rounded-2xl border border-primary/20 bg-secondary p-5">
-          <p className="text-sm font-semibold text-primary">Key Takeaway</p>
-          <p className="mt-1.5 text-sm leading-relaxed">{lesson.keyTakeaway}</p>
-        </div>
+        {/* Key takeaway */}
+        <motion.div
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3, delay: 0.3 }}
+          className="mt-8 rounded-2xl border border-primary/20 bg-primary/5 p-5"
+        >
+          <div className="flex items-center gap-2">
+            <Sparkles className="h-4 w-4 text-primary" />
+            <p className="text-sm font-semibold text-primary">Key Takeaway</p>
+          </div>
+          <p className="mt-2 text-sm leading-relaxed">{lesson.keyTakeaway}</p>
+        </motion.div>
 
+        {/* Related scenarios */}
         {relatedScenarios.length > 0 && (
           <>
-            <Separator className="my-6" />
+            <Separator className="my-8" />
             <div>
-              <p className="mb-3 text-sm font-semibold text-muted-foreground">
-                Related Scenarios
+              <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+                Try these scenarios
               </p>
               <div className="space-y-2">
                 {relatedScenarios.map((scenario) =>
@@ -106,9 +161,9 @@ export default function LessonDetailPage({
                     <Link
                       key={scenario.id}
                       href={`/scenario/${scenario.id}`}
-                      className="flex items-center gap-3 rounded-xl border border-border bg-card p-3 transition-all hover:border-primary/30"
+                      className="flex items-center gap-3 rounded-xl border border-border bg-card p-3 transition-all hover:border-primary/30 active:scale-[0.98]"
                     >
-                      <BookOpen className="h-4 w-4 text-muted-foreground" />
+                      <BookOpen className="h-4 w-4 text-primary" />
                       <span className="text-sm font-medium">{scenario.title}</span>
                     </Link>
                   ) : null
@@ -118,7 +173,8 @@ export default function LessonDetailPage({
           </>
         )}
 
-        <div className="mt-8">
+        {/* Completion area */}
+        <div className="mt-8 space-y-3">
           {justCompleted ? (
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
@@ -128,9 +184,7 @@ export default function LessonDetailPage({
               <div className="flex h-12 w-12 items-center justify-center rounded-full bg-success/20">
                 <Check className="h-6 w-6 text-success" />
               </div>
-              <p className="mt-3 font-semibold text-success">
-                Lesson complete!
-              </p>
+              <p className="mt-3 font-semibold text-success">Lesson complete!</p>
               <p className="mt-1 text-sm text-muted-foreground">
                 Great job — you are building real understanding.
               </p>
@@ -143,10 +197,37 @@ export default function LessonDetailPage({
           ) : (
             <Button
               onClick={handleComplete}
+              disabled={isSubmitting}
               className="h-12 w-full rounded-xl text-base font-semibold"
             >
-              Mark as Complete
+              {isSubmitting ? "Completing..." : "Mark as Complete"}
             </Button>
+          )}
+
+          {/* Next lesson navigation */}
+          {nextLesson ? (
+            <Link
+              href={`/learn/${nextLesson.id}`}
+              className="flex items-center justify-between rounded-xl border border-border bg-card px-4 py-3 transition-colors hover:border-primary/30 active:scale-[0.98]"
+            >
+              <div>
+                <p className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground">
+                  Next lesson
+                </p>
+                <p className="text-sm font-semibold">
+                  {nextLesson.emoji} {nextLesson.title}
+                </p>
+              </div>
+              <ArrowLeft className="h-4 w-4 rotate-180 text-muted-foreground" />
+            </Link>
+          ) : (
+            <Link
+              href="/learn"
+              className="flex items-center justify-center gap-2 rounded-xl border border-border bg-card py-3 text-sm font-medium transition-colors hover:border-primary/30"
+            >
+              <Check className="h-4 w-4 text-success" />
+              All lessons done — back to list
+            </Link>
           )}
         </div>
       </div>

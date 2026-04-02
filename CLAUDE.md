@@ -80,16 +80,16 @@ Warm fintech, not crypto-bro. Sage green + warm amber palette. Inter + DM Sans f
 ### Key features
 
 - Decision Cards with probability visualization and simulation slider
+- Scenario Replay ("Time Travel") — relive 5 real crypto events (Terra Luna crash, Bitcoin halving 2024, FTX collapse, Bitcoin ATH 2021, Ethereum Merge), make decisions at the critical moment, see animated outcomes
 - Practice Portfolio ($10k simulated, buy/sell BTC/ETH/SOL)
-- Micro-lessons (10+ beginner topics)
+- Micro-lessons (11 beginner topics)
 - AI Chat (Claude API, never gives financial advice)
-- Confidence Score + Streak system
+- Confidence Score + Streak system (replays contribute 4 points each)
 - CoinGecko API for real prices (with offline fallback)
+- E2E testing suite (59 Playwright tests)
 - PWA installable
 
 ### Build phases
-
-Full build instructions are in `PROMPT.md`. Execute one phase at a time:
 
 - **Phase 1**: Foundation, theming, Dexie, Zustand, layout, onboarding
 - **Phase 2**: Decision Cards, scenarios, simulation, explanation panels
@@ -97,5 +97,17 @@ Full build instructions are in `PROMPT.md`. Execute one phase at a time:
 - **Phase 4**: Learn section, AI Chat with Claude API, confidence/streak
 - **Phase 5**: CoinGecko API integration, price caching, offline fallback
 - **Phase 6**: PWA setup, dark mode audit, polish, loading/error/empty states, QA
+- **Phase 7**: Scenario Replay — Time Travel feature (5 historical events, animated charts, 3-phase replay experience, Dexie persistence)
+- **Phase 8**: E2E testing with Playwright (59 tests across all features)
 
 **After every phase**: run `bun run build` and fix all errors before proceeding.
+
+### Key files added in Phase 7-8
+
+- `/data/replayEvents.ts` — 5 historical events with hardcoded prices, headlines, outcomes
+- `/store/useReplayStore.ts` — Zustand store for replay session state
+- `/app/replay/page.tsx` — Replay hub with category filters
+- `/app/replay/[eventId]/page.tsx` — Full replay experience (intro → phases → decision → outcome)
+- `/components/replay/` — ReplayEventCard, ReplayTimeline, ReplayPriceChart, ReplayHeadlines, ReplayDecisionPanel, ReplayOutcomeReveal
+- `/e2e/` — Playwright test suites: onboarding, navigation, explore, practice, learn, chat, profile, replay
+- `playwright.config.ts` — Playwright config with Chromium, dev server auto-start

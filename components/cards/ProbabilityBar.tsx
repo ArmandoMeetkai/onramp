@@ -1,5 +1,7 @@
 "use client"
 
+import { InfoTip } from "@/components/shared/InfoTip"
+
 interface ProbabilityBarProps {
   up: number
   flat: number
@@ -9,9 +11,17 @@ interface ProbabilityBarProps {
 export function ProbabilityBar({ up, flat, down }: ProbabilityBarProps) {
   return (
     <div>
-      <p className="mb-3 text-sm font-semibold text-muted-foreground">
-        What people are seeing
-      </p>
+      <div className="mb-3 flex items-center gap-2">
+        <p className="text-sm font-semibold text-muted-foreground">
+          What people are seeing
+        </p>
+        <InfoTip>
+          Based on <strong className="text-foreground">historical data</strong> for
+          similar market conditions, this shows how often prices ended up higher, roughly
+          the same, or lower. It&apos;s not a prediction — past patterns don&apos;t
+          guarantee future results.
+        </InfoTip>
+      </div>
       <div className="flex h-3 overflow-hidden rounded-full">
         <div
           className="bg-success transition-all duration-500"
