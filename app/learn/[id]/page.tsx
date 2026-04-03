@@ -186,7 +186,7 @@ export default function LessonDetailPage({
               </div>
               <p className="mt-3 font-semibold text-success">Lesson complete!</p>
               <p className="mt-1 text-sm text-muted-foreground">
-                Great job — you are building real understanding.
+                Great job! You are building real understanding.
               </p>
             </motion.div>
           ) : isCompleted ? (
@@ -226,7 +226,7 @@ export default function LessonDetailPage({
               className="flex items-center justify-center gap-2 rounded-xl border border-border bg-card py-3 text-sm font-medium transition-colors hover:border-primary/30"
             >
               <Check className="h-4 w-4 text-success" />
-              All lessons done — back to list
+              All lessons done! Back to list
             </Link>
           )}
         </div>

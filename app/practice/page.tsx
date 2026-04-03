@@ -13,6 +13,7 @@ import { TransactionHistory } from "@/components/portfolio/TransactionHistory"
 import { PortfolioSummary } from "@/components/portfolio/PortfolioSummary"
 import { TradeSheet } from "@/components/portfolio/TradeSheet"
 import { DisclaimerBanner } from "@/components/shared/DisclaimerBanner"
+import { ReadyCTA } from "@/components/shared/ReadyCTA"
 import { InfoTip } from "@/components/shared/InfoTip"
 import { LearnChips } from "@/components/shared/LearnChips"
 import { cn } from "@/lib/utils"
@@ -137,7 +138,7 @@ export default function PracticePage() {
           <div className="mt-2 flex items-center justify-center gap-2 rounded-xl bg-muted px-3 py-2">
             <WifiOff className="h-3.5 w-3.5 text-muted-foreground" />
             <p className="text-xs text-muted-foreground">
-              Offline — showing last known prices
+              Offline. Showing last known prices
             </p>
           </div>
         )}
@@ -160,7 +161,7 @@ export default function PracticePage() {
             <p className="text-xs text-muted-foreground leading-relaxed">
               You start with <strong className="text-foreground">$10,000 in play money</strong>. 
               Buy and sell Bitcoin, Ethereum, or Solana to practice reading the market. 
-              Nothing here is real — experiment freely!
+              Nothing here is real. Experiment freely!
             </p>
           </motion.div>
         )}
@@ -175,8 +176,8 @@ export default function PracticePage() {
             </span>
             <InfoTip>
               <strong className="text-foreground">Total Value</strong> is the sum of your cash
-              plus the current worth of all the crypto you hold. It changes as prices move —
-              even when you don&apos;t buy or sell anything.
+              plus the current worth of all the crypto you hold. It changes as prices move.
+              Even when you don&apos;t buy or sell anything.
             </InfoTip>
           </div>
           <motion.p
@@ -231,7 +232,7 @@ export default function PracticePage() {
               <InfoTip>
                 These are <strong className="text-foreground">real market prices</strong> pulled
                 live from CoinGecko every minute. The % shows how much each coin&apos;s price
-                changed in the last 24 hours — red means it dropped, green means it rose.
+                changed in the last 24 hours. Red means it dropped, green means it rose.
                 Daily swings are normal.
               </InfoTip>
             </div>
@@ -367,8 +368,8 @@ export default function PracticePage() {
             <div className="rounded-2xl border border-border bg-card p-8 text-center">
               <p className="text-lg font-semibold">Ready to practice?</p>
               <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
-                Your practice portfolio is empty. Start by buying your first crypto —
-                it&apos;s just pretend money!
+                Your practice portfolio is empty. Start by buying your first crypto.
+                It&apos;s just pretend money!
               </p>
               <Button
                 onClick={() => setTradeOpen(true)}
@@ -392,6 +393,16 @@ export default function PracticePage() {
         <div className="mt-6">
           <LearnChips chips={PRACTICE_LEARN_CHIPS} heading="Not sure what any of this means?" />
         </div>
+
+        {totalValue > 10500 && (
+          <div className="mt-6">
+            <ReadyCTA
+              headline="You're getting good at this"
+              subtext="Your practice portfolio is in profit"
+              variant="subtle"
+            />
+          </div>
+        )}
 
         <DisclaimerBanner />
       </div>

@@ -105,7 +105,7 @@ test.describe("Scenario Replay — Time Travel", () => {
 
     // Completion
     await expect(
-      page.getByText("Replay complete — confidence score updated!")
+      page.getByText("Replay complete! Confidence score updated!")
     ).toBeVisible()
     await expect(page.getByText("Try another replay")).toBeVisible()
   })

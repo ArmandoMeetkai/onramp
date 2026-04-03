@@ -12,9 +12,9 @@ interface DecisionCardProps {
 }
 
 const assetColors: Record<string, string> = {
-  BTC: "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400",
-  ETH: "bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-400",
-  SOL: "bg-violet-100 text-violet-800 dark:bg-violet-900/30 dark:text-violet-400",
+  BTC: "bg-accent/15 text-accent",
+  ETH: "bg-primary/15 text-primary",
+  SOL: "bg-info/15 text-info",
 }
 
 export function DecisionCard({ scenario }: DecisionCardProps) {

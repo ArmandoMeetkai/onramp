@@ -65,7 +65,7 @@ export const scenarios: DecisionScenario[] = [
     },
     guidance: {
       conservative: "Consider starting with a very small amount you are completely comfortable losing. There is no rush to buy.",
-      moderate: "A small, regular purchase over time — sometimes called dollar-cost averaging — can reduce the impact of price swings.",
+      moderate: "A small, regular purchase over time (sometimes called dollar-cost averaging) can reduce the impact of price swings.",
       aggressive: "If you have done your research and understand the risks, buying during a dip can be an opportunity. But never invest more than you can afford to lose.",
     },
     socialProof: {
@@ -82,7 +82,7 @@ export const scenarios: DecisionScenario[] = [
     title: "Is Ethereum a good long-term choice?",
     subtitle: "Understanding the second-largest cryptocurrency",
     description:
-      "Ethereum is more than just a currency — it powers apps, contracts, and other tokens. Many people see it as a long-term technology bet, not just a price speculation.",
+      "Ethereum is more than just a currency. It powers apps, contracts, and other tokens. Many people see it as a long-term technology bet, not just a price speculation.",
     asset: "ETH",
     probability: { up: 50, flat: 20, down: 30 },
     simulationRange: { min: 10, max: 500, defaultAmount: 100 },
@@ -117,10 +117,10 @@ export const scenarios: DecisionScenario[] = [
   },
   {
     id: "market-dropped-15-percent",
-    title: "The market dropped 15% — should I panic?",
+    title: "The market dropped 15%. Should I panic?",
     subtitle: "What to do when prices fall sharply",
     description:
-      "Seeing your investment drop can feel scary. But in crypto, double-digit swings happen regularly. Understanding how to react — or not react — is one of the most important skills.",
+      "Seeing your investment drop can feel scary. But in crypto, double-digit swings happen regularly. Understanding how to react, or not react, is one of the most important skills.",
     asset: "BTC",
     probability: { up: 40, flat: 30, down: 30 },
     simulationRange: { min: 10, max: 500, defaultAmount: 100 },
@@ -136,7 +136,7 @@ export const scenarios: DecisionScenario[] = [
     },
     explanation: {
       whyUp: "Drops of 15% are common in crypto and often followed by recoveries. Many experienced investors see dips as buying opportunities.",
-      whyDown: "A 15% drop could signal deeper problems — like regulatory crackdowns or major exchange failures — that lead to further declines.",
+      whyDown: "A 15% drop could signal deeper problems, like regulatory crackdowns or major exchange failures, that lead to further declines.",
       whatToWatch: "Look at why the drop happened. Was it a single event, or part of a broader trend? Check if the overall market is falling or just specific coins.",
     },
     guidance: {
@@ -158,7 +158,7 @@ export const scenarios: DecisionScenario[] = [
     title: "Should I invest $50 or wait?",
     subtitle: "Starting small versus waiting for the right moment",
     description:
-      "Many beginners wait for the 'perfect' time to start. But research shows that time in the market often matters more than timing the market — especially with small amounts.",
+      "Many beginners wait for the 'perfect' time to start. But research shows that time in the market often matters more than timing the market, especially with small amounts.",
     asset: "BTC",
     probability: { up: 45, flat: 30, down: 25 },
     simulationRange: { min: 10, max: 500, defaultAmount: 50 },
@@ -169,7 +169,7 @@ export const scenarios: DecisionScenario[] = [
       },
       worstCase: {
         multiplier: 0.8,
-        description: "A 20% loss on $50 means losing $10. That is the cost of a coffee and a sandwich — a small price for learning.",
+        description: "A 20% loss on $50 means losing $10. That is the cost of a coffee and a sandwich, a small price for learning.",
       },
     },
     explanation: {
@@ -178,9 +178,9 @@ export const scenarios: DecisionScenario[] = [
       whatToWatch: "Focus less on the price and more on the learning experience. How does it feel to own crypto? What did you learn about the process?",
     },
     guidance: {
-      conservative: "Start with the minimum amount your platform allows. The goal is not to get rich — it is to learn how buying and holding crypto actually works.",
+      conservative: "Start with the minimum amount your platform allows. The goal is not to get rich. It is to learn how buying and holding crypto actually works.",
       moderate: "$50 is a reasonable starting point. Enough to feel real, small enough that a loss will not hurt. Consider it tuition for crypto education.",
-      aggressive: "If $50 feels too small to learn from, start with an amount that feels meaningful to you — but never more than you would be okay losing entirely.",
+      aggressive: "If $50 feels too small to learn from, start with an amount that feels meaningful to you, but never more than you would be okay losing entirely.",
     },
     socialProof: {
       usersWhoSimulated: 4102,
@@ -218,7 +218,7 @@ export const scenarios: DecisionScenario[] = [
     guidance: {
       conservative: "Solana is higher risk than Bitcoin or Ethereum. If you are new to crypto, consider learning about the larger coins first before exploring alternatives.",
       moderate: "If you want exposure to Solana, keep it as a small portion of your practice portfolio. Diversification reduces risk.",
-      aggressive: "Solana's speed and ecosystem growth make it an interesting bet. But be prepared for higher volatility — both up and down.",
+      aggressive: "Solana's speed and ecosystem growth make it an interesting bet. But be prepared for higher volatility, both up and down.",
     },
     socialProof: {
       usersWhoSimulated: 1876,
@@ -231,7 +231,7 @@ export const scenarios: DecisionScenario[] = [
   },
   {
     id: "everyone-talking-crypto",
-    title: "Everyone is talking about crypto — should I follow?",
+    title: "Everyone is talking about crypto. Should I follow?",
     subtitle: "Understanding social pressure and FOMO",
     description:
       "When everyone around you is excited about crypto, it can feel like you are missing out. But making decisions based on hype rather than understanding is one of the most common mistakes in investing.",
@@ -269,7 +269,7 @@ export const scenarios: DecisionScenario[] = [
   },
   {
     id: "have-200-where-to-start",
-    title: "I have $200 — where do I start?",
+    title: "I have $200. Where do I start?",
     subtitle: "Making the most of a small budget",
     description:
       "With $200, you have enough to learn meaningful lessons about crypto without taking on too much risk. The key is deciding how to split it and what to focus on.",
@@ -331,7 +331,7 @@ export const scenarios: DecisionScenario[] = [
     },
     guidance: {
       conservative: "DCA is perfect for conservative investors. Set up a small weekly purchase and forget about daily price movements.",
-      moderate: "Consider buying a fixed amount each week or month. It is boring, and that is exactly the point — boring strategies often work best.",
+      moderate: "Consider buying a fixed amount each week or month. It is boring, and that is exactly the point. Boring strategies often work best.",
       aggressive: "Even aggressive investors benefit from DCA. You can always add extra during significant dips while maintaining your regular schedule.",
     },
     socialProof: {

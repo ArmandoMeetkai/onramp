@@ -121,7 +121,7 @@ export default function ScenarioDetailPage({
               </Badge>
               <InfoTip>
                 These are <strong className="text-foreground">live prices</strong> from
-                CoinGecko. The % shows today&apos;s change — it doesn&apos;t affect the
+                CoinGecko. The % shows today&apos;s change. It doesn&apos;t affect the
                 simulation below, which is based on the scenario&apos;s historical conditions.
               </InfoTip>
             </div>

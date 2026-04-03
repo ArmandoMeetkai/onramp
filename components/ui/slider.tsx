@@ -100,7 +100,7 @@ function Slider({
         />
       </div>
       <div
-        className="absolute block size-4 rounded-full border border-ring bg-white shadow-sm ring-ring/50 transition-shadow hover:ring-4 focus-visible:ring-4"
+        className="absolute block size-4 rounded-full border border-ring bg-card shadow-sm ring-ring/50 transition-shadow hover:ring-4 focus-visible:ring-4"
         style={{ left: `calc(${percentage}% - 8px)` }}
       />
     </div>

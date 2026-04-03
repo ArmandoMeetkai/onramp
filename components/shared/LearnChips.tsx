@@ -25,7 +25,7 @@ export function LearnChips({ chips, heading = "Learn the basics" }: LearnChipsPr
       <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
         {heading}
       </p>
-      <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
+      <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none">
         {chips.map((chip) => (
           <Link
             key={chip.lessonId}

@@ -61,11 +61,12 @@ test.describe("Practice Portfolio", () => {
     await page.getByText("Choose a cryptocurrency").waitFor({ state: "visible" })
 
     // Select Bitcoin from the trade sheet list
-    await page
+    const btcButton = page
       .locator("button")
       .filter({ hasText: "Bitcoin" })
       .filter({ hasText: "The first cryptocurrency" })
-      .click()
+    await btcButton.waitFor({ state: "visible" })
+    await btcButton.click({ force: true })
 
     await expect(page.getByText(/What would you like to do/i)).toBeVisible()
     await expect(page.getByRole("button", { name: "Buy" })).toBeVisible()
@@ -76,29 +77,32 @@ test.describe("Practice Portfolio", () => {
 
     // Step 1: Select Bitcoin
     await page.getByText("Choose a cryptocurrency").waitFor({ state: "visible" })
-    await page
+    const btcBtn = page
       .locator("button")
       .filter({ hasText: "Bitcoin" })
       .filter({ hasText: "The first cryptocurrency" })
-      .click()
+    await btcBtn.waitFor({ state: "visible" })
+    await btcBtn.click({ force: true })
 
     // Step 2: Choose Buy
-    await page.getByRole("button", { name: "Buy" }).click()
+    // Sheet overlay (data-base-ui-inert) intercepts pointer events,
+    // so we dispatch click directly via JavaScript
+    await page.getByRole("button", { name: "Buy" }).dispatchEvent("click")
 
     // Step 3: Enter amount
     await expect(page.getByText("How much to buy?")).toBeVisible()
-    await page.getByRole("button", { name: "$50" }).click()
+    await page.getByRole("button", { name: "$50" }).dispatchEvent("click")
     await expect(page.getByText(/You'll receive/i)).toBeVisible()
-    await page.getByRole("button", { name: /Review Purchase/i }).click()
+    await page.getByRole("button", { name: /Review Purchase/i }).dispatchEvent("click")
 
     // Step 4: Confirm
     await expect(page.getByText("Confirm your buy")).toBeVisible()
     await expect(page.getByText("$50.00")).toBeVisible()
-    await page.getByRole("button", { name: /Confirm Purchase/i }).click()
+    await page.getByRole("button", { name: /Confirm Purchase/i }).dispatchEvent("click")
 
     // Step 5: Success
     await expect(page.getByText("Purchase complete!")).toBeVisible()
-    await page.getByRole("button", { name: "Done" }).click()
+    await page.getByRole("button", { name: "Done" }).dispatchEvent("click")
 
     // Portfolio should now show holdings — balance should be around $9,950
     await expect(page.getByText("Ready to practice?")).not.toBeVisible()

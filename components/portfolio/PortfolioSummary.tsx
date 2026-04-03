@@ -8,7 +8,7 @@ interface PortfolioSummaryProps {
 }
 
 function getLearningMessage(txCount: number): string {
-  if (txCount === 0) return "You haven't started yet. That's okay — there's no rush."
+  if (txCount === 0) return "You haven't started yet. That's okay. There's no rush."
   if (txCount <= 3) return "You're getting comfortable with the basics."
   return "You're building confidence. Keep exploring!"
 }

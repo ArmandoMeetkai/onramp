@@ -289,7 +289,7 @@ export function TradeSheet({ open, onOpenChange, holdings }: TradeSheetProps) {
                         <InfoTip>
                           You don&apos;t need to buy a whole Bitcoin or Ethereum.
                           You can own <strong className="text-foreground">any fraction</strong>,
-                          down to very small amounts. The value is proportional —
+                          down to very small amounts. The value is proportional.
                           0.01 BTC is worth 1% of one Bitcoin.
                         </InfoTip>
                       </div>

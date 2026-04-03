@@ -11,6 +11,7 @@ import { Separator } from "@/components/ui/separator"
 import { PageTransition } from "@/components/layout/PageTransition"
 import { DisclaimerBanner } from "@/components/shared/DisclaimerBanner"
 import { LearnChips } from "@/components/shared/LearnChips"
+import { ReadyCTA } from "@/components/shared/ReadyCTA"
 import { ReplayTimeline } from "@/components/replay/ReplayTimeline"
 import { ReplayPriceChart } from "@/components/replay/ReplayPriceChart"
 import { ReplayHeadlines } from "@/components/replay/ReplayHeadlines"
@@ -252,7 +253,7 @@ export default function ReplayDetailPage({
                 </h2>
                 <p className="text-xs text-muted-foreground">
                   {new Date(currentPhase.dateRange.start).toLocaleDateString("en-US", { month: "long", day: "numeric" })}
-                  {" – "}
+                  {" to "}
                   {new Date(currentPhase.dateRange.end).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}
                 </p>
               </div>
@@ -351,7 +352,7 @@ export default function ReplayDetailPage({
                   {/* Completion badge */}
                   <div className="flex items-center justify-center gap-2 rounded-xl bg-success/10 p-3 text-sm font-medium text-success">
                     <Check className="h-4 w-4" />
-                    Replay complete — confidence score updated!
+                    Replay complete! Confidence score updated!
                   </div>
 
                   {/* Related lessons */}
@@ -363,6 +364,12 @@ export default function ReplayDetailPage({
                   )}
 
                   {/* Next replay CTA */}
+                  <ReadyCTA
+                    headline="Feel ready? Take the next step"
+                    subtext="When you're ready to invest for real"
+                    variant="subtle"
+                  />
+
                   <Link
                     href="/replay"
                     className="flex items-center justify-center gap-2 rounded-xl border border-border bg-card py-3 text-sm font-medium transition-colors hover:border-primary/30"

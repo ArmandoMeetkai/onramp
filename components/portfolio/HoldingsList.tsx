@@ -42,7 +42,7 @@ export function HoldingsList({ holdings }: HoldingsListProps) {
           </h2>
           <InfoTip>
             <strong className="text-foreground">Holdings</strong> are the coins you currently
-            own. You can sell them at any time. Their value changes as market prices move —
+            own. You can sell them at any time. Their value changes as market prices move,
             even while you sleep.
           </InfoTip>
         </div>
@@ -120,7 +120,7 @@ export function HoldingsList({ holdings }: HoldingsListProps) {
                   <InfoTip>
                     <strong className="text-foreground">Average price paid</strong> is what
                     you paid per coin on average. If the current price is higher, you&apos;re
-                    in profit. If it&apos;s lower, you&apos;re at a loss — for now.
+                    in profit. If it&apos;s lower, you&apos;re at a loss, for now.
                   </InfoTip>
                 </div>
               </div>

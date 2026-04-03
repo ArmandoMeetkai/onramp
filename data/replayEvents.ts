@@ -54,7 +54,7 @@ export const replayEvents: ReplayEvent[] = [
   {
     id: "terra-luna-crash",
     title: "The Terra Luna Collapse",
-    subtitle: "May 2022 — When $40 billion vanished in 72 hours",
+    subtitle: "May 2022: When $40 billion vanished in 72 hours",
     asset: "LUNA",
     date: "May 9, 2022",
     category: "crash",
@@ -77,19 +77,19 @@ export const replayEvents: ReplayEvent[] = [
           },
           {
             source: "The Block",
-            text: "Whale moves $285M UST out of Anchor — Terra community unfazed",
+            text: "Whale moves $285M UST out of Anchor, but Terra community unfazed",
             timestamp: "2022-05-05",
             sentiment: "neutral",
           },
           {
             source: "Twitter",
-            text: "Do Kwon: 'By my hand, $DAI will die.' — confidence in Terra remains sky-high",
+            text: "Do Kwon: 'By my hand, $DAI will die.' Confidence in Terra remains sky-high",
             timestamp: "2022-05-06",
             sentiment: "bullish",
           },
         ],
         context:
-          "Terra's LUNA token sits at $80, and its stablecoin UST is supposedly pegged to $1. Anchor Protocol offers 20% APY on UST deposits — too good to be true? Large withdrawals are happening, but the Terra community dismisses concerns. You hold $100 worth of LUNA.",
+          "Terra's LUNA token sits at $80, and its stablecoin UST is supposedly pegged to $1. Anchor Protocol offers 20% APY on UST deposits. Too good to be true? Large withdrawals are happening, but the Terra community dismisses concerns. You hold $100 worth of LUNA.",
       },
       {
         id: "crisis",
@@ -161,7 +161,7 @@ export const replayEvents: ReplayEvent[] = [
           },
           {
             source: "CNBC",
-            text: "Crypto industry reels from Terra collapse — calls for regulation intensify",
+            text: "Crypto industry reels from Terra collapse as calls for regulation intensify",
             timestamp: "2022-05-16",
             sentiment: "neutral",
           },
@@ -178,7 +178,7 @@ export const replayEvents: ReplayEvent[] = [
           "If you bought $100 more at $64, you would have gotten ~1.56 LUNA. Within days, that was worth less than $0.001. Your total investment of $200 became essentially $0.",
         multiplier: 0.0,
         lessonsLearned: [
-          "Not every dip is a buying opportunity — some are the start of a collapse",
+          "Not every dip is a buying opportunity. Some are the start of a collapse",
           "Algorithmic stablecoins carry systemic risk that can wipe out an entire ecosystem",
           "When a project's fundamental mechanism (the peg) breaks, technical recovery is unlikely",
         ],
@@ -220,7 +220,7 @@ export const replayEvents: ReplayEvent[] = [
           "If you waited, you watched your $100 position fall to $0 over the next few days. By the time the dust settled, there was nothing left to act on.",
         multiplier: 0.0,
         lessonsLearned: [
-          "In a fast-moving crisis, inaction is itself a decision — and often the worst one",
+          "In a fast-moving crisis, inaction is itself a decision, and often the worst one",
           "Having a plan before a crisis hits is essential. Deciding during panic is too late",
           "Speed matters when systemic risk is unfolding",
         ],
@@ -237,14 +237,14 @@ export const replayEvents: ReplayEvent[] = [
   {
     id: "bitcoin-halving-2024",
     title: "The Bitcoin Halving",
-    subtitle: "April 2024 — When Bitcoin's supply got cut in half",
+    subtitle: "April 2024: When Bitcoin's supply got cut in half",
     asset: "BTC",
     date: "April 19, 2024",
     category: "milestone",
     difficulty: "beginner",
     coverEmoji: "⛏️",
     briefSummary:
-      "Every four years, Bitcoin's mining reward is cut in half. The 2024 halving reduced the reward from 6.25 to 3.125 BTC per block. Historically, halvings have preceded massive price increases — but would this time be different?",
+      "Every four years, Bitcoin's mining reward is cut in half. The 2024 halving reduced the reward from 6.25 to 3.125 BTC per block. Historically, halvings have preceded massive price increases, but would this time be different?",
     phases: [
       {
         id: "anticipation",
@@ -272,7 +272,7 @@ export const replayEvents: ReplayEvent[] = [
           },
         ],
         context:
-          "Bitcoin has been on a tear, hitting a new all-time high above $73,000 in March. Spot Bitcoin ETFs have been approved and are seeing massive inflows. Everyone is talking about the halving — the question is whether the anticipated price rise is already priced in. You have $100 worth of BTC.",
+          "Bitcoin has been on a tear, hitting a new all-time high above $73,000 in March. Spot Bitcoin ETFs have been approved and are seeing massive inflows. Everyone is talking about the halving, and the question is whether the anticipated price rise is already priced in. You have $100 worth of BTC.",
       },
       {
         id: "halving-day",
@@ -282,7 +282,7 @@ export const replayEvents: ReplayEvent[] = [
         headlines: [
           {
             source: "Reuters",
-            text: "Bitcoin halving complete — block reward now 3.125 BTC",
+            text: "Bitcoin halving complete: block reward now 3.125 BTC",
             timestamp: "2024-04-20",
             sentiment: "neutral",
           },
@@ -300,7 +300,7 @@ export const replayEvents: ReplayEvent[] = [
           },
         ],
         context:
-          "The halving has happened. Block rewards are now 3.125 BTC instead of 6.25. But the price hasn't exploded upward — in fact, it dipped slightly. Many retail investors expected an immediate moonshot. The market seems underwhelmed. Was it all just hype?",
+          "The halving has happened. Block rewards are now 3.125 BTC instead of 6.25. But the price hasn't exploded upward. In fact, it dipped slightly. Many retail investors expected an immediate moonshot. The market seems underwhelmed. Was it all just hype?",
         decisionPrompt:
           "It's April 22, 2024. The halving just happened but BTC dipped to $63K. What do you do with your $100 in Bitcoin?",
         decisionOptions: [
@@ -312,7 +312,7 @@ export const replayEvents: ReplayEvent[] = [
           },
           {
             id: "sell",
-            label: "Sell — it was priced in",
+            label: "Sell: it was priced in",
             emoji: "📉",
             rationale: "The market already rallied before the halving. The event is over, so is the hype.",
           },
@@ -344,7 +344,7 @@ export const replayEvents: ReplayEvent[] = [
           },
         ],
         context:
-          "After months of sideways movement and even a dip below $55K in the summer, Bitcoin eventually surged to over $90K by November 2024 — validating the historical pattern of post-halving rallies, but only for those with patience.",
+          "After months of sideways movement and even a dip below $55K in the summer, Bitcoin eventually surged to over $90K by November 2024, validating the historical pattern of post-halving rallies, but only for those with patience.",
       },
     ],
     outcomes: [
@@ -352,7 +352,7 @@ export const replayEvents: ReplayEvent[] = [
         decisionId: "buy",
         priceDataAfter: [57800, 60800, 67500, 62200, 59400, 57100, 64800, 68200, 63500, 58900, 54800, 57200, 60800, 63700, 68500, 71200, 69800, 72500, 90800, 96400],
         resultDescription:
-          "If you bought $100 more at $63K, your total $200 investment grew to about $306 by November when BTC hit $96K — a 53% gain. But you had to endure a summer dip below $55K first.",
+          "If you bought $100 more at $63K, your total $200 investment grew to about $306 by November when BTC hit $96K, a 53% gain. But you had to endure a summer dip below $55K first.",
         multiplier: 1.53,
         lessonsLearned: [
           "Halving effects are real but take months, not days, to play out",
@@ -360,13 +360,13 @@ export const replayEvents: ReplayEvent[] = [
           "You need emotional resilience to hold through dips after buying",
         ],
         expertNote:
-          "Dollar-cost averaging around the halving is what most experienced investors did. They didn't try to time the exact bottom — they spread their buying over weeks and months.",
+          "Dollar-cost averaging around the halving is what most experienced investors did. They didn't try to time the exact bottom. They spread their buying over weeks and months.",
       },
       {
         decisionId: "sell",
         priceDataAfter: [57800, 60800, 67500, 62200, 59400, 57100, 64800, 68200, 63500, 58900, 54800, 57200, 60800, 63700, 68500, 71200, 69800, 72500, 90800, 96400],
         resultDescription:
-          "If you sold at $63K, you locked in your $100. Meanwhile, BTC went on to hit $96K — a 53% gain you missed. Selling before a historically bullish event was premature.",
+          "If you sold at $63K, you locked in your $100. Meanwhile, BTC went on to hit $96K, a 53% gain you missed. Selling before a historically bullish event was premature.",
         multiplier: 1.0,
         lessonsLearned: [
           "Short-term thinking can cause you to miss long-term trends",
@@ -384,7 +384,7 @@ export const replayEvents: ReplayEvent[] = [
         multiplier: 1.53,
         lessonsLearned: [
           "Patience is often the most profitable strategy in crypto",
-          "Market cycles take months to unfold — not days or weeks",
+          "Market cycles take months to unfold, not days or weeks",
           "Having conviction based on fundamentals (supply reduction) can guide you through uncertainty",
         ],
         expertNote:
@@ -394,7 +394,7 @@ export const replayEvents: ReplayEvent[] = [
         decisionId: "wait",
         priceDataAfter: [57800, 60800, 67500, 62200, 59400, 57100, 64800, 68200, 63500, 58900, 54800, 57200, 60800, 63700, 68500, 71200, 69800, 72500, 90800, 96400],
         resultDescription:
-          "If you waited, you might have bought at $55K in the summer dip — turning $100 into about $175 by November. But only if you actually acted. Many waiters never find the 'perfect' entry and miss the move entirely.",
+          "If you waited, you might have bought at $55K in the summer dip, turning $100 into about $175 by November. But only if you actually acted. Many waiters never find the 'perfect' entry and miss the move entirely.",
         multiplier: 1.35,
         lessonsLearned: [
           "Waiting for a dip can work, but you need a plan for when to actually buy",
@@ -406,7 +406,7 @@ export const replayEvents: ReplayEvent[] = [
       },
     ],
     whatActuallyHappened:
-      "Bitcoin dropped slightly after the April 2024 halving, dipped to around $55K in the summer, then rallied to over $96K by late November. The pattern was consistent with previous halvings — a delayed but significant price increase driven by reduced supply and growing institutional demand through Bitcoin ETFs.",
+      "Bitcoin dropped slightly after the April 2024 halving, dipped to around $55K in the summer, then rallied to over $96K by late November. The pattern was consistent with previous halvings, with a delayed but significant price increase driven by reduced supply and growing institutional demand through Bitcoin ETFs.",
     tags: ["halving", "bitcoin", "supply", "milestone"],
     relatedLessonIds: ["what-is-bitcoin", "what-is-dca"],
     relatedScenarioIds: ["should-i-buy-bitcoin", "invest-50-or-wait"],
@@ -414,7 +414,7 @@ export const replayEvents: ReplayEvent[] = [
   {
     id: "ftx-collapse",
     title: "The FTX Collapse",
-    subtitle: "November 2022 — When the second-largest exchange imploded",
+    subtitle: "November 2022: When the second-largest exchange imploded",
     asset: "BTC",
     date: "November 8, 2022",
     category: "crash",
@@ -449,7 +449,7 @@ export const replayEvents: ReplayEvent[] = [
           },
         ],
         context:
-          "CoinDesk has published a bombshell report showing that Alameda Research's balance sheet is largely composed of FTT — the token created by FTX itself. It is uncomfortably circular. Then Binance CEO CZ tweets that he will dump all of Binance's FTT holdings. A bank run begins on FTX. Bitcoin is at $21K. You hold $100 in BTC on a non-FTX exchange.",
+          "CoinDesk has published a bombshell report showing that Alameda Research's balance sheet is largely composed of FTT, the token created by FTX itself. It is uncomfortably circular. Then Binance CEO CZ tweets that he will dump all of Binance's FTT holdings. A bank run begins on FTX. Bitcoin is at $21K. You hold $100 in BTC on a non-FTX exchange.",
       },
       {
         id: "bank-run",
@@ -471,13 +471,13 @@ export const replayEvents: ReplayEvent[] = [
           },
           {
             source: "CNBC",
-            text: "FTX files for bankruptcy — Sam Bankman-Fried resigns as CEO",
+            text: "FTX files for bankruptcy as Sam Bankman-Fried resigns as CEO",
             timestamp: "2022-11-11",
             sentiment: "bearish",
           },
         ],
         context:
-          "FTX has frozen withdrawals. $6 billion was requested in 72 hours — they do not have the money. Binance briefly offered to buy FTX but pulled out after seeing the books. FTX is filing for bankruptcy. The entire crypto market is in free fall. BTC drops from $21K to $15.6K.",
+          "FTX has frozen withdrawals. $6 billion was requested in 72 hours, and they do not have the money. Binance briefly offered to buy FTX but pulled out after seeing the books. FTX is filing for bankruptcy. The entire crypto market is in free fall. BTC drops from $21K to $15.6K.",
         decisionPrompt:
           "It's November 9, 2022. FTX is collapsing. Bitcoin has crashed to $17K. You hold $100 in BTC (on a different exchange). What do you do?",
         decisionOptions: [
@@ -527,7 +527,7 @@ export const replayEvents: ReplayEvent[] = [
           },
         ],
         context:
-          "FTX's collapse sent shockwaves through crypto. Multiple firms with FTX exposure went bankrupt. But Bitcoin itself continued to function perfectly — not a single block was missed. By early 2023, BTC had recovered to $25K, and by late 2024 it would hit all-time highs above $90K.",
+          "FTX's collapse sent shockwaves through crypto. Multiple firms with FTX exposure went bankrupt. But Bitcoin itself continued to function perfectly, and not a single block was missed. By early 2023, BTC had recovered to $25K, and by late 2024 it would hit all-time highs above $90K.",
       },
     ],
     outcomes: [
@@ -538,12 +538,12 @@ export const replayEvents: ReplayEvent[] = [
           "If you bought $100 more at $17K, your total $200 grew to about $295 by March 2023. By late 2024, it would be worth over $1,100. Buying during maximum fear was extremely profitable.",
         multiplier: 1.48,
         lessonsLearned: [
-          "Distinguish between a company failing and a technology failing — FTX broke, not Bitcoin",
+          "Distinguish between a company failing and a technology failing. FTX broke, not Bitcoin",
           "Maximum fear often creates maximum opportunity (for those with cash and conviction)",
           "Understanding what you own and why helps you act rationally during panic",
         ],
         expertNote:
-          "Warren Buffett's famous advice — 'Be fearful when others are greedy, and greedy when others are fearful' — applied perfectly here. Bitcoin's fundamentals were unchanged by FTX's fraud.",
+          "Warren Buffett's famous advice, 'Be fearful when others are greedy, and greedy when others are fearful,' applied perfectly here. Bitcoin's fundamentals were unchanged by FTX's fraud.",
       },
       {
         decisionId: "sell",
@@ -557,7 +557,7 @@ export const replayEvents: ReplayEvent[] = [
           "Self-custody and diversified exchange usage reduce contagion risk",
         ],
         expertNote:
-          "The lesson of FTX wasn't 'sell crypto' — it was 'don't trust centralized exchanges with all your funds.' Those who held BTC in self-custody wallets were completely unaffected.",
+          "The lesson of FTX wasn't 'sell crypto.' It was 'don't trust centralized exchanges with all your funds.' Those who held BTC in self-custody wallets were completely unaffected.",
       },
       {
         decisionId: "hold",
@@ -566,7 +566,7 @@ export const replayEvents: ReplayEvent[] = [
           "If you held through the storm, your $100 initially dropped to about $74, but recovered to about $120 by March 2023. By late 2024, it would be worth over $450. Patience won.",
         multiplier: 1.2,
         lessonsLearned: [
-          "Bitcoin has survived every crisis thrown at it — including the collapse of major exchanges",
+          "Bitcoin has survived every crisis thrown at it, including the collapse of major exchanges",
           "Short-term pain does not negate long-term thesis",
           "Having a plan before a crisis makes it easier to hold through one",
         ],
@@ -577,11 +577,11 @@ export const replayEvents: ReplayEvent[] = [
         decisionId: "wait",
         priceDataAfter: [17200, 16500, 16800, 16600, 16700, 17100, 17600, 19800, 21500, 23000, 24200, 25100],
         resultDescription:
-          "If you waited, you might have bought near the bottom around $16.5K in late November — turning $100 into about $152 by March 2023. Good entry, but waiting also risked missing the recovery entirely.",
+          "If you waited, you might have bought near the bottom around $16.5K in late November, turning $100 into about $152 by March 2023. Good entry, but waiting also risked missing the recovery entirely.",
         multiplier: 1.2,
         lessonsLearned: [
           "Waiting can work if you have a plan and follow through",
-          "The bottom is only obvious in hindsight — it never feels like the bottom at the time",
+          "The bottom is only obvious in hindsight. It never feels like the bottom at the time",
           "Dollar-cost averaging removes the stress of trying to time the perfect entry",
         ],
         expertNote:
@@ -597,14 +597,14 @@ export const replayEvents: ReplayEvent[] = [
   {
     id: "bitcoin-ath-2021",
     title: "Bitcoin's All-Time High",
-    subtitle: "November 2021 — The peak of the bull run",
+    subtitle: "November 2021: The peak of the bull run",
     asset: "BTC",
     date: "November 10, 2021",
     category: "milestone",
     difficulty: "beginner",
     coverEmoji: "🎢",
     briefSummary:
-      "Bitcoin hit $69,000 on November 10, 2021 — a new all-time high fueled by institutional adoption, Coinbase's IPO, and El Salvador making it legal tender. But what came next was a brutal 18-month crash to $15,500.",
+      "Bitcoin hit $69,000 on November 10, 2021, a new all-time high fueled by institutional adoption, Coinbase's IPO, and El Salvador making it legal tender. But what came next was a brutal 18-month crash to $15,500.",
     phases: [
       {
         id: "euphoria",
@@ -626,7 +626,7 @@ export const replayEvents: ReplayEvent[] = [
           },
           {
             source: "Twitter",
-            text: "Plan B stock-to-flow model predicts $98K Bitcoin by December — never been wrong before",
+            text: "Plan B stock-to-flow model predicts $98K Bitcoin by December, and it has never been wrong before",
             timestamp: "2021-11-05",
             sentiment: "bullish",
           },
@@ -642,13 +642,13 @@ export const replayEvents: ReplayEvent[] = [
         headlines: [
           {
             source: "CoinDesk",
-            text: "Bitcoin pulls back from $69K — analysts call it 'healthy consolidation'",
+            text: "Bitcoin pulls back from $69K as analysts call it 'healthy consolidation'",
             timestamp: "2021-11-12",
             sentiment: "neutral",
           },
           {
             source: "The Block",
-            text: "Leverage in crypto markets reaches all-time highs — danger of cascading liquidations",
+            text: "Leverage in crypto markets reaches all-time highs, raising danger of cascading liquidations",
             timestamp: "2021-11-18",
             sentiment: "bearish",
           },
@@ -666,7 +666,7 @@ export const replayEvents: ReplayEvent[] = [
         decisionOptions: [
           {
             id: "buy",
-            label: "Buy more — $100K is coming",
+            label: "Buy more: $100K is coming",
             emoji: "🚀",
             rationale: "Every dip in this bull run has been a buying opportunity. Why would this be different?",
           },
@@ -698,7 +698,7 @@ export const replayEvents: ReplayEvent[] = [
         headlines: [
           {
             source: "CNBC",
-            text: "Bitcoin crashes below $35K — down 50% from November high",
+            text: "Bitcoin crashes below $35K, down 50% from November high",
             timestamp: "2022-01-22",
             sentiment: "bearish",
           },
@@ -710,7 +710,7 @@ export const replayEvents: ReplayEvent[] = [
           },
         ],
         context:
-          "What followed the $69K high was an 18-month decline. Fed rate hikes, the Terra/Luna collapse, and leveraged positions unwinding drove BTC from $69K all the way down to $15,500 by November 2022. The $100K prediction never materialized — at least not in this cycle.",
+          "What followed the $69K high was an 18-month decline. Fed rate hikes, the Terra/Luna collapse, and leveraged positions unwinding drove BTC from $69K all the way down to $15,500 by November 2022. The $100K prediction never materialized, at least not in this cycle.",
       },
     ],
     outcomes: [
@@ -718,7 +718,7 @@ export const replayEvents: ReplayEvent[] = [
         decisionId: "buy",
         priceDataAfter: [63200, 54200, 49500, 46200, 42500, 37600, 38200, 35400, 30100, 28800, 20100, 19800],
         resultDescription:
-          "If you bought $100 more at $63K, your total $200 dropped to about $63 by June 2022 — a 68% loss. Buying at the top of euphoria is one of the most expensive mistakes in investing.",
+          "If you bought $100 more at $63K, your total $200 dropped to about $63 by June 2022, a 68% loss. Buying at the top of euphoria is one of the most expensive mistakes in investing.",
         multiplier: 0.32,
         lessonsLearned: [
           "When 'everyone' is buying and predictions are wildly optimistic, extreme caution is warranted",
@@ -726,7 +726,7 @@ export const replayEvents: ReplayEvent[] = [
           "Extreme bullish consensus often marks the top, not the beginning, of a rally",
         ],
         expertNote:
-          "The 'taxi driver indicator' — when people who never discuss markets start giving crypto tips — has historically been a reliable sign of a market top. Professional traders call this 'distribution phase.'",
+          "The 'taxi driver indicator,' when people who never discuss markets start giving crypto tips, has historically been a reliable sign of a market top. Professional traders call this 'distribution phase.'",
       },
       {
         decisionId: "sell",
@@ -735,7 +735,7 @@ export const replayEvents: ReplayEvent[] = [
           "If you sold at $63K, you locked in your $100. While BTC dropped 70% over the next year, your money was safe. This was one of the few times selling was clearly the right call.",
         multiplier: 1.0,
         lessonsLearned: [
-          "Taking profits is not the same as giving up — it is risk management",
+          "Taking profits is not the same as giving up. It is risk management",
           "Nobody went broke by taking profits",
           "Recognizing euphoria and choosing to act on caution takes courage",
         ],
@@ -746,15 +746,15 @@ export const replayEvents: ReplayEvent[] = [
         decisionId: "hold",
         priceDataAfter: [63200, 54200, 49500, 46200, 42500, 37600, 38200, 35400, 30100, 28800, 20100, 19800],
         resultDescription:
-          "If you held, your $100 dropped to about $31 by June 2022. It did eventually recover — BTC hit $90K+ by late 2024 — but it took 3 years. The emotional toll of watching 70% of your investment disappear was enormous.",
+          "If you held, your $100 dropped to about $31 by June 2022. It did eventually recover, and BTC hit $90K+ by late 2024, but it took 3 years. The emotional toll of watching 70% of your investment disappear was enormous.",
         multiplier: 0.31,
         lessonsLearned: [
           "Holding works long-term, but the psychological cost of a 70% drawdown is brutal",
-          "Models and predictions are not guarantees — the stock-to-flow model was wrong",
+          "Models and predictions are not guarantees. The stock-to-flow model was wrong",
           "Having a time horizon matters: 3 years to recovery is long for most people",
         ],
         expertNote:
-          "Long-term holders who bought at the 2017 peak ($20K) also saw a 84% crash before eventual recovery. If you believe in the long-term thesis and can handle the drawdown, holding works — but it requires genuine conviction, not hope.",
+          "Long-term holders who bought at the 2017 peak ($20K) also saw a 84% crash before eventual recovery. If you believe in the long-term thesis and can handle the drawdown, holding works, but it requires genuine conviction, not hope.",
       },
       {
         decisionId: "wait",
@@ -764,7 +764,7 @@ export const replayEvents: ReplayEvent[] = [
         multiplier: 0.31,
         lessonsLearned: [
           "Macro factors (interest rates, Fed policy) significantly affect crypto prices",
-          "Waiting is sometimes the best decision — especially when red flags are emerging",
+          "Waiting is sometimes the best decision, especially when red flags are emerging",
           "Not every opportunity requires action. Sometimes the best trade is no trade",
         ],
         expertNote:
@@ -780,14 +780,14 @@ export const replayEvents: ReplayEvent[] = [
   {
     id: "ethereum-merge",
     title: "The Ethereum Merge",
-    subtitle: "September 2022 — The biggest upgrade in crypto history",
+    subtitle: "September 2022: The biggest upgrade in crypto history",
     asset: "ETH",
     date: "September 15, 2022",
     category: "event",
     difficulty: "intermediate",
     coverEmoji: "🔀",
     briefSummary:
-      "Ethereum transitioned from Proof of Work to Proof of Stake — eliminating 99.95% of its energy use. It was the most complex live upgrade in blockchain history. But what happened to ETH's price surprised many.",
+      "Ethereum transitioned from Proof of Work to Proof of Stake, eliminating 99.95% of its energy use. It was the most complex live upgrade in blockchain history. But what happened to ETH's price surprised many.",
     phases: [
       {
         id: "buildup",
@@ -797,7 +797,7 @@ export const replayEvents: ReplayEvent[] = [
         headlines: [
           {
             source: "Ethereum Foundation",
-            text: "The Merge is confirmed for September 15 — Ethereum moves to Proof of Stake",
+            text: "The Merge is confirmed for September 15 as Ethereum moves to Proof of Stake",
             timestamp: "2022-08-11",
             sentiment: "bullish",
           },
@@ -825,7 +825,7 @@ export const replayEvents: ReplayEvent[] = [
         headlines: [
           {
             source: "Reuters",
-            text: "Ethereum Merge complete — network transitions to Proof of Stake successfully",
+            text: "Ethereum Merge complete: network transitions to Proof of Stake successfully",
             timestamp: "2022-09-15",
             sentiment: "bullish",
           },
@@ -843,31 +843,31 @@ export const replayEvents: ReplayEvent[] = [
           },
         ],
         context:
-          "The Merge was a technical success — not a single transaction was lost. But ETH dropped 15% in the week following the upgrade. The macro environment (Fed rate hikes, rising inflation) overshadowed the technical achievement. Many retail investors who bought for the Merge are now underwater.",
+          "The Merge was a technical success, and not a single transaction was lost. But ETH dropped 15% in the week following the upgrade. The macro environment (Fed rate hikes, rising inflation) overshadowed the technical achievement. Many retail investors who bought for the Merge are now underwater.",
         decisionPrompt:
           "It's September 17, 2022. The Merge was successful, but ETH dropped 15% to $1,330. Was it 'buy the rumor, sell the news' or is this a buying opportunity?",
         decisionOptions: [
           {
             id: "buy",
-            label: "Buy — the tech upgrade matters",
+            label: "Buy: the tech upgrade matters",
             emoji: "💡",
             rationale: "The Merge was the most important upgrade ever. The market will catch up to the fundamentals.",
           },
           {
             id: "sell",
-            label: "Sell — classic sell the news",
+            label: "Sell: classic sell the news",
             emoji: "📰",
             rationale: "The Merge was priced in. ETH rallied 90% before it. The hype is over.",
           },
           {
             id: "hold",
-            label: "Hold — focus on long term",
+            label: "Hold: focus on long term",
             emoji: "🧊",
             rationale: "One week of price action means nothing. Proof of Stake makes ETH fundamentally stronger.",
           },
           {
             id: "wait",
-            label: "Wait — macro is too uncertain",
+            label: "Wait: macro is too uncertain",
             emoji: "📊",
             rationale: "The Fed is raising rates aggressively. Wait until macro conditions improve.",
           },
@@ -893,7 +893,7 @@ export const replayEvents: ReplayEvent[] = [
           },
         ],
         context:
-          "ETH continued to decline through October-November 2022 (FTX collapse dragged everything down), hitting lows around $1,100. But by April 2023, ETH had recovered to $2,100. The Merge's benefits — reduced energy use, lower issuance, staking yield — gradually attracted institutional interest.",
+          "ETH continued to decline through October-November 2022 (FTX collapse dragged everything down), hitting lows around $1,100. But by April 2023, ETH had recovered to $2,100. The Merge's benefits, including reduced energy use, lower issuance, and staking yield, gradually attracted institutional interest.",
       },
     ],
     outcomes: [
@@ -904,18 +904,18 @@ export const replayEvents: ReplayEvent[] = [
           "If you bought $100 more at $1,330, your total $200 grew to about $316 by April 2023. The fundamentals eventually won, but you had to endure further drops first (ETH hit $1,100 in November).",
         multiplier: 1.58,
         lessonsLearned: [
-          "Fundamental improvements do eventually affect price — but timing is unpredictable",
+          "Fundamental improvements do eventually affect price, but timing is unpredictable",
           "Buying after a 'sell the news' dip on a genuinely positive event can be profitable",
           "You need conviction and patience when the market disagrees with your thesis",
         ],
         expertNote:
-          "The Merge was a genuine technological leap — reducing Ethereum's energy consumption by 99.95%. Investors who understood the technical significance bought the dip, while traders who only followed price action sold.",
+          "The Merge was a genuine technological leap, reducing Ethereum's energy consumption by 99.95%. Investors who understood the technical significance bought the dip, while traders who only followed price action sold.",
       },
       {
         decisionId: "sell",
         priceDataAfter: [1330, 1280, 1210, 1260, 1580, 1660, 1720, 1920, 2100],
         resultDescription:
-          "If you sold at $1,330, you locked in about $84 of your original $100 (an 16% loss from when ETH was at ~$1,590). ETH did drop further to $1,100, but then recovered to $2,100 — gains you missed.",
+          "If you sold at $1,330, you locked in about $84 of your original $100 (an 16% loss from when ETH was at ~$1,590). ETH did drop further to $1,100, but then recovered to $2,100, which means gains you missed.",
         multiplier: 0.84,
         lessonsLearned: [
           "'Buy the rumor, sell the news' is a real pattern, but it does not mean the news is bad",
@@ -929,7 +929,7 @@ export const replayEvents: ReplayEvent[] = [
         decisionId: "hold",
         priceDataAfter: [1330, 1280, 1210, 1260, 1580, 1660, 1720, 1920, 2100],
         resultDescription:
-          "If you held your $100, it dropped to about $69 in November 2022 (FTX crash), but recovered to about $132 by April 2023. Holding through the noise worked — but required nerves of steel.",
+          "If you held your $100, it dropped to about $69 in November 2022 (FTX crash), but recovered to about $132 by April 2023. Holding through the noise worked, but required nerves of steel.",
         multiplier: 1.32,
         lessonsLearned: [
           "Focusing on fundamentals over price action is the hallmark of experienced investors",
@@ -943,11 +943,11 @@ export const replayEvents: ReplayEvent[] = [
         decisionId: "wait",
         priceDataAfter: [1330, 1280, 1210, 1260, 1580, 1660, 1720, 1920, 2100],
         resultDescription:
-          "If you waited, you could have bought at $1,100 in November 2022 — turning $100 into about $191 by April 2023. The macro concern was valid; waiting for better conditions paid off.",
+          "If you waited, you could have bought at $1,100 in November 2022, turning $100 into about $191 by April 2023. The macro concern was valid; waiting for better conditions paid off.",
         multiplier: 1.5,
         lessonsLearned: [
           "Macro conditions (interest rates, Fed policy) matter more than any single event",
-          "Sometimes the best strategy is patience — even when others are acting",
+          "Sometimes the best strategy is patience, even when others are acting",
           "Understanding the broader economic context helps you make better crypto decisions",
         ],
         expertNote:
@@ -955,7 +955,7 @@ export const replayEvents: ReplayEvent[] = [
       },
     ],
     whatActuallyHappened:
-      "The Merge was executed flawlessly on September 15, 2022. ETH dropped 15% in the following week — a textbook 'sell the news' event. The broader market continued declining due to macro headwinds and the FTX collapse in November. ETH hit a low of about $1,100 before recovering to $2,100 by April 2023 and eventually surpassing $3,500 in 2024.",
+      "The Merge was executed flawlessly on September 15, 2022. ETH dropped 15% in the following week, a textbook 'sell the news' event. The broader market continued declining due to macro headwinds and the FTX collapse in November. ETH hit a low of about $1,100 before recovering to $2,100 by April 2023 and eventually surpassing $3,500 in 2024.",
     tags: ["event", "ethereum", "merge", "proof-of-stake", "upgrade"],
     relatedLessonIds: ["what-is-ethereum", "what-are-fees"],
     relatedScenarioIds: ["is-ethereum-good-long-term"],

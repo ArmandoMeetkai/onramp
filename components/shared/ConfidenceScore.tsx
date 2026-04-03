@@ -16,7 +16,7 @@ function getLabel(score: number): string {
 
 function getEncouragement(score: number): string {
   if (score === 0) return "Explore a scenario or complete a lesson to get started"
-  if (score <= 20) return "You're taking your first steps — that's what matters"
+  if (score <= 20) return "You're taking your first steps. That's what matters"
   if (score <= 40) return "Keep going, you're building a solid foundation"
   if (score <= 60) return "You're making great progress"
   if (score <= 80) return "You're well on your way to understanding crypto"

@@ -75,7 +75,7 @@ Next.js 15+ (App Router) · TypeScript strict · Tailwind CSS 4 · shadcn/ui · 
 
 ### UI direction
 
-Warm fintech, not crypto-bro. Sage green + warm amber palette. Inter + DM Sans fonts. Generous whitespace. Soft shadows. Rounded corners (12-16px). Dark-first design. References: Headspace, Linear, Duolingo.
+Warm fintech, not crypto-bro. Forest green (`oklch(0.45 0.1 155)`) + burnt amber (`oklch(0.65 0.1 45)`) palette. All colors centralized in `app/globals.css` using oklch color space with semantic tokens — zero hardcoded colors in components. Inter + DM Sans fonts. Generous whitespace. Soft shadows. Rounded corners (12-16px). Dark-first design. References: Wise, Headspace, Linear.
 
 ### Key features
 
@@ -86,6 +86,7 @@ Warm fintech, not crypto-bro. Sage green + warm amber palette. Inter + DM Sans f
 - AI Chat (Claude API, never gives financial advice)
 - Confidence Score + Streak system (replays contribute 4 points each)
 - CoinGecko API for real prices (with offline fallback)
+- "Ready to make it real?" waitlist page + contextual CTAs (monetization funnel)
 - E2E testing suite (59 Playwright tests)
 - PWA installable
 
@@ -99,15 +100,19 @@ Warm fintech, not crypto-bro. Sage green + warm amber palette. Inter + DM Sans f
 - **Phase 6**: PWA setup, dark mode audit, polish, loading/error/empty states, QA
 - **Phase 7**: Scenario Replay — Time Travel feature (5 historical events, animated charts, 3-phase replay experience, Dexie persistence)
 - **Phase 8**: E2E testing with Playwright (59 tests across all features)
+- **Phase 9**: "Ready to make it real?" waitlist page, contextual CTAs, palette upgrade (Forest + Amber), em dash cleanup, styling audit
 
 **After every phase**: run `bun run build` and fix all errors before proceeding.
 
-### Key files added in Phase 7-8
+### Key files added in Phase 7-9
 
 - `/data/replayEvents.ts` — 5 historical events with hardcoded prices, headlines, outcomes
 - `/store/useReplayStore.ts` — Zustand store for replay session state
 - `/app/replay/page.tsx` — Replay hub with category filters
 - `/app/replay/[eventId]/page.tsx` — Full replay experience (intro → phases → decision → outcome)
 - `/components/replay/` — ReplayEventCard, ReplayTimeline, ReplayPriceChart, ReplayHeadlines, ReplayDecisionPanel, ReplayOutcomeReveal
+- `/app/ready/page.tsx` — Waitlist landing page with animated SVG hero, email capture (localStorage), user progress display
+- `/components/ready/ReadyHero.tsx` — Animated SVG illustration (3 coins rising with Framer Motion)
+- `/components/shared/ReadyCTA.tsx` — Reusable CTA component with `default` and `subtle` variants. Appears contextually: Home (confidence >= 60), Replay (after completion), Practice (portfolio in profit), Profile (always visible)
 - `/e2e/` — Playwright test suites: onboarding, navigation, explore, practice, learn, chat, profile, replay
 - `playwright.config.ts` — Playwright config with Chromium, dev server auto-start

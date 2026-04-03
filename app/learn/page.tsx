@@ -49,7 +49,7 @@ export default function LearnPage() {
                 </p>
                 <p className="text-xs text-muted-foreground">
                   {completedCount === 0
-                    ? "Pick your first lesson — each takes about 2 minutes"
+                    ? "Pick your first lesson. Each takes about 2 minutes"
                     : completedCount === totalCount
                       ? "You've completed every lesson. Amazing!"
                       : `${totalCount - completedCount} lessons remaining`}

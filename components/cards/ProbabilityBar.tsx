@@ -18,7 +18,7 @@ export function ProbabilityBar({ up, flat, down }: ProbabilityBarProps) {
         <InfoTip>
           Based on <strong className="text-foreground">historical data</strong> for
           similar market conditions, this shows how often prices ended up higher, roughly
-          the same, or lower. It&apos;s not a prediction — past patterns don&apos;t
+          the same, or lower. It&apos;s not a prediction. Past patterns don&apos;t
           guarantee future results.
         </InfoTip>
       </div>

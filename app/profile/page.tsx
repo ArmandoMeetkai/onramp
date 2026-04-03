@@ -3,6 +3,7 @@
 import { User } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
+import { ReadyCTA } from "@/components/shared/ReadyCTA"
 import { PageTransition } from "@/components/layout/PageTransition"
 import { ConfidenceScore } from "@/components/shared/ConfidenceScore"
 import { StreakBadge } from "@/components/shared/StreakBadge"
@@ -100,7 +101,13 @@ export default function ProfilePage() {
 
         <Separator className="my-6" />
 
-        <p className="text-center text-xs text-muted-foreground">
+        <ReadyCTA
+          headline="When you're ready"
+          subtext="Take the next step toward real investing"
+          variant="subtle"
+        />
+
+        <p className="mt-6 text-center text-xs text-muted-foreground">
           Member since {new Date(profile.createdAt).toLocaleDateString("en-US", {
             month: "long",
             year: "numeric",

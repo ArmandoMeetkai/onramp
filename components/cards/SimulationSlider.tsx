@@ -44,7 +44,7 @@ export function SimulationSlider({ scenario, onSimulate }: SimulationSliderProps
         <InfoTip>
           This <strong className="text-foreground">simulation</strong> shows what could
           happen to your money based on the best and worst historical outcomes for this
-          type of scenario. It&apos;s not a prediction — it&apos;s a way to feel the
+          type of scenario. It&apos;s not a prediction. It&apos;s a way to feel the
           range of possibilities before risking anything real.
         </InfoTip>
       </div>

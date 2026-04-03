@@ -8,6 +8,7 @@ import { useProgressStore } from "@/store/useProgressStore"
 import { ConfidenceScore } from "@/components/shared/ConfidenceScore"
 import { StreakBadge } from "@/components/shared/StreakBadge"
 import { DisclaimerBanner } from "@/components/shared/DisclaimerBanner"
+import { ReadyCTA } from "@/components/shared/ReadyCTA"
 
 function getGreeting(name: string): string {
   const hour = new Date().getHours()
@@ -21,7 +22,7 @@ function getGreeting(name: string): string {
 function getSubgreeting(): string {
   const messages = [
     "Ready to learn something new?",
-    "Take your time — there's no rush.",
+    "Take your time. There's no rush.",
     "Every small step builds confidence.",
     "Curiosity is your superpower.",
   ]
@@ -111,6 +112,15 @@ export function HomeContent() {
           </motion.div>
         ))}
       </div>
+
+      {(progress?.confidenceScore ?? 0) >= 60 && (
+        <div className="mt-8">
+          <ReadyCTA
+            headline="Ready to make it real?"
+            subtext="You've built real understanding. Take the next step."
+          />
+        </div>
+      )}
 
       <DisclaimerBanner />
     </motion.div>
