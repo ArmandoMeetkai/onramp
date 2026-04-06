@@ -36,13 +36,13 @@ export default function ReplayHubPage() {
           Relive real crypto events. Make the call. See what happened.
         </p>
 
-        <div className="mt-5 flex gap-2 overflow-x-auto pb-1 scrollbar-none">
+        <div className="mt-5 flex flex-wrap gap-2">
           {filters.map((filter) => (
             <button
               key={filter.value}
               onClick={() => setActiveFilter(filter.value)}
               className={cn(
-                "shrink-0 rounded-full px-4 py-2 text-sm font-medium transition-colors",
+                "rounded-full px-4 py-2 text-sm font-medium transition-colors",
                 activeFilter === filter.value
                   ? "bg-primary text-primary-foreground"
                   : "bg-muted text-muted-foreground hover:text-foreground"
