@@ -19,6 +19,7 @@ const starterQuestions = [
 export default function ChatPage() {
   const messages = useChatStore((s) => s.messages)
   const isLoading = useChatStore((s) => s.isLoading)
+  const abortRequest = useChatStore((s) => s.abortRequest)
   const addUserMessage = useChatStore((s) => s.addUserMessage)
   const streamAssistantMessage = useChatStore((s) => s.streamAssistantMessage)
   const profile = useUserStore((s) => s.profile)
@@ -65,6 +66,9 @@ export default function ChatPage() {
         <div
           ref={scrollRef}
           className="flex-1 overflow-y-auto space-y-3 pb-3"
+          aria-live="polite"
+          aria-relevant="additions"
+          role="log"
         >
           {messages.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full space-y-6 py-8">
@@ -96,7 +100,7 @@ export default function ChatPage() {
         </div>
 
         <div className="pt-2">
-          <ChatInput onSend={handleSend} disabled={isLoading} />
+          <ChatInput onSend={handleSend} onStop={abortRequest} disabled={isLoading} />
         </div>
       </div>
     </PageTransition>

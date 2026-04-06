@@ -10,10 +10,11 @@ interface LessonCardProps {
   lesson: Lesson
   isCompleted: boolean
   isNext: boolean
+  isFirstTime: boolean
   lessonNumber: number
 }
 
-export function LessonCard({ lesson, isCompleted, isNext, lessonNumber }: LessonCardProps) {
+export function LessonCard({ lesson, isCompleted, isNext, isFirstTime, lessonNumber }: LessonCardProps) {
   return (
     <Link
       href={`/learn/${lesson.id}`}
@@ -47,7 +48,9 @@ export function LessonCard({ lesson, isCompleted, isNext, lessonNumber }: Lesson
             {lesson.difficulty === "beginner" ? "Beginner" : "Intermediate"}
           </Badge>
           {isNext && !isCompleted && (
-            <Badge className="rounded-md px-1.5 py-0 text-[10px]">Up next</Badge>
+            <Badge className="rounded-md px-1.5 py-0 text-[10px]">
+              {isFirstTime ? "Start here" : "Up next"}
+            </Badge>
           )}
         </div>
       </div>

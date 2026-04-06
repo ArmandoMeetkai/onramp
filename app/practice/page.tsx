@@ -12,6 +12,7 @@ import { HoldingsList } from "@/components/portfolio/HoldingsList"
 import { TransactionHistory } from "@/components/portfolio/TransactionHistory"
 import { PortfolioSummary } from "@/components/portfolio/PortfolioSummary"
 import { TradeSheet } from "@/components/portfolio/TradeSheet"
+import { EmptyState } from "@/components/shared/EmptyState"
 import { DisclaimerBanner } from "@/components/shared/DisclaimerBanner"
 import { ReadyCTA } from "@/components/shared/ReadyCTA"
 import { InfoTip } from "@/components/shared/InfoTip"
@@ -21,12 +22,6 @@ import { CoinIcon } from "@/components/shared/CoinIcon"
 import { usePortfolioStore } from "@/store/usePortfolioStore"
 import { useUserStore } from "@/store/useUserStore"
 import { usePriceStore } from "@/store/usePriceStore"
-
-const ASSET_NAMES: Record<string, string> = {
-  BTC: "Bitcoin",
-  ETH: "Ethereum",
-  SOL: "Solana",
-}
 
 const ASSET_TAGLINES: Record<string, string> = {
   BTC: "Digital gold. Max supply: 21 million coins.",
@@ -64,6 +59,7 @@ export default function PracticePage() {
   const isStale = usePriceStore((s) => s.isStale)
   const fetchPrices = usePriceStore((s) => s.fetchPrices)
   const fetchSparklines = usePriceStore((s) => s.fetchSparklines)
+  const getName = usePriceStore((s) => s.getName)
 
   useEffect(() => {
     if (profile && !portfolio) {
@@ -76,12 +72,25 @@ export default function PracticePage() {
     fetchSparklines()
 
     // Prices: every 60s — sparklines: every 5min (historical data changes slowly)
-    const priceInterval = setInterval(fetchPrices, 60_000)
-    const sparklineInterval = setInterval(fetchSparklines, 5 * 60_000)
+    let priceInterval = setInterval(fetchPrices, 60_000)
+    let sparklineInterval = setInterval(fetchSparklines, 5 * 60_000)
 
+    function handleVisibility() {
+      if (document.hidden) {
+        clearInterval(priceInterval)
+        clearInterval(sparklineInterval)
+      } else {
+        fetchPrices()
+        priceInterval = setInterval(fetchPrices, 60_000)
+        sparklineInterval = setInterval(fetchSparklines, 5 * 60_000)
+      }
+    }
+
+    document.addEventListener("visibilitychange", handleVisibility)
     return () => {
       clearInterval(priceInterval)
       clearInterval(sparklineInterval)
+      document.removeEventListener("visibilitychange", handleVisibility)
     }
   }, [fetchPrices, fetchSparklines])
 
@@ -104,7 +113,7 @@ export default function PracticePage() {
     if (!portfolio) return []
     return portfolio.holdings.map((h) => ({
       asset: h.asset,
-      name: ASSET_NAMES[h.asset] ?? h.asset,
+      name: getName(h.asset),
       value: h.amount * (prices[h.asset]?.price ?? 0),
     }))
   }, [portfolio, prices])
@@ -269,7 +278,7 @@ export default function PracticePage() {
                 >
                   <CoinIcon symbol={symbol} size="sm" className="mb-1.5" />
                   <p className="text-[10px] font-medium text-muted-foreground leading-none">
-                    {ASSET_NAMES[symbol]}
+                    {getName(symbol)}
                   </p>
                   <p className={cn("text-[10px] font-bold leading-none mt-0.5", isSelected ? "text-primary" : "text-muted-foreground")}>
                     {symbol}
@@ -317,7 +326,7 @@ export default function PracticePage() {
                   {/* Header */}
                   <div className="mb-3 flex items-start justify-between">
                     <div>
-                      <p className="text-sm font-semibold">{ASSET_NAMES[selectedCoin]}</p>
+                      <p className="text-sm font-semibold">{getName(selectedCoin)}</p>
                       <p className="text-xs text-muted-foreground">Last 7 days · real market price</p>
                     </div>
                     <div className="text-right">
@@ -336,8 +345,8 @@ export default function PracticePage() {
                   {/* Contextual note */}
                   <p className="mt-1 text-center text-[11px] text-muted-foreground">
                     {isUp
-                      ? `${ASSET_NAMES[selectedCoin]} is up this week — prices still change daily.`
-                      : `${ASSET_NAMES[selectedCoin]} dropped this week — volatility is normal in crypto.`}
+                      ? `${getName(selectedCoin)} is up this week — prices still change daily.`
+                      : `${getName(selectedCoin)} dropped this week — volatility is normal in crypto.`}
                   </p>
                 </motion.div>
               )
@@ -365,19 +374,18 @@ export default function PracticePage() {
               </Button>
             </div>
           ) : (
-            <div className="rounded-2xl border border-border bg-card p-8 text-center">
-              <p className="text-lg font-semibold">Ready to practice?</p>
-              <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
-                Your practice portfolio is empty. Start by buying your first crypto.
-                It&apos;s just pretend money!
-              </p>
-              <Button
-                onClick={() => setTradeOpen(true)}
-                className="mt-4 h-12 rounded-xl px-8 text-base font-semibold"
-              >
-                Start Practicing
-              </Button>
-            </div>
+            <EmptyState
+              title="Ready to practice?"
+              description="Your practice portfolio is empty. Start by buying your first crypto. It's just pretend money!"
+              action={
+                <Button
+                  onClick={() => setTradeOpen(true)}
+                  className="h-12 rounded-xl px-8 text-base font-semibold"
+                >
+                  Start Practicing
+                </Button>
+              }
+            />
           )}
         </div>
 

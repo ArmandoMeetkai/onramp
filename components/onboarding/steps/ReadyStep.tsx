@@ -1,5 +1,6 @@
 "use client"
 
+import { useEffect } from "react"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 
@@ -25,6 +26,18 @@ const riskLabels: Record<string, string> = {
 }
 
 export function ReadyStep({ name, experienceLevel, riskStyle, onComplete, onBack }: ReadyStepProps) {
+  useEffect(() => {
+    function handleKeyDown(e: KeyboardEvent) {
+      if (e.key === "Enter") {
+        onComplete()
+      } else if (e.key === "Backspace") {
+        onBack()
+      }
+    }
+    window.addEventListener("keydown", handleKeyDown)
+    return () => window.removeEventListener("keydown", handleKeyDown)
+  }, [onComplete, onBack])
+
   return (
     <div className="flex flex-col items-center text-center">
       <div className="mb-2 text-4xl">✨</div>

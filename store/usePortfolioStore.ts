@@ -16,15 +16,23 @@ export const usePortfolioStore = create<PortfolioState>((set, get) => ({
   portfolio: null,
 
   hydrate: async (userId) => {
-    const portfolio = await db.portfolios.get(userId)
-    set({ portfolio: portfolio ?? null })
+    try {
+      const portfolio = await db.portfolios.get(userId)
+      set({ portfolio: portfolio ?? null })
+    } catch {
+      set({ portfolio: null })
+    }
   },
 
   initializePortfolio: async (userId) => {
-    const existing = await db.portfolios.get(userId)
-    if (existing) {
-      set({ portfolio: existing })
-      return
+    try {
+      const existing = await db.portfolios.get(userId)
+      if (existing) {
+        set({ portfolio: existing })
+        return
+      }
+    } catch {
+      // continue to create default
     }
     const portfolio: PracticePortfolio = {
       userId,
@@ -32,8 +40,12 @@ export const usePortfolioStore = create<PortfolioState>((set, get) => ({
       holdings: [],
       transactions: [],
     }
-    await db.portfolios.put(portfolio)
     set({ portfolio })
+    try {
+      await db.portfolios.put(portfolio)
+    } catch {
+      console.error("Failed to persist initial portfolio")
+    }
   },
 
   buy: async (asset, usdAmount) => {
@@ -77,8 +89,12 @@ export const usePortfolioStore = create<PortfolioState>((set, get) => ({
       transactions: [transaction, ...current.transactions],
     }
 
-    await db.portfolios.put(updated)
     set({ portfolio: updated })
+    try {
+      await db.portfolios.put(updated)
+    } catch {
+      console.error("Failed to persist buy transaction")
+    }
     return true
   },
 
@@ -126,8 +142,12 @@ export const usePortfolioStore = create<PortfolioState>((set, get) => ({
       transactions: [transaction, ...current.transactions],
     }
 
-    await db.portfolios.put(updated)
     set({ portfolio: updated })
+    try {
+      await db.portfolios.put(updated)
+    } catch {
+      console.error("Failed to persist sell transaction")
+    }
     return true
   },
 }))

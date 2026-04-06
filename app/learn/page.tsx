@@ -74,6 +74,7 @@ export default function LearnPage() {
                 lesson={lesson}
                 isCompleted={completedIds.includes(lesson.id)}
                 isNext={lesson.id === nextLessonId}
+                isFirstTime={completedCount === 0}
                 lessonNumber={index + 1}
               />
             </motion.div>

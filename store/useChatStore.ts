@@ -9,16 +9,19 @@ export interface ChatMessage {
 interface ChatState {
   messages: ChatMessage[]
   isLoading: boolean
+  abortController: AbortController | null
   addUserMessage: (content: string) => void
   streamAssistantMessage: (
     userProfile: { experienceLevel: string; riskStyle: string }
   ) => Promise<void>
+  abortRequest: () => void
   clearMessages: () => void
 }
 
 export const useChatStore = create<ChatState>((set, get) => ({
   messages: [],
   isLoading: false,
+  abortController: null,
 
   addUserMessage: (content) => {
     const message: ChatMessage = {
@@ -30,7 +33,10 @@ export const useChatStore = create<ChatState>((set, get) => ({
   },
 
   streamAssistantMessage: async (userProfile) => {
-    set({ isLoading: true })
+    const controller = new AbortController()
+    const timeoutId = setTimeout(() => controller.abort(), 30_000)
+
+    set({ isLoading: true, abortController: controller })
 
     const assistantMessage: ChatMessage = {
       id: crypto.randomUUID(),
@@ -49,6 +55,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ messages: apiMessages, userProfile }),
+        signal: controller.signal,
       })
 
       if (!response.ok || !response.body) {
@@ -84,27 +91,37 @@ export const useChatStore = create<ChatState>((set, get) => ({
                 ),
               }))
             }
-          } catch {
-            // skip unparseable lines
+          } catch (e) {
+            if (e instanceof SyntaxError) continue
+            throw e
           }
         }
       }
-    } catch {
+    } catch (e) {
+      const isAbort = e instanceof DOMException && e.name === "AbortError"
       set((state) => ({
         messages: state.messages.map((m) =>
           m.id === assistantMessage.id
             ? {
                 ...m,
-                content:
-                  "I'm having trouble connecting right now. Please try again in a moment.",
+                content: m.content || (isAbort
+                  ? "Request cancelled."
+                  : "I'm having trouble connecting right now. Please try again in a moment."),
               }
             : m
         ),
       }))
     } finally {
-      set({ isLoading: false })
+      clearTimeout(timeoutId)
+      set({ isLoading: false, abortController: null })
     }
   },
 
-  clearMessages: () => set({ messages: [], isLoading: false }),
+  abortRequest: () => {
+    const controller = get().abortController
+    if (controller) controller.abort()
+    set({ isLoading: false, abortController: null })
+  },
+
+  clearMessages: () => set({ messages: [], isLoading: false, abortController: null }),
 }))

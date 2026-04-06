@@ -8,23 +8,29 @@ import { useReplayStore } from "@/store/useReplayStore"
 
 export function useHydration() {
   const [isReady, setIsReady] = useState(false)
+  const [error, setError] = useState<string | null>(null)
   const hydrateUser = useUserStore((s) => s.hydrate)
 
   useEffect(() => {
     async function hydrate() {
-      await hydrateUser()
-      const profile = useUserStore.getState().profile
-      if (profile) {
-        await Promise.all([
-          useProgressStore.getState().hydrate(profile.id),
-          usePortfolioStore.getState().hydrate(profile.id),
-          useReplayStore.getState().hydrate(profile.id),
-        ])
+      try {
+        await hydrateUser()
+        const profile = useUserStore.getState().profile
+        if (profile) {
+          await Promise.all([
+            useProgressStore.getState().hydrate(profile.id),
+            usePortfolioStore.getState().hydrate(profile.id),
+            useReplayStore.getState().hydrate(profile.id),
+          ])
+        }
+      } catch {
+        setError("Unable to load your data. Storage may be unavailable.")
+      } finally {
+        setIsReady(true)
       }
-      setIsReady(true)
     }
     hydrate()
   }, [hydrateUser])
 
-  return isReady
+  return { isReady, error }
 }

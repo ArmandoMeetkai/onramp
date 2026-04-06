@@ -1,5 +1,6 @@
 "use client"
 
+import { useEffect } from "react"
 import { cn } from "@/lib/utils"
 import type { UserProfile } from "@/lib/db"
 
@@ -20,16 +21,35 @@ interface ExperienceStepProps {
 }
 
 export function ExperienceStep({ selected, onSelect, onNext, onBack }: ExperienceStepProps) {
+  useEffect(() => {
+    function handleKeyDown(e: KeyboardEvent) {
+      if (e.key === "Enter" && selected) {
+        onNext()
+      } else if (e.key === "Backspace") {
+        onBack()
+      } else {
+        const num = Number(e.key)
+        if (num >= 1 && num <= options.length) {
+          onSelect(options[num - 1].value)
+        }
+      }
+    }
+    window.addEventListener("keydown", handleKeyDown)
+    return () => window.removeEventListener("keydown", handleKeyDown)
+  }, [selected, onNext, onBack, onSelect])
+
   return (
     <div className="flex flex-col items-center text-center">
       <h1 className="font-heading text-2xl font-bold tracking-tight">
         How familiar are you with crypto?
       </h1>
       <p className="mt-2 text-muted-foreground">No wrong answers here</p>
-      <div className="mt-6 w-full space-y-3">
+      <div className="mt-6 w-full space-y-3" role="radiogroup" aria-label="Experience level">
         {options.map((option) => (
           <button
             key={option.value}
+            role="radio"
+            aria-checked={selected === option.value}
             onClick={() => onSelect(option.value)}
             className={cn(
               "w-full rounded-2xl border-2 p-4 text-left transition-all duration-200",

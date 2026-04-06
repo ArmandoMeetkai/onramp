@@ -63,8 +63,6 @@ export const useReplayStore = create<ReplayState>((set, get) => ({
       completedAt: new Date(),
     }
 
-    await db.completedReplays.put(entry)
-
     const alreadyCompleted = completedReplays.some(
       (r) => r.eventId === activeEventId
     )
@@ -78,6 +76,12 @@ export const useReplayStore = create<ReplayState>((set, get) => ({
           )
         : [...completedReplays, entry],
     })
+
+    try {
+      await db.completedReplays.put(entry)
+    } catch {
+      console.error("Failed to persist replay completion")
+    }
   },
 
   resetReplay: () => {
@@ -91,11 +95,15 @@ export const useReplayStore = create<ReplayState>((set, get) => ({
   },
 
   hydrate: async (userId) => {
-    const entries = await db.completedReplays
-      .where("userId")
-      .equals(userId)
-      .toArray()
-    set({ completedReplays: entries })
+    try {
+      const entries = await db.completedReplays
+        .where("userId")
+        .equals(userId)
+        .toArray()
+      set({ completedReplays: entries })
+    } catch {
+      set({ completedReplays: [] })
+    }
   },
 
   isEventCompleted: (eventId) => {

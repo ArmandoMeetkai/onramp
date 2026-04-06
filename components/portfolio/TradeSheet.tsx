@@ -140,7 +140,7 @@ export function TradeSheet({ open, onOpenChange, holdings }: TradeSheetProps) {
 
   return (
     <Sheet open={open} onOpenChange={handleOpenChange}>
-      <SheetContent side="bottom" className="rounded-t-3xl px-5 pb-8 pt-4" showCloseButton={false}>
+      <SheetContent side="bottom" className="rounded-t-3xl px-5 pb-8 pt-4">
         {step !== "asset" && step !== "success" && (
           <button
             onClick={goBack}
@@ -251,10 +251,15 @@ export function TradeSheet({ open, onOpenChange, holdings }: TradeSheetProps) {
                       $
                     </span>
                     <Input
-                      type="number"
+                      type="text"
+                      inputMode="decimal"
+                      pattern="[0-9]*\.?[0-9]*"
                       placeholder="0"
                       value={amount}
-                      onChange={(e) => setAmount(e.target.value)}
+                      onChange={(e) => {
+                        const v = e.target.value
+                        if (v === "" || /^\d*\.?\d*$/.test(v)) setAmount(v)
+                      }}
                       className="h-14 rounded-xl pl-8 text-center text-2xl font-bold"
                       autoFocus
                     />

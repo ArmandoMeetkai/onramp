@@ -37,15 +37,23 @@ export const useProgressStore = create<ProgressState>((set, get) => ({
   progress: null,
 
   hydrate: async (userId) => {
-    const progress = await db.progress.get(userId)
-    set({ progress: progress ?? null })
+    try {
+      const progress = await db.progress.get(userId)
+      set({ progress: progress ?? null })
+    } catch {
+      set({ progress: null })
+    }
   },
 
   initializeProgress: async (userId) => {
-    const existing = await db.progress.get(userId)
-    if (existing) {
-      set({ progress: existing })
-      return
+    try {
+      const existing = await db.progress.get(userId)
+      if (existing) {
+        set({ progress: existing })
+        return
+      }
+    } catch {
+      // continue to create default
     }
     const progress: UserProgress = {
       userId,
@@ -58,8 +66,12 @@ export const useProgressStore = create<ProgressState>((set, get) => ({
       confidenceScore: 0,
       lessonsCompleted: [],
     }
-    await db.progress.put(progress)
     set({ progress })
+    try {
+      await db.progress.put(progress)
+    } catch {
+      console.error("Failed to persist initial progress")
+    }
   },
 
   incrementCardsViewed: async () => {
@@ -70,8 +82,12 @@ export const useProgressStore = create<ProgressState>((set, get) => ({
       cardsViewed: current.cardsViewed + 1,
     }
     updated.confidenceScore = calculateConfidence(updated)
-    await db.progress.put(updated)
     set({ progress: updated })
+    try {
+      await db.progress.put(updated)
+    } catch {
+      console.error("Failed to persist progress update")
+    }
   },
 
   incrementSimulationsRun: async () => {
@@ -82,8 +98,12 @@ export const useProgressStore = create<ProgressState>((set, get) => ({
       simulationsRun: current.simulationsRun + 1,
     }
     updated.confidenceScore = calculateConfidence(updated)
-    await db.progress.put(updated)
     set({ progress: updated })
+    try {
+      await db.progress.put(updated)
+    } catch {
+      console.error("Failed to persist progress update")
+    }
   },
 
   incrementExplanationsOpened: async () => {
@@ -94,8 +114,12 @@ export const useProgressStore = create<ProgressState>((set, get) => ({
       explanationsOpened: current.explanationsOpened + 1,
     }
     updated.confidenceScore = calculateConfidence(updated)
-    await db.progress.put(updated)
     set({ progress: updated })
+    try {
+      await db.progress.put(updated)
+    } catch {
+      console.error("Failed to persist progress update")
+    }
   },
 
   completeLesson: async (lessonId) => {
@@ -107,8 +131,12 @@ export const useProgressStore = create<ProgressState>((set, get) => ({
       lessonsCompleted: [...current.lessonsCompleted, lessonId],
     }
     updated.confidenceScore = calculateConfidence(updated)
-    await db.progress.put(updated)
     set({ progress: updated })
+    try {
+      await db.progress.put(updated)
+    } catch {
+      console.error("Failed to persist lesson completion")
+    }
   },
 
   incrementReplaysCompleted: async () => {
@@ -119,8 +147,12 @@ export const useProgressStore = create<ProgressState>((set, get) => ({
       replaysCompleted: (current.replaysCompleted ?? 0) + 1,
     }
     updated.confidenceScore = calculateConfidence(updated)
-    await db.progress.put(updated)
     set({ progress: updated })
+    try {
+      await db.progress.put(updated)
+    } catch {
+      console.error("Failed to persist progress update")
+    }
   },
 
   updateStreak: async () => {
@@ -136,7 +168,11 @@ export const useProgressStore = create<ProgressState>((set, get) => ({
         : 1
 
     const updated = { ...current, streakDays, lastStreakDate: today }
-    await db.progress.put(updated)
     set({ progress: updated })
+    try {
+      await db.progress.put(updated)
+    } catch {
+      console.error("Failed to persist streak update")
+    }
   },
 }))

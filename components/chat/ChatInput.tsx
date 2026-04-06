@@ -1,15 +1,16 @@
 "use client"
 
 import { useState, useCallback } from "react"
-import { Send } from "lucide-react"
+import { Send, Square } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 interface ChatInputProps {
   onSend: (message: string) => void
+  onStop: () => void
   disabled: boolean
 }
 
-export function ChatInput({ onSend, disabled }: ChatInputProps) {
+export function ChatInput({ onSend, onStop, disabled }: ChatInputProps) {
   const [value, setValue] = useState("")
 
   const handleSubmit = useCallback(() => {
@@ -20,32 +21,43 @@ export function ChatInput({ onSend, disabled }: ChatInputProps) {
   }, [value, disabled, onSend])
 
   return (
-    <div className="flex items-end gap-2">
+    <form
+      onSubmit={(e) => {
+        e.preventDefault()
+        handleSubmit()
+      }}
+      className="flex items-end gap-2"
+    >
       <input
         type="text"
         value={value}
         onChange={(e) => setValue(e.target.value)}
-        onKeyDown={(e) => {
-          if (e.key === "Enter" && !e.shiftKey) {
-            e.preventDefault()
-            handleSubmit()
-          }
-        }}
         placeholder="Ask anything about crypto..."
         disabled={disabled}
         className="flex-1 rounded-xl border border-border bg-card px-4 py-3 text-sm outline-none transition-colors placeholder:text-muted-foreground focus:border-primary disabled:opacity-50"
       />
-      <button
-        onClick={handleSubmit}
-        disabled={disabled || !value.trim()}
-        className={cn(
-          "flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary text-primary-foreground transition-opacity",
-          (disabled || !value.trim()) && "opacity-40"
-        )}
-        aria-label="Send message"
-      >
-        <Send className="h-4 w-4" />
-      </button>
-    </div>
+      {disabled ? (
+        <button
+          type="button"
+          onClick={onStop}
+          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-destructive text-destructive-foreground transition-opacity"
+          aria-label="Stop generating"
+        >
+          <Square className="h-4 w-4" />
+        </button>
+      ) : (
+        <button
+          type="submit"
+          disabled={!value.trim()}
+          className={cn(
+            "flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary text-primary-foreground transition-opacity",
+            !value.trim() && "opacity-40"
+          )}
+          aria-label="Send message"
+        >
+          <Send className="h-4 w-4" />
+        </button>
+      )}
+    </form>
   )
 }
