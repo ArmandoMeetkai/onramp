@@ -6,8 +6,6 @@ import { Plus, RefreshCw, WifiOff } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import { PageTransition } from "@/components/layout/PageTransition"
-import { Sparkline } from "@/components/portfolio/Sparkline"
-import { PriceChart } from "@/components/portfolio/PriceChart"
 import { CoinChartPanel } from "@/components/portfolio/CoinChartPanel"
 import { HoldingsList } from "@/components/portfolio/HoldingsList"
 import { TransactionHistory } from "@/components/portfolio/TransactionHistory"
@@ -117,8 +115,18 @@ export default function PracticePage() {
   if (!portfolio) {
     return (
       <PageTransition>
-        <div className="flex items-center justify-center py-20">
-          <div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+        <div className="py-6 space-y-4">
+          <div className="h-7 w-48 animate-pulse rounded-lg bg-muted" />
+          <div className="h-10 animate-pulse rounded-xl bg-muted" />
+          <div className="mt-6 flex flex-col items-center gap-2">
+            <div className="h-4 w-24 animate-pulse rounded bg-muted" />
+            <div className="h-10 w-40 animate-pulse rounded-lg bg-muted" />
+          </div>
+          <div className="grid grid-cols-3 gap-2 mt-5">
+            <div className="h-28 animate-pulse rounded-2xl bg-muted" />
+            <div className="h-28 animate-pulse rounded-2xl bg-muted" />
+            <div className="h-28 animate-pulse rounded-2xl bg-muted" />
+          </div>
         </div>
       </PageTransition>
     )

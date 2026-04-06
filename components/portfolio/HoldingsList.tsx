@@ -11,12 +11,6 @@ interface HoldingsListProps {
   holdings: Holding[]
 }
 
-const assetTaglines: Record<string, string> = {
-  BTC: "Digital gold. Max supply: 21 million.",
-  ETH: "Powers smart contracts and apps.",
-  SOL: "Fast & low-cost transactions.",
-}
-
 function formatCryptoAmount(amount: number, symbol: string): string {
   const formatted =
     amount < 0.001
@@ -30,6 +24,7 @@ function formatCryptoAmount(amount: number, symbol: string): string {
 export function HoldingsList({ holdings }: HoldingsListProps) {
   const getPrice = usePriceStore((s) => s.getPrice)
   const getName = usePriceStore((s) => s.getName)
+  const getTagline = usePriceStore((s) => s.getTagline)
 
   if (holdings.length === 0) return null
 
@@ -79,7 +74,7 @@ export function HoldingsList({ holdings }: HoldingsListProps) {
                   <div>
                     <p className="font-semibold">{getName(holding.asset)}</p>
                     <p className="text-xs text-muted-foreground">
-                      {assetTaglines[holding.asset] ?? ""}
+                      {getTagline(holding.asset)}
                     </p>
                   </div>
                 </div>

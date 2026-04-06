@@ -32,6 +32,9 @@ export function TransactionHistory({ transactions }: TransactionHistoryProps) {
         </div>
       ) : (
         <div className="space-y-2">
+          {transactions.length > 20 && (
+            <p className="text-xs text-muted-foreground">Showing last 20 transactions</p>
+          )}
           {transactions.slice(0, 20).map((tx) => (
             <div
               key={tx.id}

@@ -33,7 +33,6 @@ export function BottomNav() {
                 "relative flex flex-col items-center gap-0.5 px-3 py-2 text-xs transition-colors press-scale",
                 isActive ? "text-primary" : "text-muted-foreground hover:text-foreground"
               )}
-              aria-label={label}
               aria-current={isActive ? "page" : undefined}
             >
               {isActive && (
