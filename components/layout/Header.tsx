@@ -27,7 +27,7 @@ export function Header() {
         <button
           onClick={toggleTheme}
           className="rounded-lg p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground press-scale"
-          aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
+          aria-label="Dark mode"
           role="switch"
           aria-checked={isDark}
         >

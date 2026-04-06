@@ -26,6 +26,7 @@ export function ExperienceStep({ selected, onSelect, onNext, onBack }: Experienc
       if (e.key === "Enter" && selected) {
         onNext()
       } else if (e.key === "Backspace") {
+        e.preventDefault()
         onBack()
       } else {
         const num = Number(e.key)

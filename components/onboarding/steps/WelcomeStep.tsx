@@ -20,7 +20,9 @@ export function WelcomeStep({ name, onNameChange, onNext }: WelcomeStepProps) {
         A safe place to explore crypto at your own pace.
       </p>
       <div className="mt-8 w-full space-y-4">
+        <label htmlFor="onboarding-name" className="sr-only">Your name</label>
         <Input
+          id="onboarding-name"
           placeholder="What should we call you?"
           value={name}
           onChange={(e) => onNameChange(e.target.value)}

@@ -26,6 +26,8 @@ export function ExplanationPanel({ whyUp, whyDown, whatToWatch, onOpen }: Explan
     <div className="rounded-2xl border border-border bg-card">
       <button
         onClick={toggle}
+        aria-expanded={isOpen}
+        aria-controls="explanation-content"
         className="flex w-full items-center justify-between p-5 text-left"
       >
         <span className="font-semibold">Explain this simply</span>
@@ -46,7 +48,7 @@ export function ExplanationPanel({ whyUp, whyDown, whatToWatch, onOpen }: Explan
             transition={{ duration: 0.25, ease: "easeInOut" }}
             className="overflow-hidden"
           >
-            <div className="space-y-5 px-5 pb-5">
+            <div id="explanation-content" className="space-y-5 px-5 pb-5">
               <div className="flex gap-3">
                 <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-success/10">
                   <TrendingUp className="h-4 w-4 text-success" />

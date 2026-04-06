@@ -28,7 +28,9 @@ export function ChatInput({ onSend, onStop, disabled }: ChatInputProps) {
       }}
       className="flex items-end gap-2"
     >
+      <label htmlFor="chat-input" className="sr-only">Ask anything about crypto</label>
       <input
+        id="chat-input"
         type="text"
         value={value}
         onChange={(e) => setValue(e.target.value)}

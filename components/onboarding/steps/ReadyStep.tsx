@@ -31,6 +31,7 @@ export function ReadyStep({ name, experienceLevel, riskStyle, onComplete, onBack
       if (e.key === "Enter") {
         onComplete()
       } else if (e.key === "Backspace") {
+        e.preventDefault()
         onBack()
       }
     }

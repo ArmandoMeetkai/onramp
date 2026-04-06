@@ -116,7 +116,7 @@ export default function PracticePage() {
       name: getName(h.asset),
       value: h.amount * (prices[h.asset]?.price ?? 0),
     }))
-  }, [portfolio, prices])
+  }, [portfolio, prices, getName])
 
   if (!portfolio) {
     return (

@@ -12,7 +12,14 @@ interface OnboardingStepProps {
 export function OnboardingStep({ children, currentStep, totalSteps }: OnboardingStepProps) {
   return (
     <div className="flex min-h-dvh flex-col items-center justify-center px-6 py-12">
-      <div className="mb-8 flex gap-2">
+      <div
+        className="mb-8 flex gap-2"
+        role="progressbar"
+        aria-valuenow={currentStep + 1}
+        aria-valuemin={1}
+        aria-valuemax={totalSteps}
+        aria-label={`Step ${currentStep + 1} of ${totalSteps}`}
+      >
         {Array.from({ length: totalSteps }, (_, i) => (
           <div
             key={i}

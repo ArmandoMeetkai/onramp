@@ -81,7 +81,7 @@ export default function ScenarioDetailPage({
     <PageTransition>
       <div className="py-4">
         <button
-          onClick={() => router.back()}
+          onClick={() => window.history.length > 1 ? router.back() : router.push("/explore")}
           className="mb-4 flex items-center gap-1.5 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
         >
           <ArrowLeft className="h-4 w-4" />
