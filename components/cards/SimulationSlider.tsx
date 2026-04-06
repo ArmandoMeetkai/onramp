@@ -74,7 +74,6 @@ export function SimulationSlider({ scenario, onSimulate }: SimulationSliderProps
           min={simulationRange.min}
           max={simulationRange.max}
           step={10}
-          className="cursor-pointer"
         />
         <div className="mt-1 flex justify-between text-xs text-muted-foreground">
           <span>${simulationRange.min}</span>

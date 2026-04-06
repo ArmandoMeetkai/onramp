@@ -168,6 +168,18 @@
   html {
     @apply font-sans scroll-smooth;
   }
+
+  /* Restore pointer cursor for interactive elements */
+  button,
+  [type="button"],
+  [type="reset"],
+  [type="submit"],
+  [role="button"],
+  a[href],
+  summary,
+  select {
+    cursor: pointer;
+  }
 }
 
 /* Micro-interactions */
