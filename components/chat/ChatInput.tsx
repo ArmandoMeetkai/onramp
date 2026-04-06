@@ -41,7 +41,7 @@ export function ChatInput({ onSend, onStop, isLoading }: ChatInputProps) {
         <button
           type="button"
           onClick={onStop}
-          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-destructive text-destructive-foreground transition-opacity"
+          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-border bg-muted text-muted-foreground transition-colors hover:text-foreground"
           aria-label="Stop generating"
         >
           <Square className="h-4 w-4" />
