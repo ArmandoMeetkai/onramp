@@ -140,7 +140,7 @@ export function ReplayPriceChart({
       </svg>
 
       {/* Y-axis labels */}
-      <div className="flex justify-between text-[10px] text-muted-foreground mt-0.5">
+      <div className="flex justify-between text-[11px] text-muted-foreground mt-0.5">
         <span>${minPrice.toLocaleString()}</span>
         <span>${maxPrice.toLocaleString()}</span>
       </div>

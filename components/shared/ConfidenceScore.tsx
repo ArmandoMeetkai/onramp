@@ -32,7 +32,7 @@ export function ConfidenceScore({ score }: ConfidenceScoreProps) {
   return (
     <div className="flex flex-col items-center gap-4 rounded-2xl border border-border bg-card p-6 w-full">
       <div className="relative h-32 w-32">
-        <svg className="h-32 w-32 -rotate-90" viewBox="0 0 100 100">
+        <svg className="h-32 w-32 -rotate-90" viewBox="0 0 100 100" role="img" aria-label={`Confidence score: ${score} out of 100`}>
           <circle
             cx="50"
             cy="50"
@@ -66,7 +66,7 @@ export function ConfidenceScore({ score }: ConfidenceScoreProps) {
           >
             {score}
           </motion.span>
-          <span className="text-[10px] uppercase tracking-wider text-muted-foreground mt-0.5">
+          <span className="text-[11px] uppercase tracking-wider text-muted-foreground mt-0.5">
             of 100
           </span>
         </div>

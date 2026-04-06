@@ -52,7 +52,7 @@ export function HoldingsList({ holdings }: HoldingsListProps) {
             <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-success opacity-60" />
             <span className="relative inline-flex h-2 w-2 rounded-full bg-success" />
           </span>
-          <span className="text-[10px] font-medium text-success">Live</span>
+          <span className="text-[11px] font-medium text-success">Live</span>
         </div>
       </div>
 

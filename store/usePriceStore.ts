@@ -18,6 +18,7 @@ interface PriceState {
   fetchSparklines: () => Promise<void>
   getPrice: (symbol: string) => number
   getName: (symbol: string) => string
+  getTagline: (symbol: string) => string
 }
 
 const STALE_THRESHOLD = 5 * 60 * 1000 // 5 minutes
@@ -26,6 +27,12 @@ const assetNames: Record<string, string> = {
   BTC: "Bitcoin",
   ETH: "Ethereum",
   SOL: "Solana",
+}
+
+const assetTaglines: Record<string, string> = {
+  BTC: "The first cryptocurrency. Often called digital gold.",
+  ETH: "A platform for apps and smart contracts. Powers most of DeFi.",
+  SOL: "Built for speed and low fees. Popular for apps and NFTs.",
 }
 
 function fallbackPriceData(): Record<string, PriceData> {
@@ -157,5 +164,9 @@ export const usePriceStore = create<PriceState>((set, get) => ({
 
   getName: (symbol) => {
     return assetNames[symbol] ?? symbol
+  },
+
+  getTagline: (symbol) => {
+    return assetTaglines[symbol] ?? ""
   },
 }))

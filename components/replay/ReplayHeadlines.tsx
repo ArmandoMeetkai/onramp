@@ -44,7 +44,7 @@ export function ReplayHeadlines({ headlines }: ReplayHeadlinesProps) {
                 sentimentDots[headline.sentiment]
               )}
             />
-            <span className="text-[10px] font-medium opacity-70">
+            <span className="text-[11px] font-medium opacity-70">
               {headline.source} · {new Date(headline.timestamp).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
             </span>
           </div>

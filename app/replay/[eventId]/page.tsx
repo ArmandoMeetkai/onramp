@@ -1,6 +1,6 @@
 "use client"
 
-import { use, useState, useEffect, useCallback } from "react"
+import { use, useState, useEffect, useCallback, useRef } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { ArrowLeft, Clock, Check } from "lucide-react"
@@ -50,6 +50,7 @@ export default function ReplayDetailPage({
 
   const [stage, setStage] = useState<Stage>("intro")
   const [timeTravelDate, setTimeTravelDate] = useState<string | null>(null)
+  const timersRef = useRef<{ interval?: ReturnType<typeof setInterval>; timeout?: ReturnType<typeof setTimeout> }>({})
 
   // Build accumulated price data up to current phase
   const accumulatedPriceData = event
@@ -93,10 +94,18 @@ export default function ReplayDetailPage({
 
       if (step >= steps) {
         clearInterval(interval)
-        setTimeout(() => setStage("phase"), 400)
+        timersRef.current.timeout = setTimeout(() => setStage("phase"), 400)
       }
     }, 60)
+    timersRef.current.interval = interval
   }, [event, startReplay])
+
+  useEffect(() => {
+    return () => {
+      clearInterval(timersRef.current.interval)
+      clearTimeout(timersRef.current.timeout)
+    }
+  }, [])
 
   const handleAdvance = useCallback(() => {
     if (!event) return

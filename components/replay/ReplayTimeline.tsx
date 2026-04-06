@@ -29,7 +29,7 @@ export function ReplayTimeline({ phases, currentIndex }: ReplayTimelineProps) {
               />
               <span
                 className={cn(
-                  "text-[10px] font-medium transition-colors truncate",
+                  "text-[11px] font-medium transition-colors truncate",
                   isActive
                     ? "text-primary"
                     : isCompleted

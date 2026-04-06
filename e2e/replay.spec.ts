@@ -41,9 +41,9 @@ test.describe("Scenario Replay — Time Travel", () => {
     await page.goto("/replay")
     await page.getByText("Time Travel").first().waitFor({ state: "visible" })
 
-    await page.getByText("The Bitcoin Halving").click()
+    await page.getByText("The Bitcoin Halving").first().click()
     await expect(page).toHaveURL(/\/replay\/bitcoin-halving-2024/)
-    await expect(page.getByText("The Bitcoin Halving")).toBeVisible()
+    await expect(page.getByRole("heading", { name: "The Bitcoin Halving" })).toBeVisible()
     await expect(
       page.getByRole("button", { name: "Begin Replay" })
     ).toBeVisible()

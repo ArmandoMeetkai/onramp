@@ -31,24 +31,9 @@ interface TradeSheetProps {
 }
 
 const assets = [
-  {
-    symbol: "BTC",
-    name: "Bitcoin",
-    tagline: "The first cryptocurrency. Often called digital gold.",
-    lessonId: "what-is-bitcoin",
-  },
-  {
-    symbol: "ETH",
-    name: "Ethereum",
-    tagline: "A platform for apps and smart contracts. Powers most of DeFi.",
-    lessonId: "what-is-blockchain",
-  },
-  {
-    symbol: "SOL",
-    name: "Solana",
-    tagline: "Built for speed and low fees. Popular for apps and NFTs.",
-    lessonId: "what-is-market-cap",
-  },
+  { symbol: "BTC", lessonId: "what-is-bitcoin" },
+  { symbol: "ETH", lessonId: "what-is-blockchain" },
+  { symbol: "SOL", lessonId: "what-is-market-cap" },
 ] as const
 
 const presetAmounts = [10, 25, 50, 100]
@@ -71,6 +56,7 @@ export function TradeSheet({ open, onOpenChange, holdings }: TradeSheetProps) {
   const updateStreak = useProgressStore((s) => s.updateStreak)
   const getPrice = usePriceStore((s) => s.getPrice)
   const getName = usePriceStore((s) => s.getName)
+  const getTagline = usePriceStore((s) => s.getTagline)
 
   const price = getPrice(selectedAsset)
   const usdAmount = parseFloat(amount) || 0
@@ -169,7 +155,7 @@ export function TradeSheet({ open, onOpenChange, holdings }: TradeSheetProps) {
                   </SheetDescription>
                 </SheetHeader>
                 <div className="mt-4 space-y-2">
-                  {assets.map(({ symbol, name, tagline }) => (
+                  {assets.map(({ symbol }) => (
                     <button
                       key={symbol}
                       onClick={() => handleSelectAsset(symbol)}
@@ -178,11 +164,11 @@ export function TradeSheet({ open, onOpenChange, holdings }: TradeSheetProps) {
                       <CoinIcon symbol={symbol} size="lg" />
                       <div className="min-w-0">
                         <div className="flex items-baseline gap-2">
-                          <p className="font-semibold">{name}</p>
+                          <p className="font-semibold">{getName(symbol)}</p>
                           <p className="text-xs text-muted-foreground">{symbol}</p>
                         </div>
                         <p className="text-xs text-muted-foreground leading-snug">
-                          {tagline}
+                          {getTagline(symbol)}
                         </p>
                         <p className="mt-0.5 text-xs font-medium">
                           ${getPrice(symbol).toLocaleString()} per coin

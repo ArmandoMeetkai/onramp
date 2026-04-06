@@ -211,7 +211,7 @@ export default function LessonDetailPage({
               className="flex items-center justify-between rounded-xl border border-border bg-card px-4 py-3 transition-colors hover:border-primary/30 active:scale-[0.98]"
             >
               <div>
-                <p className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground">
+                <p className="text-[11px] font-medium uppercase tracking-widest text-muted-foreground">
                   Next lesson
                 </p>
                 <p className="text-sm font-semibold">

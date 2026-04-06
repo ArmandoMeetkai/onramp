@@ -44,7 +44,7 @@ export function TransactionHistory({ transactions }: TransactionHistoryProps) {
                     <Badge
                       variant="secondary"
                       className={cn(
-                        "rounded-md px-1.5 py-0 text-[10px] font-semibold",
+                        "rounded-md px-1.5 py-0 text-[11px] font-semibold",
                         tx.type === "buy"
                           ? "bg-success/10 text-success"
                           : "bg-danger/10 text-danger"

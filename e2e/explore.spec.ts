@@ -31,10 +31,10 @@ test.describe("Explore & Scenarios", () => {
   })
 
   test("navigates to scenario detail page", async ({ page }) => {
-    await page.getByText("Should I buy Bitcoin right now?").click()
+    await page.getByText("Should I buy Bitcoin right now?").first().click()
     await expect(page).toHaveURL(/\/scenario\/should-i-buy-bitcoin/)
 
-    await expect(page.getByText("Should I buy Bitcoin right now?")).toBeVisible()
+    await expect(page.getByRole("heading", { name: "Should I buy Bitcoin right now?" })).toBeVisible()
     await expect(page.getByText("BTC").first()).toBeVisible()
   })
 

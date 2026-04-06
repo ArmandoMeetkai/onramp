@@ -34,7 +34,7 @@ export function LessonCard({ lesson, isCompleted, isNext, isFirstTime, lessonNum
       </div>
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2">
-          <span className="text-[10px] font-medium text-muted-foreground">{lessonNumber}.</span>
+          <span className="text-[11px] font-medium text-muted-foreground">{lessonNumber}.</span>
           <p className={cn(
             "font-semibold leading-snug truncate",
             isCompleted && "text-muted-foreground"
@@ -44,11 +44,11 @@ export function LessonCard({ lesson, isCompleted, isNext, isFirstTime, lessonNum
         </div>
         <div className="mt-1 flex items-center gap-2">
           <span className="text-xs text-muted-foreground">{lesson.duration}</span>
-          <Badge variant="secondary" className="rounded-md px-1.5 py-0 text-[10px]">
+          <Badge variant="secondary" className="rounded-md px-1.5 py-0 text-[11px]">
             {lesson.difficulty === "beginner" ? "Beginner" : "Intermediate"}
           </Badge>
           {isNext && !isCompleted && (
-            <Badge className="rounded-md px-1.5 py-0 text-[10px]">
+            <Badge className="rounded-md px-1.5 py-0 text-[11px]">
               {isFirstTime ? "Start here" : "Up next"}
             </Badge>
           )}

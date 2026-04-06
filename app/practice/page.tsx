@@ -8,6 +8,7 @@ import { Separator } from "@/components/ui/separator"
 import { PageTransition } from "@/components/layout/PageTransition"
 import { Sparkline } from "@/components/portfolio/Sparkline"
 import { PriceChart } from "@/components/portfolio/PriceChart"
+import { CoinChartPanel } from "@/components/portfolio/CoinChartPanel"
 import { HoldingsList } from "@/components/portfolio/HoldingsList"
 import { TransactionHistory } from "@/components/portfolio/TransactionHistory"
 import { PortfolioSummary } from "@/components/portfolio/PortfolioSummary"
@@ -23,11 +24,6 @@ import { usePortfolioStore } from "@/store/usePortfolioStore"
 import { useUserStore } from "@/store/useUserStore"
 import { usePriceStore } from "@/store/usePriceStore"
 
-const ASSET_TAGLINES: Record<string, string> = {
-  BTC: "Digital gold. Max supply: 21 million coins.",
-  ETH: "Powers smart contracts and most DeFi apps.",
-  SOL: "Fast transactions. Popular for apps and NFTs.",
-}
 
 const PRACTICE_LEARN_CHIPS = [
   { lessonId: "what-is-bitcoin", emoji: "🪙", label: "What is Bitcoin?" },
@@ -246,7 +242,7 @@ export default function PracticePage() {
               </InfoTip>
             </div>
             <div className="flex items-center gap-1.5">
-              <span className="text-[10px] text-muted-foreground">Live · CoinGecko</span>
+              <span className="text-[11px] text-muted-foreground">Live · CoinGecko</span>
               <button
                 onClick={handleRefresh}
                 disabled={isLoading}
@@ -277,10 +273,10 @@ export default function PracticePage() {
                   )}
                 >
                   <CoinIcon symbol={symbol} size="sm" className="mb-1.5" />
-                  <p className="text-[10px] font-medium text-muted-foreground leading-none">
+                  <p className="text-[11px] font-medium text-muted-foreground leading-none">
                     {getName(symbol)}
                   </p>
-                  <p className={cn("text-[10px] font-bold leading-none mt-0.5", isSelected ? "text-primary" : "text-muted-foreground")}>
+                  <p className={cn("text-[11px] font-bold leading-none mt-0.5", isSelected ? "text-primary" : "text-muted-foreground")}>
                     {symbol}
                   </p>
                   <p className="mt-1 text-sm font-semibold">
@@ -299,58 +295,14 @@ export default function PracticePage() {
 
           {/* Per-coin chart panel — animates when coin changes */}
           <AnimatePresence mode="wait">
-            {(sparklines[selectedCoin]?.length ?? 0) > 1 && (() => {
-              const base = sparklines[selectedCoin]!
-              const livePrice = prices[selectedCoin]?.price
-
-              // Replace the last data point with the current live price so the
-              // chart end always matches the price shown on the card above.
-              const chartData = livePrice
-                ? [...base.slice(0, -1), livePrice]
-                : base
-
-              const start = chartData[0]
-              const end = chartData[chartData.length - 1]
-              const isUp = end >= start
-              const weekPct = (((end - start) / start) * 100).toFixed(2)
-
-              return (
-                <motion.div
-                  key={selectedCoin}
-                  initial={{ opacity: 0, y: 6 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -4 }}
-                  transition={{ duration: 0.2 }}
-                  className="mt-3 rounded-2xl border border-border bg-card px-4 pb-3 pt-4"
-                >
-                  {/* Header */}
-                  <div className="mb-3 flex items-start justify-between">
-                    <div>
-                      <p className="text-sm font-semibold">{getName(selectedCoin)}</p>
-                      <p className="text-xs text-muted-foreground">Last 7 days · real market price</p>
-                    </div>
-                    <div className="text-right">
-                      <p className={cn("text-sm font-semibold", isUp ? "text-success" : "text-danger")}>
-                        {isUp ? "+" : ""}{weekPct}%
-                      </p>
-                      <p className="text-[10px] text-muted-foreground">
-                        ${Math.round(start).toLocaleString()} → ${Math.round(end).toLocaleString()}
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Chart with axes */}
-                  <PriceChart data={chartData} positive={isUp} />
-
-                  {/* Contextual note */}
-                  <p className="mt-1 text-center text-[11px] text-muted-foreground">
-                    {isUp
-                      ? `${getName(selectedCoin)} is up this week — prices still change daily.`
-                      : `${getName(selectedCoin)} dropped this week — volatility is normal in crypto.`}
-                  </p>
-                </motion.div>
-              )
-            })()}
+            {(sparklines[selectedCoin]?.length ?? 0) > 1 && (
+              <CoinChartPanel
+                symbol={selectedCoin}
+                name={getName(selectedCoin)}
+                sparkline={sparklines[selectedCoin]!}
+                livePrice={prices[selectedCoin]?.price}
+              />
+            )}
           </AnimatePresence>
 
           <div className="mt-2 flex items-center justify-center gap-1">

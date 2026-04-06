@@ -41,14 +41,14 @@ export function ReplayEventCard({ event, isCompleted }: ReplayEventCardProps) {
           {event.date} · {event.asset}
         </p>
         <div className="mt-1.5 flex items-center gap-1.5">
-          <Badge variant="secondary" className="rounded-md px-1.5 py-0 text-[10px]">
+          <Badge variant="secondary" className="rounded-md px-1.5 py-0 text-[11px]">
             {categoryLabels[event.category]}
           </Badge>
-          <Badge variant="secondary" className="rounded-md px-1.5 py-0 text-[10px]">
+          <Badge variant="secondary" className="rounded-md px-1.5 py-0 text-[11px]">
             {event.difficulty === "beginner" ? "Beginner" : "Intermediate"}
           </Badge>
           {isCompleted && (
-            <Badge className="rounded-md px-1.5 py-0 text-[10px] bg-success/15 text-success border-0">
+            <Badge className="rounded-md px-1.5 py-0 text-[11px] bg-success/15 text-success border-0">
               Completed
             </Badge>
           )}
