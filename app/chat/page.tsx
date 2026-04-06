@@ -35,6 +35,7 @@ export default function ChatPage() {
 
   const handleSend = useCallback(
     async (content: string) => {
+      if (isLoading) abortRequest()
       addUserMessage(content)
       await updateStreak()
       await streamAssistantMessage({
@@ -42,7 +43,7 @@ export default function ChatPage() {
         riskStyle: profile?.riskStyle ?? "moderate",
       })
     },
-    [addUserMessage, streamAssistantMessage, profile, updateStreak]
+    [addUserMessage, streamAssistantMessage, profile, updateStreak, isLoading, abortRequest]
   )
 
   return (
@@ -100,7 +101,7 @@ export default function ChatPage() {
         </div>
 
         <div className="pt-2">
-          <ChatInput onSend={handleSend} onStop={abortRequest} disabled={isLoading} />
+          <ChatInput onSend={handleSend} onStop={abortRequest} isLoading={isLoading} />
         </div>
       </div>
     </PageTransition>

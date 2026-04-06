@@ -7,18 +7,18 @@ import { cn } from "@/lib/utils"
 interface ChatInputProps {
   onSend: (message: string) => void
   onStop: () => void
-  disabled: boolean
+  isLoading: boolean
 }
 
-export function ChatInput({ onSend, onStop, disabled }: ChatInputProps) {
+export function ChatInput({ onSend, onStop, isLoading }: ChatInputProps) {
   const [value, setValue] = useState("")
 
   const handleSubmit = useCallback(() => {
     const trimmed = value.trim()
-    if (!trimmed || disabled) return
+    if (!trimmed) return
     onSend(trimmed)
     setValue("")
-  }, [value, disabled, onSend])
+  }, [value, onSend])
 
   return (
     <form
@@ -35,10 +35,9 @@ export function ChatInput({ onSend, onStop, disabled }: ChatInputProps) {
         value={value}
         onChange={(e) => setValue(e.target.value)}
         placeholder="Ask anything about crypto..."
-        disabled={disabled}
-        className="flex-1 rounded-xl border border-border bg-card px-4 py-3 text-sm outline-none transition-colors placeholder:text-muted-foreground focus:border-primary disabled:opacity-50"
+        className="flex-1 rounded-xl border border-border bg-card px-4 py-3 text-sm outline-none transition-colors placeholder:text-muted-foreground focus:border-primary"
       />
-      {disabled ? (
+      {isLoading && !value.trim() ? (
         <button
           type="button"
           onClick={onStop}
