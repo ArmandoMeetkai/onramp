@@ -8,11 +8,11 @@ test.describe("Chat Page", () => {
     await page.reload()
     await completeOnboarding(page)
     await page.locator("nav").getByText("Chat").click()
-    await page.getByText("Ask Anything").waitFor({ state: "visible" })
+    await page.getByRole("heading", { name: "Ask Anything" }).waitFor({ state: "visible" })
   })
 
   test("shows chat page with title and disclaimer", async ({ page }) => {
-    await expect(page.getByText("Ask Anything")).toBeVisible()
+    await expect(page.getByRole("heading", { name: "Ask Anything" })).toBeVisible()
     await expect(
       page.getByText(/here to help you learn/i)
     ).toBeVisible()

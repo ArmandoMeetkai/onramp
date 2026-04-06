@@ -16,11 +16,25 @@ const dmSans = DM_Sans({
 })
 
 export const metadata: Metadata = {
-  title: "Onramp",
+  title: {
+    default: "Onramp",
+    template: "%s — Onramp",
+  },
   description: "The first safe place to think before entering crypto",
   manifest: "/manifest.json",
   icons: {
     apple: "/icons/icon-192.svg",
+  },
+  openGraph: {
+    type: "website",
+    siteName: "Onramp",
+    title: "Onramp",
+    description: "The first safe place to think before entering crypto",
+  },
+  twitter: {
+    card: "summary",
+    title: "Onramp",
+    description: "The first safe place to think before entering crypto",
   },
   appleWebApp: {
     capable: true,

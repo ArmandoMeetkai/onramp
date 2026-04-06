@@ -42,7 +42,7 @@ test.describe("Navigation", () => {
 
   test("navigates to Chat page", async ({ page }) => {
     await page.locator("nav").getByText("Chat").click()
-    await expect(page.getByText("Ask Anything")).toBeVisible()
+    await expect(page.getByRole("heading", { name: "Ask Anything" })).toBeVisible()
     await expect(page).toHaveURL("/chat")
   })
 

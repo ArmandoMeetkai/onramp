@@ -15,8 +15,27 @@ export function AppShell({ children }: AppShellProps) {
 
   if (!isReady) {
     return (
-      <div className="flex min-h-dvh items-center justify-center bg-background">
-        <div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+      <div className="flex min-h-dvh flex-col bg-background">
+        <div className="mx-auto w-full max-w-[480px]">
+          {/* Header skeleton */}
+          <div className="flex items-center justify-between px-4 py-3">
+            <div className="h-6 w-24 animate-pulse rounded-lg bg-muted" />
+            <div className="flex gap-2">
+              <div className="h-8 w-8 animate-pulse rounded-lg bg-muted" />
+              <div className="h-8 w-8 animate-pulse rounded-lg bg-muted" />
+            </div>
+          </div>
+          {/* Content skeleton */}
+          <div className="space-y-4 px-4 pt-6">
+            <div className="h-7 w-48 animate-pulse rounded-lg bg-muted" />
+            <div className="h-4 w-64 animate-pulse rounded-lg bg-muted" />
+            <div className="mt-4 space-y-3">
+              <div className="h-24 animate-pulse rounded-2xl bg-muted" />
+              <div className="h-24 animate-pulse rounded-2xl bg-muted" />
+              <div className="h-24 animate-pulse rounded-2xl bg-muted" />
+            </div>
+          </div>
+        </div>
       </div>
     )
   }

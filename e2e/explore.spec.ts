@@ -8,7 +8,7 @@ test.describe("Explore & Scenarios", () => {
     await page.reload()
     await completeOnboarding(page)
     await page.locator("nav").getByText("Explore").click()
-    await page.getByText("Explore Scenarios").waitFor({ state: "visible" })
+    await page.getByRole("heading", { name: "Explore Scenarios" }).waitFor({ state: "visible" })
   })
 
   test("displays scenario cards", async ({ page }) => {
@@ -74,7 +74,7 @@ test.describe("Explore & Scenarios", () => {
     await page.waitForURL(/\/scenario\//)
 
     await page.getByText("Back").click()
-    await expect(page.getByText("Explore Scenarios")).toBeVisible()
+    await expect(page.getByRole("heading", { name: "Explore Scenarios" })).toBeVisible()
   })
 
   test("scenario has link to practice", async ({ page }) => {
