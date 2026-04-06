@@ -15,10 +15,10 @@ export function ChatInput({ onSend, onStop, isLoading }: ChatInputProps) {
 
   const handleSubmit = useCallback(() => {
     const trimmed = value.trim()
-    if (!trimmed) return
+    if (!trimmed || isLoading) return
     onSend(trimmed)
     setValue("")
-  }, [value, onSend])
+  }, [value, isLoading, onSend])
 
   return (
     <form
@@ -34,10 +34,10 @@ export function ChatInput({ onSend, onStop, isLoading }: ChatInputProps) {
         type="text"
         value={value}
         onChange={(e) => setValue(e.target.value)}
-        placeholder="Ask anything about crypto..."
+        placeholder={isLoading ? "Wait for response..." : "Ask anything about crypto..."}
         className="flex-1 rounded-xl border border-border bg-card px-4 py-3 text-sm outline-none transition-colors placeholder:text-muted-foreground focus:border-primary"
       />
-      {isLoading && !value.trim() ? (
+      {isLoading ? (
         <button
           type="button"
           onClick={onStop}
