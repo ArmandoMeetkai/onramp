@@ -26,18 +26,27 @@ export default function ReadyPage() {
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   const handleSubmit = useCallback(
-    (e: React.FormEvent) => {
+    async (e: React.FormEvent) => {
       e.preventDefault()
       const trimmed = email.trim()
       if (!trimmed || isSubmitting) return
 
       setIsSubmitting(true)
-      // Store locally — no backend yet
-      localStorage.setItem(WAITLIST_KEY, trimmed)
-      setTimeout(() => {
+      try {
+        await fetch("/api/waitlist", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email: trimmed }),
+        })
+        localStorage.setItem(WAITLIST_KEY, trimmed)
         setIsSubmitted(true)
+      } catch {
+        // Fallback to localStorage only
+        localStorage.setItem(WAITLIST_KEY, trimmed)
+        setIsSubmitted(true)
+      } finally {
         setIsSubmitting(false)
-      }, 800)
+      }
     },
     [email, isSubmitting]
   )

@@ -25,7 +25,7 @@ export async function POST(request: Request) {
   try {
     const headersList = await headers()
     const ip = headersList.get("x-forwarded-for")?.split(",")[0] ?? "unknown"
-    const { allowed } = rateLimit(ip)
+    const { allowed } = await rateLimit(ip)
 
     if (!allowed) {
       return Response.json(
