@@ -2,7 +2,6 @@
 
 import { useEffect, useRef, useCallback } from "react"
 import { motion } from "framer-motion"
-import { events } from "@/lib/analytics"
 import { PageTransition } from "@/components/layout/PageTransition"
 import { ChatMessage } from "@/components/chat/ChatMessage"
 import { ChatInput } from "@/components/chat/ChatInput"
@@ -36,7 +35,6 @@ export default function ChatPage() {
 
   const handleSend = useCallback(
     async (content: string) => {
-      events.chatMessageSent()
       addUserMessage(content)
       await updateStreak()
       await streamAssistantMessage({

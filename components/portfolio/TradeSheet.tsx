@@ -17,7 +17,6 @@ import { cn } from "@/lib/utils"
 import { usePortfolioStore } from "@/store/usePortfolioStore"
 import { useProgressStore } from "@/store/useProgressStore"
 import { usePriceStore } from "@/store/usePriceStore"
-import { events } from "@/lib/analytics"
 import { TradeAssetStep } from "./trade/TradeAssetStep"
 import { TradeConfirmStep } from "./trade/TradeConfirmStep"
 import { TradeSuccessStep } from "./trade/TradeSuccessStep"
@@ -101,7 +100,6 @@ export function TradeSheet({ open, onOpenChange, holdings }: TradeSheetProps) {
 
     if (success) {
       await updateStreak()
-      events.tradeExecuted(action, selectedAsset, usdAmount)
       setStep("success")
     }
   }, [action, buy, sell, selectedAsset, usdAmount, updateStreak])

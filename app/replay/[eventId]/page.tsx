@@ -10,7 +10,6 @@ import { ReplayPhaseStage } from "@/components/replay/ReplayPhaseStage"
 import { ReplayOutcomeStage } from "@/components/replay/ReplayOutcomeStage"
 import { getReplayEventById } from "@/data/replayEvents"
 import { getLessonById } from "@/data/lessons"
-import { events as analytics } from "@/lib/analytics"
 import { useReplayStore } from "@/store/useReplayStore"
 import { useUserStore } from "@/store/useUserStore"
 import { useProgressStore } from "@/store/useProgressStore"
@@ -64,7 +63,6 @@ export default function ReplayDetailPage({
   const handleBeginReplay = useCallback(() => {
     if (!event) return
     startReplay(event.id)
-    analytics.replayStarted(event.id)
 
     const targetDate = new Date(event.phases[0].dateRange.start)
     const now = new Date()
@@ -121,7 +119,6 @@ export default function ReplayDetailPage({
       await incrementReplaysCompleted()
     }
     await updateStreak()
-    if (event) analytics.replayCompleted(event.id, userDecision ?? "")
   }, [profile, completeReplay, wasAlreadyCompleted, incrementReplaysCompleted, updateStreak])
 
   if (!event) {
