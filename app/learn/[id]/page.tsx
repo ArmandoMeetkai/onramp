@@ -48,14 +48,15 @@ export default function LessonDetailPage({
     try {
       await completeLesson(id)
       await updateStreak()
-      setTimeout(() => router.push("/learn"), 1500)
+      const destination = nextLesson ? `/learn/${nextLesson.id}` : "/learn"
+      setTimeout(() => router.push(destination), 1500)
     } catch {
       if (mountedRef.current) {
         setIsSubmitting(false)
         setJustCompleted(false)
       }
     }
-  }, [id, completeLesson, updateStreak, router, isSubmitting])
+  }, [id, completeLesson, updateStreak, router, isSubmitting, nextLesson])
 
   if (!lesson) {
     return (
