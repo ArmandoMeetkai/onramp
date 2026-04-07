@@ -6,6 +6,7 @@ import { ArrowLeft, Check, Sparkles } from "lucide-react"
 import { motion } from "framer-motion"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { events } from "@/lib/analytics"
 import { Separator } from "@/components/ui/separator"
 import { PageTransition } from "@/components/layout/PageTransition"
 import { ReadyHero } from "@/components/ready/ReadyHero"
@@ -40,6 +41,7 @@ export default function ReadyPage() {
         })
         localStorage.setItem(WAITLIST_KEY, trimmed)
         setIsSubmitted(true)
+        events.waitlistJoined()
       } catch {
         // Fallback to localStorage only
         localStorage.setItem(WAITLIST_KEY, trimmed)

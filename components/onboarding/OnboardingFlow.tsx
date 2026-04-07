@@ -6,6 +6,7 @@ import type { UserProfile } from "@/lib/db"
 import { useUserStore } from "@/store/useUserStore"
 import { useProgressStore } from "@/store/useProgressStore"
 import { usePortfolioStore } from "@/store/usePortfolioStore"
+import { events } from "@/lib/analytics"
 import { OnboardingStep } from "./OnboardingStep"
 import { WelcomeStep } from "./steps/WelcomeStep"
 import { ExperienceStep } from "./steps/ExperienceStep"
@@ -53,6 +54,7 @@ export function OnboardingFlow() {
       initializeProgress(id),
       initializePortfolio(id),
     ])
+    events.onboardingCompleted(experienceLevel, riskStyle)
   }, [name, experienceLevel, riskStyle, setProfile, initializeProgress, initializePortfolio])
 
   const variants = {
