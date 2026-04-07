@@ -49,6 +49,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
       const allMessages = get().messages
       const apiMessages = allMessages
         .filter((m) => m.id !== assistantMessage.id)
+        .slice(-20)
         .map((m) => ({ role: m.role, content: m.content }))
 
       const response = await fetch("/api/chat", {

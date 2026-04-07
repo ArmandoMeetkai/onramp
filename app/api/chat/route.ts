@@ -1,4 +1,6 @@
 import Anthropic from "@anthropic-ai/sdk"
+import { headers } from "next/headers"
+import { rateLimit } from "@/lib/rateLimit"
 
 const anthropic = new Anthropic()
 
@@ -21,6 +23,17 @@ Rules:
 
 export async function POST(request: Request) {
   try {
+    const headersList = await headers()
+    const ip = headersList.get("x-forwarded-for")?.split(",")[0] ?? "unknown"
+    const { allowed } = rateLimit(ip)
+
+    if (!allowed) {
+      return Response.json(
+        { error: "Too many requests. Please wait a moment." },
+        { status: 429, headers: { "Retry-After": "60" } }
+      )
+    }
+
     const body = await request.json()
     const { messages, userProfile } = body as {
       messages: { role: "user" | "assistant"; content: string }[]
