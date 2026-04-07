@@ -73,7 +73,7 @@ test.describe("Scenario Replay — Time Travel", () => {
 
   test("full replay flow: navigate phases and make decision", async ({ page }) => {
     await page.goto("/replay/bitcoin-halving-2024")
-    await page.getByText("The Bitcoin Halving").waitFor({ state: "visible" })
+    await page.getByRole("heading", { name: "The Bitcoin Halving" }).waitFor({ state: "visible" })
 
     // Start replay
     await page.getByRole("button", { name: "Begin Replay" }).click()
@@ -84,7 +84,7 @@ test.describe("Scenario Replay — Time Travel", () => {
     await page.getByRole("button", { name: "Continue" }).click()
 
     // Phase 2: Halving Day — has decision prompt
-    await expect(page.getByText("Halving Day")).toBeVisible()
+    await expect(page.getByRole("heading", { name: "Halving Day" })).toBeVisible()
     await expect(page.getByText("Your Decision")).toBeVisible()
 
     // Make a decision
