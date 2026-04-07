@@ -87,42 +87,12 @@ export default function ReadyPage() {
           </p>
         </motion.div>
 
-        {/* User's progress — proof they're ready */}
-        {confidenceScore > 0 && (
-          <motion.div
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.5, duration: 0.4 }}
-            className="mt-8"
-          >
-            <p className="text-center text-xs font-semibold uppercase tracking-widest text-muted-foreground mb-3">
-              Your progress so far
-            </p>
-            <div className="flex justify-center">
-              <div className="w-full max-w-[200px]">
-                <ConfidenceScore score={confidenceScore} />
-              </div>
-            </div>
-            <div className="mt-3 flex justify-center gap-6 text-center">
-              <div>
-                <p className="font-heading text-lg font-bold">{lessonsCompleted}</p>
-                <p className="text-[11px] text-muted-foreground">Lessons</p>
-              </div>
-              <div>
-                <p className="font-heading text-lg font-bold">{replaysCompleted}</p>
-                <p className="text-[11px] text-muted-foreground">Replays</p>
-              </div>
-            </div>
-          </motion.div>
-        )}
-
-        <Separator className="my-8" />
-
-        {/* Waitlist form or success state */}
+        {/* Waitlist form or success state — above the fold */}
         <motion.div
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.7, duration: 0.4 }}
+          transition={{ delay: 0.5, duration: 0.4 }}
+          className="mt-8"
         >
           {isSubmitted ? (
             <div className="flex flex-col items-center rounded-2xl bg-success/10 p-6 text-center">
@@ -165,6 +135,37 @@ export default function ReadyPage() {
             </form>
           )}
         </motion.div>
+
+        {/* User's progress — proof they're ready */}
+        {confidenceScore > 0 && (
+          <>
+            <Separator className="my-8" />
+            <motion.div
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.7, duration: 0.4 }}
+            >
+              <p className="text-center text-xs font-semibold uppercase tracking-widest text-muted-foreground mb-3">
+                Your progress so far
+              </p>
+              <div className="flex justify-center">
+                <div className="w-full max-w-[200px]">
+                  <ConfidenceScore score={confidenceScore} />
+                </div>
+              </div>
+              <div className="mt-3 flex justify-center gap-6 text-center">
+                <div>
+                  <p className="font-heading text-lg font-bold">{lessonsCompleted}</p>
+                  <p className="text-[11px] text-muted-foreground">Lessons</p>
+                </div>
+                <div>
+                  <p className="font-heading text-lg font-bold">{replaysCompleted}</p>
+                  <p className="text-[11px] text-muted-foreground">Replays</p>
+                </div>
+              </div>
+            </motion.div>
+          </>
+        )}
 
         {/* Disclaimer */}
         <p className="mt-8 text-center text-xs text-muted-foreground leading-relaxed">
