@@ -53,8 +53,7 @@ export default function LessonDetailPage({
     try {
       await completeLesson(id)
       await updateStreak()
-      const destination = nextLesson ? `/learn/${nextLesson.id}` : "/learn"
-      navTimerRef.current = setTimeout(() => router.push(destination), 1500)
+      navTimerRef.current = setTimeout(() => router.push("/learn"), 1500)
     } catch {
       if (mountedRef.current) {
         setIsSubmitting(false)

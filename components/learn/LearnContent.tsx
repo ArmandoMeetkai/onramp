@@ -1,5 +1,6 @@
 "use client"
 
+import { useEffect, useRef } from "react"
 import { motion } from "framer-motion"
 import { BookOpen } from "lucide-react"
 import { Progress } from "@/components/ui/progress"
@@ -20,6 +21,16 @@ export function LearnContent({ lessons }: LearnContentProps) {
   const progressPercent = totalCount > 0 ? (completedCount / totalCount) * 100 : 0
 
   const nextLessonId = lessons.find((l) => !completedIds.includes(l.id))?.id ?? null
+  const nextRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (nextLessonId && completedCount > 0) {
+      const timer = setTimeout(() => {
+        nextRef.current?.scrollIntoView({ behavior: "smooth", block: "center" })
+      }, 400)
+      return () => clearTimeout(timer)
+    }
+  }, [nextLessonId, completedCount])
 
   return (
     <PageTransition>
@@ -68,6 +79,7 @@ export function LearnContent({ lessons }: LearnContentProps) {
           {lessons.map((lesson, index) => (
             <motion.div
               key={lesson.id}
+              ref={lesson.id === nextLessonId ? nextRef : undefined}
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.25, delay: 0.05 + index * 0.03 }}

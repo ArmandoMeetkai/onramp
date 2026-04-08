@@ -1,5 +1,5 @@
-const CACHE_NAME = "onramp-v4";
-const STATIC_ASSETS = ["/", "/explore", "/practice", "/learn", "/chat", "/replay", "/profile"];
+const CACHE_NAME = "onramp-v5";
+const STATIC_ASSETS = ["/", "/explore", "/practice", "/learn", "/chat", "/replay", "/predictions", "/profile"];
 
 self.addEventListener("install", (event) => {
   event.waitUntil(

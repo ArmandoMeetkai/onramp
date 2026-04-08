@@ -1,5 +1,6 @@
 "use client"
 
+import Link from "next/link"
 import { User } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
@@ -9,6 +10,7 @@ import { ConfidenceScore } from "@/components/shared/ConfidenceScore"
 import { StreakBadge } from "@/components/shared/StreakBadge"
 import { useUserStore } from "@/store/useUserStore"
 import { useProgressStore } from "@/store/useProgressStore"
+import { usePredictionStore } from "@/store/usePredictionStore"
 
 const experienceLabels: Record<string, string> = {
   new: "Completely new",
@@ -26,6 +28,8 @@ const riskLabels: Record<string, string> = {
 export default function ProfilePage() {
   const profile = useUserStore((s) => s.profile)
   const progress = useProgressStore((s) => s.progress)
+  const predictionAccuracy = usePredictionStore((s) => s.getPredictionAccuracy)
+  const userPredictions = usePredictionStore((s) => s.userPredictions)
 
   if (!profile) {
     return (
@@ -96,7 +100,25 @@ export default function ProfilePage() {
               <p className="font-heading text-2xl font-bold">{progress?.explanationsOpened ?? 0}</p>
               <p className="mt-1 text-xs text-muted-foreground">Explanations read</p>
             </div>
+            <Link href="/predictions" className="rounded-2xl border border-border bg-card p-4 text-center transition-all hover:border-primary/30">
+              <p className="font-heading text-2xl font-bold">{userPredictions.length}</p>
+              <p className="mt-1 text-xs text-muted-foreground">Predictions made</p>
+            </Link>
           </div>
+
+          {userPredictions.length > 0 && (
+            <Link href="/predictions" className="mt-4 flex items-center justify-between rounded-2xl border border-accent/20 bg-accent/5 p-4 transition-all hover:border-accent/40">
+              <div>
+                <p className="text-sm font-semibold">Prediction Accuracy</p>
+                <p className="text-xs text-muted-foreground">
+                  {predictionAccuracy().total > 0
+                    ? `${Math.round(predictionAccuracy().rate * 100)}% accuracy (${predictionAccuracy().correct}/${predictionAccuracy().total})`
+                    : "No resolved predictions yet"
+                  }
+                </p>
+              </div>
+            </Link>
+          )}
         </div>
 
         <Separator className="my-6" />
