@@ -32,13 +32,18 @@ export default function LessonDetailPage({
   const mountedRef = useRef(true)
 
   useEffect(() => {
-    return () => { mountedRef.current = false }
+    return () => {
+      mountedRef.current = false
+      if (navTimerRef.current) clearTimeout(navTimerRef.current)
+    }
   }, [])
 
   const currentIndex = lessons.findIndex((l) => l.id === id)
   const nextLesson = lessons[currentIndex + 1] ?? null
   const lessonNumber = currentIndex + 1
   const totalLessons = lessons.length
+
+  const navTimerRef = useRef<ReturnType<typeof setTimeout>>(null)
 
   const handleComplete = useCallback(async () => {
     if (isSubmitting) return
@@ -49,7 +54,7 @@ export default function LessonDetailPage({
       await completeLesson(id)
       await updateStreak()
       const destination = nextLesson ? `/learn/${nextLesson.id}` : "/learn"
-      setTimeout(() => router.push(destination), 1500)
+      navTimerRef.current = setTimeout(() => router.push(destination), 1500)
     } catch {
       if (mountedRef.current) {
         setIsSubmitting(false)

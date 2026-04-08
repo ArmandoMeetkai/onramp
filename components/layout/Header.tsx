@@ -1,15 +1,13 @@
 "use client"
 
 import { Sun, Moon, User } from "lucide-react"
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import Link from "next/link"
 
 export function Header() {
-  const [isDark, setIsDark] = useState(true)
-
-  useEffect(() => {
-    setIsDark(document.documentElement.classList.contains("dark"))
-  }, [])
+  const [isDark, setIsDark] = useState(() =>
+    typeof window !== "undefined" ? document.documentElement.classList.contains("dark") : true
+  )
 
   function toggleTheme() {
     const next = !isDark
@@ -27,7 +25,7 @@ export function Header() {
         <button
           onClick={toggleTheme}
           className="rounded-lg p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground press-scale"
-          aria-label="Dark mode"
+          aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
           role="switch"
           aria-checked={isDark}
         >

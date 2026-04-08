@@ -35,10 +35,24 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json()
-    const { messages, userProfile } = body as {
+    const { messages: rawMessages, userProfile } = body as {
       messages: { role: "user" | "assistant"; content: string }[]
       userProfile: { experienceLevel: string; riskStyle: string }
     }
+
+    if (!Array.isArray(rawMessages) || rawMessages.length === 0) {
+      return Response.json(
+        { error: "Messages are required" },
+        { status: 400 }
+      )
+    }
+
+    const MAX_MESSAGES = 50
+    const MAX_CONTENT_LENGTH = 4000
+    const messages = rawMessages.slice(-MAX_MESSAGES).map((m) => ({
+      role: m.role === "assistant" ? "assistant" as const : "user" as const,
+      content: typeof m.content === "string" ? m.content.slice(0, MAX_CONTENT_LENGTH) : "",
+    }))
 
     const systemPrompt = buildSystemPrompt(
       userProfile?.experienceLevel ?? "new",
@@ -46,13 +60,10 @@ export async function POST(request: Request) {
     )
 
     const stream = anthropic.messages.stream({
-      model: "claude-sonnet-4-20250514",
+      model: "claude-sonnet-4-6",
       max_tokens: 1024,
       system: systemPrompt,
-      messages: messages.map((m) => ({
-        role: m.role,
-        content: m.content,
-      })),
+      messages,
     })
 
     const encoder = new TextEncoder()

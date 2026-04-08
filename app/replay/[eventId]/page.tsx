@@ -93,9 +93,10 @@ export default function ReplayDetailPage({
   }, [event, startReplay])
 
   useEffect(() => {
+    const timers = timersRef.current
     return () => {
-      clearInterval(timersRef.current.interval)
-      clearTimeout(timersRef.current.timeout)
+      clearInterval(timers.interval)
+      clearTimeout(timers.timeout)
     }
   }, [])
 

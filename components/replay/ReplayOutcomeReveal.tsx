@@ -21,16 +21,18 @@ function AnimatedMultiplier({ target }: { target: number }) {
     const duration = 1500
     const startTime = Date.now()
     const start = 100
+    let rafId: number
 
     function tick() {
       const elapsed = Date.now() - startTime
       const progress = Math.min(elapsed / duration, 1)
       const eased = 1 - Math.pow(1 - progress, 3)
       setCurrent(Math.round(start + (final - start) * eased))
-      if (progress < 1) requestAnimationFrame(tick)
+      if (progress < 1) rafId = requestAnimationFrame(tick)
     }
 
-    requestAnimationFrame(tick)
+    rafId = requestAnimationFrame(tick)
+    return () => cancelAnimationFrame(rafId)
   }, [final])
 
   const isPositive = current >= 100

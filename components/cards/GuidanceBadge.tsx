@@ -30,10 +30,12 @@ export function GuidanceBadge({ guidance, userRiskStyle }: GuidanceBadgeProps) {
       <p className="mb-3 text-sm font-semibold text-muted-foreground">
         What would you do?
       </p>
-      <div className="flex gap-2">
+      <div className="flex gap-2" role="radiogroup" aria-label="Risk style">
         {riskOptions.map(({ value, label }) => (
           <button
             key={value}
+            role="radio"
+            aria-checked={selected === value}
             onClick={() => setSelected(value)}
             className={cn(
               "flex-1 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200",

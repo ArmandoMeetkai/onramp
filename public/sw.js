@@ -1,4 +1,4 @@
-const CACHE_NAME = "onramp-v3";
+const CACHE_NAME = "onramp-v4";
 const STATIC_ASSETS = ["/", "/explore", "/practice", "/learn", "/chat", "/replay", "/profile"];
 
 self.addEventListener("install", (event) => {
