@@ -32,6 +32,9 @@ interface PredictionState {
   }
 }
 
+// Module-level lock: prevents concurrent resolveMarket calls on the same market
+const resolvingMarkets = new Set<string>()
+
 export const usePredictionStore = create<PredictionState>((set, get) => ({
   userPredictions: [],
 
@@ -104,12 +107,12 @@ export const usePredictionStore = create<PredictionState>((set, get) => ({
     set({ userPredictions: [...userPredictions, prediction] })
 
     try {
-      await Promise.all([
-        db.userPredictions.put(prediction),
-        db.portfolios.put(updatedPortfolio),
-      ])
+      await db.transaction("rw", db.userPredictions, db.portfolios, async () => {
+        await db.userPredictions.put(prediction)
+        await db.portfolios.put(updatedPortfolio)
+      })
     } catch {
-      // DB write failed — rollback both stores to keep memory consistent with DB
+      // Atomic transaction failed — rollback both stores
       usePortfolioStore.setState({ portfolio })
       set({ userPredictions })
       console.error("Failed to persist prediction — rolled back")
@@ -146,20 +149,8 @@ export const usePredictionStore = create<PredictionState>((set, get) => ({
       p.id === prediction.id ? resolved : p
     )
 
-    // Write resolved prediction to DB FIRST — prevents double-payout if subsequent
-    // writes fail. checkPriceResolutions guards with !p.resolved, so once this is
-    // persisted the market will never resolve again on reload.
-    try {
-      await db.userPredictions.put(resolved)
-    } catch {
-      console.error("Failed to persist market resolution — aborting payout")
-      return
-    }
-
-    // Safe to update memory now: DB already marks this as resolved
-    set({ userPredictions: updatedPredictions })
-
-    // Credit winnings back to holdings
+    // Build updated portfolio if a payout is owed
+    let updatedPortfolio = null as ReturnType<typeof usePortfolioStore.getState>["portfolio"]
     if (payoutCrypto > 0) {
       const portfolio = usePortfolioStore.getState().portfolio
       if (portfolio) {
@@ -183,14 +174,30 @@ export const usePredictionStore = create<PredictionState>((set, get) => ({
           })
         }
 
-        const updatedPortfolio = { ...portfolio, holdings }
-        usePortfolioStore.setState({ portfolio: updatedPortfolio })
-        try {
-          await db.portfolios.put(updatedPortfolio)
-        } catch {
-          console.error("Failed to persist payout")
-        }
+        updatedPortfolio = { ...portfolio, holdings }
       }
+    }
+
+    // Atomic Dexie transaction: both prediction and portfolio are persisted together.
+    // If either write fails, neither is committed — no double-payout and no lost winnings.
+    try {
+      if (updatedPortfolio) {
+        await db.transaction("rw", db.userPredictions, db.portfolios, async () => {
+          await db.userPredictions.put(resolved)
+          await db.portfolios.put(updatedPortfolio!)
+        })
+      } else {
+        await db.userPredictions.put(resolved)
+      }
+    } catch {
+      console.error("Failed to persist market resolution — no state change applied")
+      return
+    }
+
+    // DB write succeeded — safe to update memory
+    set({ userPredictions: updatedPredictions })
+    if (updatedPortfolio) {
+      usePortfolioStore.setState({ portfolio: updatedPortfolio })
     }
   },
 
@@ -228,8 +235,13 @@ export const usePredictionStore = create<PredictionState>((set, get) => ({
         outcome = market.resolvedOutcome
       }
 
-      if (outcome) {
-        await get().resolveMarket(userId, market.id, outcome)
+      if (outcome && !resolvingMarkets.has(market.id)) {
+        resolvingMarkets.add(market.id)
+        try {
+          await get().resolveMarket(userId, market.id, outcome)
+        } finally {
+          resolvingMarkets.delete(market.id)
+        }
       }
     }
   },

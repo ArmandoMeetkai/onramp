@@ -38,7 +38,7 @@ export function PredictionHubContent({ markets }: PredictionHubContentProps) {
   const [assetFilter, setAssetFilter] = useState<AssetFilter>("all")
   const [walkthroughDone, setWalkthroughDone] = useState(false)
   const [forceWalkthrough, setForceWalkthrough] = useState(false)
-  const profile = useUserStore((s) => s.profile)
+  const profileId = useUserStore((s) => s.profile?.id)
   const getPredictionForMarket = usePredictionStore((s) => s.getPredictionForMarket)
   const getMarketOdds = usePredictionStore((s) => s.getMarketOdds)
   const checkPriceResolutions = usePredictionStore((s) => s.checkPriceResolutions)
@@ -48,16 +48,20 @@ export function PredictionHubContent({ markets }: PredictionHubContentProps) {
   const showWalkthrough = autoShowWalkthrough || forceWalkthrough
 
   function handleReplayWalkthrough() {
-    localStorage.removeItem(WALKTHROUGH_HUB_KEY)
+    try {
+      localStorage.removeItem(WALKTHROUGH_HUB_KEY)
+    } catch {
+      // Safari Private Browsing
+    }
     setWalkthroughDone(false)
     setForceWalkthrough(true)
   }
 
   useEffect(() => {
-    if (profile) {
-      checkPriceResolutions(profile.id)
+    if (profileId) {
+      checkPriceResolutions(profileId)
     }
-  }, [profile, checkPriceResolutions])
+  }, [profileId, checkPriceResolutions])
 
   const filtered = markets.filter((market) => {
     const statusMatch = statusFilter === "all" || market.status === statusFilter

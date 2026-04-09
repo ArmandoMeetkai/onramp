@@ -325,8 +325,13 @@ export function PredictionWalkthrough({ onComplete }: PredictionWalkthroughProps
 export function useShouldShowWalkthrough(hasPredictions: boolean): boolean {
   const [show, setShow] = useState(false)
   useEffect(() => {
-    const seen = localStorage.getItem(WALKTHROUGH_HUB_KEY)
-    if (!seen && !hasPredictions) setShow(true)
+    try {
+      const seen = localStorage.getItem(WALKTHROUGH_HUB_KEY)
+      if (!seen && !hasPredictions) setShow(true)
+    } catch {
+      // Safari Private Browsing — show the walkthrough by default
+      if (!hasPredictions) setShow(true)
+    }
   }, [hasPredictions])
   return show
 }
@@ -334,8 +339,13 @@ export function useShouldShowWalkthrough(hasPredictions: boolean): boolean {
 export function useShouldShowFormWalkthrough(): boolean {
   const [show, setShow] = useState(false)
   useEffect(() => {
-    const seen = localStorage.getItem(WALKTHROUGH_FORM_KEY)
-    if (!seen) setShow(true)
+    try {
+      const seen = localStorage.getItem(WALKTHROUGH_FORM_KEY)
+      if (!seen) setShow(true)
+    } catch {
+      // Safari Private Browsing — show the walkthrough by default
+      setShow(true)
+    }
   }, [])
   return show
 }

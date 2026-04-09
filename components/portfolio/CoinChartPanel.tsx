@@ -19,7 +19,7 @@ export function CoinChartPanel({ symbol, name, sparkline, livePrice }: CoinChart
   const start = chartData[0]
   const end = chartData[chartData.length - 1]
   const isUp = end >= start
-  const weekPct = (((end - start) / start) * 100).toFixed(2)
+  const monthPct = (((end - start) / start) * 100).toFixed(2)
 
   return (
     <motion.div
@@ -33,11 +33,11 @@ export function CoinChartPanel({ symbol, name, sparkline, livePrice }: CoinChart
       <div className="mb-3 flex items-start justify-between">
         <div>
           <p className="text-sm font-semibold">{name}</p>
-          <p className="text-xs text-muted-foreground">Last 7 days · real market price</p>
+          <p className="text-xs text-muted-foreground">Last 30 days · real market price</p>
         </div>
         <div className="text-right">
           <p className={cn("text-sm font-semibold", isUp ? "text-success" : "text-danger")}>
-            {isUp ? "+" : ""}{weekPct}%
+            {isUp ? "+" : ""}{monthPct}%
           </p>
           <p className="text-[11px] text-muted-foreground">
             ${Math.round(start).toLocaleString()} → ${Math.round(end).toLocaleString()}
@@ -49,8 +49,8 @@ export function CoinChartPanel({ symbol, name, sparkline, livePrice }: CoinChart
 
       <p className="mt-1 text-center text-[11px] text-muted-foreground">
         {isUp
-          ? `${name} is up this week — prices still change daily.`
-          : `${name} dropped this week — volatility is normal in crypto.`}
+          ? `${name} is up this month — prices still change daily.`
+          : `${name} dropped this month — volatility is normal in crypto.`}
       </p>
     </motion.div>
   )

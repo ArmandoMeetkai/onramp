@@ -5,6 +5,7 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet"
 import { Button } from "@/components/ui/button"
+import { formatCrypto } from "@/lib/utils"
 
 interface TradeConfirmStepProps {
   action: "buy" | "sell"
@@ -14,12 +15,6 @@ interface TradeConfirmStepProps {
   symbol: string
   price: number
   onConfirm: () => void
-}
-
-function formatCrypto(n: number): string {
-  if (n < 0.001) return n.toFixed(6)
-  if (n < 1) return n.toFixed(4)
-  return n.toFixed(2)
 }
 
 export function TradeConfirmStep({
@@ -55,7 +50,7 @@ export function TradeConfirmStep({
               You {action === "buy" ? "receive" : "return"}
             </span>
             <span className="font-semibold">
-              {formatCrypto(cryptoAmount)} {symbol}
+              {formatCrypto(cryptoAmount, symbol)} {symbol}
             </span>
           </div>
           <div className="flex justify-between">

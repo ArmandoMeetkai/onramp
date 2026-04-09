@@ -93,7 +93,9 @@ export const usePortfolioStore = create<PortfolioState>((set, get) => ({
     try {
       await db.portfolios.put(updated)
     } catch {
-      console.error("Failed to persist buy transaction")
+      set({ portfolio: current })
+      console.error("Failed to persist buy transaction — rolled back")
+      return false
     }
     return true
   },
@@ -146,7 +148,9 @@ export const usePortfolioStore = create<PortfolioState>((set, get) => ({
     try {
       await db.portfolios.put(updated)
     } catch {
-      console.error("Failed to persist sell transaction")
+      set({ portfolio: current })
+      console.error("Failed to persist sell transaction — rolled back")
+      return false
     }
     return true
   },

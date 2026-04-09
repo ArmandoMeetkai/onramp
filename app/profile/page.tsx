@@ -106,19 +106,22 @@ export default function ProfilePage() {
             </Link>
           </div>
 
-          {userPredictions.length > 0 && (
-            <Link href="/predictions" className="mt-4 flex items-center justify-between rounded-2xl border border-accent/20 bg-accent/5 p-4 transition-all hover:border-accent/40">
-              <div>
-                <p className="text-sm font-semibold">Prediction Accuracy</p>
-                <p className="text-xs text-muted-foreground">
-                  {predictionAccuracy().total > 0
-                    ? `${Math.round(predictionAccuracy().rate * 100)}% accuracy (${predictionAccuracy().correct}/${predictionAccuracy().total})`
-                    : "No resolved predictions yet"
-                  }
-                </p>
-              </div>
-            </Link>
-          )}
+          {userPredictions.length > 0 && (() => {
+            const accuracy = predictionAccuracy()
+            return (
+              <Link href="/predictions" className="mt-4 flex items-center justify-between rounded-2xl border border-accent/20 bg-accent/5 p-4 transition-all hover:border-accent/40">
+                <div>
+                  <p className="text-sm font-semibold">Prediction Accuracy</p>
+                  <p className="text-xs text-muted-foreground">
+                    {accuracy.total > 0
+                      ? `${Math.round(accuracy.rate * 100)}% accuracy (${accuracy.correct}/${accuracy.total})`
+                      : "No resolved predictions yet"
+                    }
+                  </p>
+                </div>
+              </Link>
+            )
+          })()}
         </div>
 
         <Separator className="my-6" />

@@ -29,6 +29,14 @@ function memoryRateLimit(ip: string): { allowed: boolean; remaining: number } {
 
   timestamps.push(now)
   memoryRequests.set(ip, timestamps)
+
+  // Evict IPs with no recent activity to prevent unbounded Map growth
+  if (memoryRequests.size > 1000) {
+    for (const [key, ts] of memoryRequests) {
+      if (ts.every((t) => now - t >= WINDOW_MS)) memoryRequests.delete(key)
+    }
+  }
+
   return { allowed: true, remaining: MAX_REQUESTS - timestamps.length }
 }
 

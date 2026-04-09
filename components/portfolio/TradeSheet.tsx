@@ -13,7 +13,7 @@ import {
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { InfoTip } from "@/components/shared/InfoTip"
-import { cn } from "@/lib/utils"
+import { cn, formatCrypto } from "@/lib/utils"
 import { usePortfolioStore } from "@/store/usePortfolioStore"
 import { useProgressStore } from "@/store/useProgressStore"
 import { usePriceStore } from "@/store/usePriceStore"
@@ -32,12 +32,6 @@ interface TradeSheetProps {
 }
 
 const presetAmounts = [10, 25, 50, 100]
-
-function formatCrypto(n: number): string {
-  if (n < 0.001) return n.toFixed(6)
-  if (n < 1) return n.toFixed(4)
-  return n.toFixed(2)
-}
 
 export function TradeSheet({ open, onOpenChange, holdings }: TradeSheetProps) {
   const [step, setStep] = useState<TradeStep>("asset")
@@ -221,7 +215,7 @@ export function TradeSheet({ open, onOpenChange, holdings }: TradeSheetProps) {
                       <p className="text-sm text-muted-foreground">
                         You&apos;ll receive{" "}
                         <strong className="text-foreground">
-                          {formatCrypto(cryptoAmount)} {selectedAsset}
+                          {formatCrypto(cryptoAmount, selectedAsset)} {selectedAsset}
                         </strong>
                       </p>
                       <div className="flex items-center justify-center gap-1">
