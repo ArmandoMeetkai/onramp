@@ -1,16 +1,16 @@
 "use client"
 
-import { useState, useEffect, useCallback } from "react"
+import { useState, useEffect } from "react"
 import { motion } from "framer-motion"
-import { HelpCircle } from "lucide-react"
 import { PageTransition } from "@/components/layout/PageTransition"
 import { PredictionMarketCard } from "./PredictionMarketCard"
-import { PredictionWalkthrough, useShouldShowWalkthrough, triggerWalkthroughReplay } from "./PredictionWalkthrough"
+import { PredictionWalkthrough, useShouldShowWalkthrough, WALKTHROUGH_HUB_KEY } from "./PredictionWalkthrough"
 import { PredictionSummary } from "./PredictionSummary"
 import { PredictionPortfolioChip } from "./PredictionPortfolioChip"
 import { usePredictionStore } from "@/store/usePredictionStore"
 import { useUserStore } from "@/store/useUserStore"
 import { cn } from "@/lib/utils"
+import { HelpCircle } from "lucide-react"
 import type { PredictionMarket } from "@/data/predictionMarkets"
 
 const statusFilters = [
@@ -37,7 +37,7 @@ export function PredictionHubContent({ markets }: PredictionHubContentProps) {
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("active")
   const [assetFilter, setAssetFilter] = useState<AssetFilter>("all")
   const [walkthroughDone, setWalkthroughDone] = useState(false)
-  const [showManualWalkthrough, setShowManualWalkthrough] = useState(false)
+  const [forceWalkthrough, setForceWalkthrough] = useState(false)
   const profileId = useUserStore((s) => s.profile?.id)
   const getPredictionForMarket = usePredictionStore((s) => s.getPredictionForMarket)
   const getMarketOdds = usePredictionStore((s) => s.getMarketOdds)
@@ -45,14 +45,17 @@ export function PredictionHubContent({ markets }: PredictionHubContentProps) {
   const userPredictions = usePredictionStore((s) => s.userPredictions)
 
   const autoShowWalkthrough = useShouldShowWalkthrough(userPredictions.length > 0)
-  const showWalkthrough = (autoShowWalkthrough || showManualWalkthrough) && !walkthroughDone
+  const showWalkthrough = autoShowWalkthrough || forceWalkthrough
 
-  const handleReplayWalkthrough = useCallback(() => {
-    triggerWalkthroughReplay()
+  function handleReplayWalkthrough() {
+    try {
+      localStorage.removeItem(WALKTHROUGH_HUB_KEY)
+    } catch {
+      // Safari Private Browsing
+    }
     setWalkthroughDone(false)
-    setShowManualWalkthrough(true)
-  }, [])
-
+    setForceWalkthrough(true)
+  }
 
   useEffect(() => {
     if (profileId) {
@@ -162,9 +165,9 @@ export function PredictionHubContent({ markets }: PredictionHubContentProps) {
         </div>
       </div>
 
-      {/* Walkthrough overlay */}
-      {showWalkthrough && (
-        <PredictionWalkthrough onComplete={() => { setWalkthroughDone(true); setShowManualWalkthrough(false) }} />
+      {/* Walkthrough overlay — first time only */}
+      {showWalkthrough && !walkthroughDone && (
+        <PredictionWalkthrough onComplete={() => { setWalkthroughDone(true); setForceWalkthrough(false) }} />
       )}
     </PageTransition>
   )
