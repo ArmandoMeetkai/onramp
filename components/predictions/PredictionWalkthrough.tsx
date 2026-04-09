@@ -196,10 +196,11 @@ export function SpotlightTour({ steps, onComplete, storageKey }: SpotlightTourPr
             )}
           </motion.svg>
 
-          {/* Tooltip card */}
+          {/* Tooltip card — wait for measurement when step has a target */}
+          {(!step.targetId || targetRect) && (
           <motion.div
             key={stepIndex}
-            initial={{ opacity: 0, y: targetRect ? (side === "below" ? 10 : -10) : 30 }}
+            initial={{ opacity: 0, y: side === "below" ? 10 : -10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0 }}
             transition={{ type: "spring", stiffness: 280, damping: 28 }}
@@ -265,6 +266,7 @@ export function SpotlightTour({ steps, onComplete, storageKey }: SpotlightTourPr
               </Button>
             </div>
           </motion.div>
+          )}
         </>
       )}
     </AnimatePresence>
