@@ -16,8 +16,6 @@ import { usePredictionStore } from "@/store/usePredictionStore"
 import { usePortfolioStore } from "@/store/usePortfolioStore"
 import { usePriceStore } from "@/store/usePriceStore"
 import { useUserStore } from "@/store/useUserStore"
-import { PredictionFormWalkthrough } from "@/components/predictions/PredictionFormWalkthrough"
-import { useShouldShowFormWalkthrough } from "@/components/predictions/PredictionWalkthrough"
 import { getTimeRemaining } from "@/lib/utils"
 
 export default function PredictionDetailPage({
@@ -39,8 +37,6 @@ export default function PredictionDetailPage({
   const userPrediction = getPredictionForMarket(marketId)
   const odds = getMarketOdds(marketId)
   const [justPlaced, setJustPlaced] = useState(false)
-  const [formWalkthroughDone, setFormWalkthroughDone] = useState(false)
-  const showFormWalkthrough = useShouldShowFormWalkthrough()
 
   const handlePlace = useCallback(
     async (position: "yes" | "no", asset: "BTC" | "ETH" | "SOL", amount: number): Promise<boolean> => {
@@ -241,11 +237,6 @@ export default function PredictionDetailPage({
               onPlace={handlePlace}
             />
           </div>
-        )}
-
-        {/* Form walkthrough — only when form is actually rendered */}
-        {isActive && !hasEnded && !formWalkthroughDone && showFormWalkthrough && (
-          <PredictionFormWalkthrough onComplete={() => setFormWalkthroughDone(true)} />
         )}
 
         {/* Educational content */}
