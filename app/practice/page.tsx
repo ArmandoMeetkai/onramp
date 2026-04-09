@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, useMemo } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { Plus, RefreshCw, WifiOff } from "lucide-react"
+import { Plus, RefreshCw, WifiOff, TrendingUp, ArrowRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import { PageTransition } from "@/components/layout/PageTransition"
@@ -18,6 +18,7 @@ import { InfoTip } from "@/components/shared/InfoTip"
 import { LearnChips } from "@/components/shared/LearnChips"
 import { cn } from "@/lib/utils"
 import { CoinIcon } from "@/components/shared/CoinIcon"
+import Link from "next/link"
 import { usePortfolioStore } from "@/store/usePortfolioStore"
 import { useUserStore } from "@/store/useUserStore"
 import { usePriceStore } from "@/store/usePriceStore"
@@ -348,6 +349,30 @@ export default function PracticePage() {
             />
           )}
         </div>
+
+        {/* Prediction bridge */}
+        {hasHoldings && (
+          <Link
+            href="/predictions"
+            className="group mt-6 flex items-center gap-4 overflow-hidden rounded-2xl border border-accent/30 bg-gradient-to-r from-accent/10 via-accent/5 to-transparent p-4 transition-all hover:border-accent/50 hover:shadow-md active:scale-[0.98]"
+          >
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-accent/15">
+              <TrendingUp className="h-5 w-5 text-accent" />
+            </div>
+            <div className="flex-1">
+              <div className="flex items-center gap-2">
+                <p className="text-sm font-semibold">Think you know where it&apos;s heading?</p>
+                <span className="rounded-full bg-accent/20 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-accent">
+                  New
+                </span>
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Predict crypto outcomes with your practice cash
+              </p>
+            </div>
+            <ArrowRight className="h-4 w-4 text-accent transition-transform group-hover:translate-x-0.5" />
+          </Link>
+        )}
 
         <Separator className="my-6" />
 

@@ -5,6 +5,7 @@ import { useUserStore } from "@/store/useUserStore"
 import { useProgressStore } from "@/store/useProgressStore"
 import { usePortfolioStore } from "@/store/usePortfolioStore"
 import { useReplayStore } from "@/store/useReplayStore"
+import { usePredictionStore } from "@/store/usePredictionStore"
 
 export function useHydration() {
   const [isReady, setIsReady] = useState(false)
@@ -21,6 +22,7 @@ export function useHydration() {
             useProgressStore.getState().hydrate(profile.id),
             usePortfolioStore.getState().hydrate(profile.id),
             useReplayStore.getState().hydrate(profile.id),
+            usePredictionStore.getState().hydrate(profile.id),
           ])
         }
       } catch {

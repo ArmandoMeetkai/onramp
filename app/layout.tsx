@@ -69,7 +69,7 @@ export default function RootLayout({
           id="sw-register"
           strategy="afterInteractive"
           dangerouslySetInnerHTML={{
-            __html: `if('serviceWorker' in navigator){navigator.serviceWorker.register('/sw.js')}`,
+            __html: `if('serviceWorker' in navigator){if(location.hostname==='localhost'){navigator.serviceWorker.getRegistrations().then(function(r){r.forEach(function(reg){reg.unregister()})})}else{navigator.serviceWorker.register('/sw.js').then(function(reg){reg.update()})}}`,
           }}
         />
         <ClientShell>{children}</ClientShell>

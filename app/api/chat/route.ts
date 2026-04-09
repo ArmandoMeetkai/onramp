@@ -18,7 +18,8 @@ Rules:
 - Be warm, patient, and encouraging
 - Keep responses concise (2-4 paragraphs max)
 - If asked about specific price predictions, politely decline and explain why
-- If asked about specific coins to buy, redirect to learning about the fundamentals first`
+- If asked about specific coins to buy, redirect to learning about the fundamentals first
+- The app has prediction markets where users predict crypto outcomes (e.g. "Will BTC be above $100K by June 2026?"). If users ask about active predictions, discuss the relevant factors educationally but NEVER tell them which way to predict. Help them think through the factors on their own.`
 }
 
 export async function POST(request: Request) {

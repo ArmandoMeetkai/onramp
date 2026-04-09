@@ -1,14 +1,15 @@
 "use client"
 
-import { Flame } from "lucide-react"
+import Link from "next/link"
+import { Flame, ChevronRight } from "lucide-react"
 
 interface StreakBadgeProps {
   streakDays: number
 }
 
 export function StreakBadge({ streakDays }: StreakBadgeProps) {
-  return (
-    <div className="flex items-center gap-3 rounded-2xl border border-border bg-card p-4">
+  const content = (
+    <>
       <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-accent/10">
         <Flame className="h-5 w-5 text-accent" />
       </div>
@@ -29,6 +30,26 @@ export function StreakBadge({ streakDays }: StreakBadgeProps) {
           </>
         )}
       </div>
+      {streakDays === 0 && (
+        <ChevronRight className="h-4 w-4 text-muted-foreground/50" />
+      )}
+    </>
+  )
+
+  if (streakDays === 0) {
+    return (
+      <Link
+        href="/learn"
+        className="flex items-center gap-3 rounded-2xl border border-border bg-card p-4 transition-all duration-200 hover:border-primary/30 hover:shadow-sm active:scale-[0.98]"
+      >
+        {content}
+      </Link>
+    )
+  }
+
+  return (
+    <div className="flex items-center gap-3 rounded-2xl border border-border bg-card p-4">
+      {content}
     </div>
   )
 }

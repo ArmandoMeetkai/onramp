@@ -2,8 +2,9 @@
 
 import { useState, useCallback } from "react"
 import { useRouter } from "next/navigation"
-import { ArrowLeft, Check, Sparkles } from "lucide-react"
+import { ArrowLeft, Check, Sparkles, TrendingUp, ArrowRight } from "lucide-react"
 import { motion } from "framer-motion"
+import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Separator } from "@/components/ui/separator"
@@ -93,21 +94,53 @@ export default function ReadyPage() {
           className="mt-8"
         >
           {isSubmitted ? (
-            <div className="flex flex-col items-center rounded-2xl bg-success/10 p-6 text-center">
+            <div className="space-y-4">
+              <div className="flex flex-col items-center rounded-2xl bg-success/10 p-6 text-center">
+                <motion.div
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                  className="flex h-12 w-12 items-center justify-center rounded-full bg-success/20"
+                >
+                  <Check className="h-6 w-6 text-success" />
+                </motion.div>
+                <p className="mt-3 font-semibold text-success">
+                  You&apos;re on the list!
+                </p>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  We&apos;ll reach out when it&apos;s time.
+                </p>
+              </div>
+
               <motion.div
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                transition={{ type: "spring", stiffness: 300, damping: 20 }}
-                className="flex h-12 w-12 items-center justify-center rounded-full bg-success/20"
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.6 }}
               >
-                <Check className="h-6 w-6 text-success" />
+                <p className="text-center text-xs text-muted-foreground mb-3">
+                  While you wait, keep building your edge
+                </p>
+                <Link
+                  href="/predictions"
+                  className="group flex items-center gap-4 overflow-hidden rounded-2xl border border-accent/30 bg-gradient-to-r from-accent/10 via-accent/5 to-transparent p-4 transition-all hover:border-accent/50 hover:shadow-md active:scale-[0.98]"
+                >
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-accent/15">
+                    <TrendingUp className="h-5 w-5 text-accent" />
+                  </div>
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2">
+                      <p className="text-sm font-semibold">Try Predictions</p>
+                      <span className="rounded-full bg-accent/20 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-accent">
+                        New
+                      </span>
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      Predict crypto outcomes with your practice cash
+                    </p>
+                  </div>
+                  <ArrowRight className="h-4 w-4 text-accent transition-transform group-hover:translate-x-0.5" />
+                </Link>
               </motion.div>
-              <p className="mt-3 font-semibold text-success">
-                You&apos;re on the list!
-              </p>
-              <p className="mt-1 text-sm text-muted-foreground">
-                We&apos;ll reach out when it&apos;s time.
-              </p>
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="space-y-3">
