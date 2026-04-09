@@ -20,7 +20,11 @@ export function PredictionOddsBar({
 
   return (
     <div className="w-full">
-      <div className={cn("flex w-full overflow-hidden rounded-full", isLarge ? "h-6" : "h-3")}>
+      <div
+        role="img"
+        aria-label={`Market odds: YES ${yesPercent}%, NO ${noPercent}%`}
+        className={cn("flex w-full overflow-hidden rounded-full", isLarge ? "h-6" : "h-3")}
+      >
         <motion.div
           className={cn(
             "bg-success",
@@ -40,12 +44,10 @@ export function PredictionOddsBar({
           transition={{ duration: 0.6, ease: "easeOut" }}
         />
       </div>
-      {isLarge && (
-        <div className="mt-2 flex justify-between text-sm font-medium">
-          <span className="text-success">YES {yesPercent}%</span>
-          <span className="text-danger">NO {noPercent}%</span>
-        </div>
-      )}
+      <div className={cn("mt-1.5 flex justify-between font-medium", isLarge ? "text-sm" : "text-[11px]")}>
+        <span className="text-success">YES {yesPercent}%</span>
+        <span className="text-danger">NO {noPercent}%</span>
+      </div>
     </div>
   )
 }

@@ -67,9 +67,9 @@ export default function RootLayout({
         />
         <Script
           id="sw-register"
-          strategy="afterInteractive"
+          strategy="beforeInteractive"
           dangerouslySetInnerHTML={{
-            __html: `if('serviceWorker' in navigator){if(location.hostname==='localhost'){navigator.serviceWorker.getRegistrations().then(function(r){r.forEach(function(reg){reg.unregister()})})}else{navigator.serviceWorker.register('/sw.js').then(function(reg){reg.update()})}}`,
+            __html: `(function(){if(!('serviceWorker' in navigator))return;if(location.hostname==='localhost'||location.hostname==='127.0.0.1'){navigator.serviceWorker.getRegistrations().then(function(regs){if(regs.length>0){Promise.all(regs.map(function(r){return r.unregister()})).then(function(){if('caches' in window){caches.keys().then(function(keys){Promise.all(keys.map(function(k){return caches.delete(k)}))})}})}});return;}navigator.serviceWorker.register('/sw.js').then(function(reg){reg.update()})})()`,
           }}
         />
         <ClientShell>{children}</ClientShell>

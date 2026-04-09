@@ -5,7 +5,8 @@ import { motion } from "framer-motion"
 import { PageTransition } from "@/components/layout/PageTransition"
 import { PredictionMarketCard } from "./PredictionMarketCard"
 import { PredictionWalkthrough, useShouldShowWalkthrough } from "./PredictionWalkthrough"
-import { CashBalance } from "./CashBalance"
+import { PredictionSummary } from "./PredictionSummary"
+import { PredictionPortfolioChip } from "./PredictionPortfolioChip"
 import { usePredictionStore } from "@/store/usePredictionStore"
 import { usePortfolioStore } from "@/store/usePortfolioStore"
 import { useUserStore } from "@/store/useUserStore"
@@ -37,7 +38,7 @@ export function PredictionHubContent({ markets }: PredictionHubContentProps) {
   const [assetFilter, setAssetFilter] = useState<AssetFilter>("all")
   const [walkthroughDone, setWalkthroughDone] = useState(false)
   const profile = useUserStore((s) => s.profile)
-  const portfolioBalance = usePortfolioStore((s) => s.portfolio?.balance ?? 0)
+  const _portfolioBalance = usePortfolioStore((s) => s.portfolio?.balance ?? 0)
   const getPredictionForMarket = usePredictionStore((s) => s.getPredictionForMarket)
   const getMarketOdds = usePredictionStore((s) => s.getMarketOdds)
   const checkPriceResolutions = usePredictionStore((s) => s.checkPriceResolutions)
@@ -69,11 +70,17 @@ export function PredictionHubContent({ markets }: PredictionHubContentProps) {
               Predict crypto outcomes. Learn to think probabilistically.
             </p>
           </div>
-          <CashBalance balance={portfolioBalance} />
+          <div id="pred-balance">
+            <PredictionPortfolioChip />
+          </div>
         </div>
 
+        {/* Summary — only when user has predictions */}
+        {userPredictions.length > 0 && <PredictionSummary />}
+
         {/* Asset filter */}
-        <div className="mt-5 flex gap-2 overflow-x-auto">
+        <div id="pred-filters" className="mt-5">
+        <div className="flex gap-2 overflow-x-auto">
           {assetFilters.map((filter) => (
             <button
               key={filter.value}
@@ -107,11 +114,13 @@ export function PredictionHubContent({ markets }: PredictionHubContentProps) {
             </button>
           ))}
         </div>
+        </div>
 
         <div className="mt-5 space-y-3">
           {filtered.map((market, index) => (
             <motion.div
               key={market.id}
+              id={index === 0 ? "pred-first-card" : undefined}
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.25, delay: index * 0.06 }}

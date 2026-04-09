@@ -2,7 +2,7 @@
 
 import { use, useCallback, useState } from "react"
 import { useRouter } from "next/navigation"
-import { ArrowLeft, Clock, Check } from "lucide-react"
+import { ArrowLeft, Clock, Check, Lock } from "lucide-react"
 import Link from "next/link"
 import { motion } from "framer-motion"
 import { Badge } from "@/components/ui/badge"
@@ -16,20 +16,9 @@ import { usePredictionStore } from "@/store/usePredictionStore"
 import { usePortfolioStore } from "@/store/usePortfolioStore"
 import { usePriceStore } from "@/store/usePriceStore"
 import { useUserStore } from "@/store/useUserStore"
-
-function getTimeRemaining(dateStr: string): string {
-  const diff = new Date(dateStr).getTime() - Date.now()
-  if (diff <= 0) return "Ended"
-  const days = Math.floor(diff / (1000 * 60 * 60 * 24))
-  if (days > 30) {
-    const months = Math.floor(days / 30)
-    const remainingDays = days % 30
-    return remainingDays > 0 ? `${months}mo ${remainingDays}d left` : `${months}mo left`
-  }
-  if (days > 0) return `${days}d left`
-  const hours = Math.floor(diff / (1000 * 60 * 60))
-  return `${hours}h left`
-}
+import { PredictionFormWalkthrough } from "@/components/predictions/PredictionFormWalkthrough"
+import { useShouldShowFormWalkthrough } from "@/components/predictions/PredictionWalkthrough"
+import { getTimeRemaining } from "@/lib/utils"
 
 export default function PredictionDetailPage({
   params,
@@ -50,11 +39,13 @@ export default function PredictionDetailPage({
   const userPrediction = getPredictionForMarket(marketId)
   const odds = getMarketOdds(marketId)
   const [justPlaced, setJustPlaced] = useState(false)
+  const [formWalkthroughDone, setFormWalkthroughDone] = useState(false)
+  const showFormWalkthrough = useShouldShowFormWalkthrough()
 
   const handlePlace = useCallback(
-    async (position: "yes" | "no", amount: number): Promise<boolean> => {
+    async (position: "yes" | "no", asset: "BTC" | "ETH" | "SOL", amount: number): Promise<boolean> => {
       if (!profile) return false
-      const success = await placePrediction(profile.id, marketId, position, amount)
+      const success = await placePrediction(profile.id, marketId, position, asset, amount)
       if (success) setJustPlaced(true)
       return success
     },
@@ -103,8 +94,8 @@ export default function PredictionDetailPage({
         >
           <div className="flex items-start justify-between">
             <span className="text-4xl">{market.coverEmoji}</span>
-            <Badge variant="secondary" className="rounded-lg px-3 py-1 text-sm font-bold">
-              {market.asset}
+            <Badge variant="secondary" className="rounded-lg px-3 py-1 text-sm font-medium">
+              About: {market.asset}
             </Badge>
           </div>
           <h1 className="mt-4 font-heading text-xl font-bold tracking-tight leading-tight">
@@ -161,25 +152,43 @@ export default function PredictionDetailPage({
             transition={{ type: "spring", stiffness: 200, damping: 20 }}
             className="mt-5 space-y-4"
           >
-            <div className="rounded-2xl border border-primary/20 bg-primary/5 p-5 text-center">
+            <div className="rounded-2xl border border-primary/20 bg-primary/5 p-5">
+              <div className="flex items-center gap-3">
+                {justPlaced && (
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-success/20">
+                    <Check className="h-5 w-5 text-success" />
+                  </div>
+                )}
+                <div className="flex-1">
+                  <p className="text-sm font-semibold text-primary">
+                    {justPlaced ? "Prediction placed!" : "Your prediction"}
+                  </p>
+                  <p className="text-2xl font-bold leading-tight">
+                    {userPrediction.position.toUpperCase()}
+                  </p>
+                  <p className="text-sm font-medium">
+                    {(userPrediction.cryptoAmount ?? 0).toFixed(userPrediction.asset === "BTC" ? 6 : 4)} {userPrediction.asset ?? ""}
+                    <span className="ml-1 text-xs font-normal text-muted-foreground">
+                      (~${Math.round((userPrediction.cryptoAmount ?? 0) * (getPrice(userPrediction.asset ?? "BTC") || userPrediction.priceAtPrediction || 0))})
+                    </span>
+                  </p>
+                </div>
+              </div>
               {justPlaced && (
-                <div className="mx-auto mb-2 flex h-10 w-10 items-center justify-center rounded-full bg-success/20">
-                  <Check className="h-5 w-5 text-success" />
+                <div className="mt-4 rounded-xl bg-muted/60 px-4 py-3 text-xs text-muted-foreground leading-relaxed">
+                  <span className="font-semibold text-foreground">What happens next?</span>{" "}
+                  Your {userPrediction.asset} is now at stake. This market resolves on{" "}
+                  <span className="font-semibold text-foreground">
+                    {new Date(market.resolutionDate).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}
+                  </span>
+                  . If you&apos;re right, you&apos;ll get your crypto back plus a bonus. If not, you lose what you staked — that&apos;s how real investors learn to think probabilistically.
                 </div>
               )}
-              <p className="text-sm font-semibold text-primary">
-                {justPlaced ? "Prediction placed!" : "Your prediction"}
-              </p>
-              <p className="mt-1 text-2xl font-bold">
-                {userPrediction.position.toUpperCase()}
-              </p>
-              <p className="mt-1 text-sm font-medium">
-                {(userPrediction.cryptoAmount ?? 0).toFixed(userPrediction.asset === "BTC" ? 6 : 4)} {userPrediction.asset ?? ""}
-              </p>
-              <p className="text-xs text-muted-foreground">
-                ~${Math.round((userPrediction.cryptoAmount ?? 0) * (getPrice(userPrediction.asset ?? "BTC") || userPrediction.priceAtPrediction || 0))}
-                {hasEnded ? " — Awaiting resolution" : ""}
-              </p>
+              {hasEnded && (
+                <p className="mt-3 text-xs text-muted-foreground text-center">
+                  ⏳ Market ended — awaiting official resolution
+                </p>
+              )}
             </div>
 
             {justPlaced && (
@@ -201,16 +210,42 @@ export default function PredictionDetailPage({
           </motion.div>
         )}
 
+        {/* Market ended without a prediction — awaiting resolution */}
+        {hasEnded && !userPrediction && (
+          <motion.div
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mt-5 flex items-start gap-3 rounded-2xl border border-border bg-muted/40 p-5"
+          >
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-muted">
+              <Lock className="h-4 w-4 text-muted-foreground" />
+            </div>
+            <div>
+              <p className="text-sm font-semibold">Market closed</p>
+              <p className="mt-1 text-xs text-muted-foreground leading-relaxed">
+                This market ended before you placed a prediction. The outcome will be resolved soon — check back to see what happened.
+              </p>
+            </div>
+          </motion.div>
+        )}
+
         {/* Place prediction form */}
         {isActive && !hasEnded && (
-          <div className="mt-5">
+          <div className="mt-5" id="pred-form-section">
             <PredictionPlaceForm
-              asset={market.asset}
-              holdingAmount={portfolio?.holdings.find((h) => h.asset === market.asset)?.amount ?? 0}
-              currentPrice={getPrice(market.asset)}
+              holdings={(["BTC", "ETH", "SOL"] as const).map((a) => ({
+                asset: a,
+                amount: portfolio?.holdings.find((h) => h.asset === a)?.amount ?? 0,
+                price: getPrice(a),
+              }))}
               onPlace={handlePlace}
             />
           </div>
+        )}
+
+        {/* Form walkthrough — only when form is actually rendered */}
+        {isActive && !hasEnded && !formWalkthroughDone && showFormWalkthrough && (
+          <PredictionFormWalkthrough onComplete={() => setFormWalkthroughDone(true)} />
         )}
 
         {/* Educational content */}

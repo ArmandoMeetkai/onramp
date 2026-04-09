@@ -2,9 +2,12 @@ const CACHE_NAME = "onramp-v5";
 const STATIC_ASSETS = ["/", "/explore", "/practice", "/learn", "/chat", "/replay", "/predictions", "/profile"];
 
 self.addEventListener("install", (event) => {
-  event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(STATIC_ASSETS))
-  );
+  const isDev = self.location.hostname === "localhost" || self.location.hostname === "127.0.0.1";
+  if (!isDev) {
+    event.waitUntil(
+      caches.open(CACHE_NAME).then((cache) => cache.addAll(STATIC_ASSETS))
+    );
+  }
   self.skipWaiting();
 });
 
@@ -22,6 +25,9 @@ self.addEventListener("activate", (event) => {
 self.addEventListener("fetch", (event) => {
   const { request } = event;
   const url = new URL(request.url);
+
+  // Never intercept in development — avoids stale module errors with Turbopack
+  if (url.hostname === "localhost" || url.hostname === "127.0.0.1") return;
 
   // Skip non-GET requests
   if (request.method !== "GET") return;

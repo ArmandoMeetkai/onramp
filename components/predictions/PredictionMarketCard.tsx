@@ -4,7 +4,7 @@ import Link from "next/link"
 import { ChevronRight, Check, X } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { PredictionOddsBar } from "./PredictionOddsBar"
-import { cn } from "@/lib/utils"
+import { cn, formatCrypto, getTimeRemaining } from "@/lib/utils"
 import type { PredictionMarket } from "@/data/predictionMarkets"
 import type { UserPrediction } from "@/lib/db"
 
@@ -12,16 +12,6 @@ interface PredictionMarketCardProps {
   market: PredictionMarket
   odds: { yesPercent: number; noPercent: number }
   userPrediction?: UserPrediction
-}
-
-function getTimeRemaining(dateStr: string): string {
-  const diff = new Date(dateStr).getTime() - Date.now()
-  if (diff <= 0) return "Ended"
-  const days = Math.floor(diff / (1000 * 60 * 60 * 24))
-  if (days > 30) return `${Math.floor(days / 30)}mo left`
-  if (days > 0) return `${days}d left`
-  const hours = Math.floor(diff / (1000 * 60 * 60))
-  return `${hours}h left`
 }
 
 const categoryLabels: Record<string, string> = {
@@ -46,7 +36,9 @@ export function PredictionMarketCard({
         isResolved
           ? userWon
             ? "border-success/30"
-            : "border-border"
+            : userPrediction?.resolved
+              ? "border-danger/20"
+              : "border-border"
           : "border-border"
       )}
     >
@@ -87,7 +79,7 @@ export function PredictionMarketCard({
                 : "bg-danger/15 text-danger"
             )}
           >
-            You: {userPrediction.position.toUpperCase()} · {(userPrediction.cryptoAmount ?? 0).toFixed(userPrediction.asset === "BTC" ? 6 : 4)} {userPrediction.asset ?? ""}
+            You: {userPrediction.position.toUpperCase()} · {formatCrypto(userPrediction.cryptoAmount ?? 0, userPrediction.asset ?? "BTC")} {userPrediction.asset ?? ""}
           </Badge>
           {isResolved && (
             <Badge
@@ -97,9 +89,9 @@ export function PredictionMarketCard({
               )}
             >
               {userWon ? (
-                <><Check className="mr-1 inline h-3 w-3" />Won +{((userPrediction.payoutCrypto ?? 0) - (userPrediction.cryptoAmount ?? 0)).toFixed(userPrediction.asset === "BTC" ? 6 : 4)} {userPrediction.asset ?? ""}</>
+                <><Check className="mr-1 inline h-3 w-3" />Won +{formatCrypto((userPrediction.payoutCrypto ?? 0) - (userPrediction.cryptoAmount ?? 0), userPrediction.asset ?? "BTC")} {userPrediction.asset ?? ""}</>
               ) : (
-                <><X className="mr-1 inline h-3 w-3" />Lost {(userPrediction.cryptoAmount ?? 0).toFixed(userPrediction.asset === "BTC" ? 6 : 4)} {userPrediction.asset ?? ""}</>
+                <><X className="mr-1 inline h-3 w-3" />Lost {formatCrypto(userPrediction.cryptoAmount ?? 0, userPrediction.asset ?? "BTC")} {userPrediction.asset ?? ""}</>
               )}
             </Badge>
           )}

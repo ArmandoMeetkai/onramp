@@ -12,6 +12,7 @@ interface PredictionState {
     userId: string,
     marketId: string,
     position: "yes" | "no",
+    asset: "BTC" | "ETH" | "SOL",
     usdAmount: number
   ) => Promise<boolean>
   resolveMarket: (
@@ -24,6 +25,11 @@ interface PredictionState {
   getPredictionForMarket: (marketId: string) => UserPrediction | undefined
   getMarketOdds: (marketId: string) => { yesPercent: number; noPercent: number }
   getPredictionAccuracy: () => { total: number; correct: number; rate: number }
+  getPredictionStats: () => {
+    perCoin: Record<"BTC" | "ETH" | "SOL", { staked: number; returned: number; net: number }>
+    totalNetUsd: number
+    counts: { total: number; wins: number; losses: number; pending: number }
+  }
 }
 
 export const usePredictionStore = create<PredictionState>((set, get) => ({
@@ -50,7 +56,7 @@ export const usePredictionStore = create<PredictionState>((set, get) => ({
     }
   },
 
-  placePrediction: async (userId, marketId, position, usdAmount) => {
+  placePrediction: async (userId, marketId, position, asset, usdAmount) => {
     const { userPredictions } = get()
     const market = getMarketById(marketId)
     if (!market) return false
@@ -58,7 +64,6 @@ export const usePredictionStore = create<PredictionState>((set, get) => ({
     const portfolio = usePortfolioStore.getState().portfolio
     if (!portfolio) return false
 
-    const asset = market.asset
     const price = usePriceStore.getState().getPrice(asset)
     if (price <= 0) return false
 
@@ -248,6 +253,48 @@ export const usePredictionStore = create<PredictionState>((set, get) => ({
       total: resolved.length,
       correct: correct.length,
       rate: resolved.length > 0 ? correct.length / resolved.length : 0,
+    }
+  },
+
+  getPredictionStats: () => {
+    const predictions = get().userPredictions
+    const assets = ["BTC", "ETH", "SOL"] as const
+
+    const perCoin = Object.fromEntries(
+      assets.map((a) => [a, { staked: 0, returned: 0, net: 0 }])
+    ) as Record<"BTC" | "ETH" | "SOL", { staked: number; returned: number; net: number }>
+
+    let wins = 0
+    let losses = 0
+    let pending = 0
+
+    for (const p of predictions) {
+      const coin = p.asset
+      if (!perCoin[coin]) continue
+
+      if (!p.resolved) {
+        perCoin[coin].staked += p.cryptoAmount
+        pending++
+      } else {
+        const payout = p.payoutCrypto ?? 0
+        perCoin[coin].staked += p.cryptoAmount
+        perCoin[coin].returned += payout
+        perCoin[coin].net += payout - p.cryptoAmount
+        if (payout > 0) wins++
+        else losses++
+      }
+    }
+
+    // Total net P&L in USD using current prices
+    const totalNetUsd = assets.reduce((sum, a) => {
+      const price = usePriceStore.getState().getPrice(a)
+      return sum + perCoin[a].net * price
+    }, 0)
+
+    return {
+      perCoin,
+      totalNetUsd,
+      counts: { total: predictions.length, wins, losses, pending },
     }
   },
 }))
