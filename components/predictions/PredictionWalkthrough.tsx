@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useCallback } from "react"
+import { useState, useEffect, useCallback, useRef } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { ArrowRight, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -34,19 +34,22 @@ interface SpotlightTourProps {
   steps: TourStep[]
   onComplete: () => void
   storageKey: string
-  devMode?: boolean
 }
 
-export function SpotlightTour({ steps, onComplete, storageKey, devMode = true }: SpotlightTourProps) {
+export function SpotlightTour({ steps, onComplete, storageKey }: SpotlightTourProps) {
   const [stepIndex, setStepIndex] = useState(0)
   const [isVisible, setIsVisible] = useState(false)
   const [targetRect, setTargetRect] = useState<TargetRect | null>(null)
+  const scrollTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const dismissTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const step = steps[stepIndex]
   const isLast = stepIndex === steps.length - 1
 
-  // Measure target element after scrolling it into view
+  // Measure target element, returns a cleanup fn to cancel the pending timer
   const measureTarget = useCallback((id: string | undefined) => {
+    if (scrollTimerRef.current) clearTimeout(scrollTimerRef.current)
+
     if (!id) {
       setTargetRect(null)
       return
@@ -56,12 +59,36 @@ export function SpotlightTour({ steps, onComplete, storageKey, devMode = true }:
       setTargetRect(null)
       return
     }
-    el.scrollIntoView({ behavior: "smooth", block: "center" })
-    // Wait for scroll to settle before measuring
-    setTimeout(() => {
+
+    const doMeasure = () => {
       const r = el.getBoundingClientRect()
       setTargetRect({ left: r.left, top: r.top, width: r.width, height: r.height })
-    }, 450)
+    }
+
+    el.scrollIntoView({ behavior: "smooth", block: "center" })
+    // Wait for scroll to settle before measuring
+    scrollTimerRef.current = setTimeout(doMeasure, 450)
+  }, [])
+
+  // Re-measure on window resize / orientation change
+  useEffect(() => {
+    function handleResize() {
+      measureTarget(step.targetId)
+    }
+    window.addEventListener("resize", handleResize)
+    window.addEventListener("orientationchange", handleResize)
+    return () => {
+      window.removeEventListener("resize", handleResize)
+      window.removeEventListener("orientationchange", handleResize)
+    }
+  }, [step.targetId, measureTarget])
+
+  // Cleanup all timers on unmount
+  useEffect(() => {
+    return () => {
+      if (scrollTimerRef.current) clearTimeout(scrollTimerRef.current)
+      if (dismissTimerRef.current) clearTimeout(dismissTimerRef.current)
+    }
   }, [])
 
   useEffect(() => {
@@ -91,8 +118,8 @@ export function SpotlightTour({ steps, onComplete, storageKey, devMode = true }:
 
   function dismiss() {
     setIsVisible(false)
-    if (!devMode) localStorage.setItem(storageKey, "1")
-    setTimeout(onComplete, 300)
+    localStorage.setItem(storageKey, "1")
+    dismissTimerRef.current = setTimeout(onComplete, 300)
   }
 
   // Decide tooltip position
@@ -116,15 +143,14 @@ export function SpotlightTour({ steps, onComplete, storageKey, devMode = true }:
     <AnimatePresence>
       {isVisible && (
         <>
-          {/* SVG overlay with cutout */}
+          {/* SVG overlay — pointer-events on the dark area only, cutout passes through */}
           <motion.svg
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.25 }}
-            className="pointer-events-none fixed inset-0 z-50 h-full w-full"
-            onClick={dismiss}
-            style={{ pointerEvents: "all" }}
+            className="fixed inset-0 z-50 h-full w-full"
+            style={{ pointerEvents: "none" }}
           >
             <defs>
               <mask id={`tour-mask-${stepIndex}`}>
@@ -141,14 +167,16 @@ export function SpotlightTour({ steps, onComplete, storageKey, devMode = true }:
                 )}
               </mask>
             </defs>
-            {/* Dark overlay with cutout */}
+            {/* Dark overlay — gets pointer events so clicks on the dim area dismiss */}
             <rect
               width="100%"
               height="100%"
               fill="rgba(0,0,0,0.72)"
               mask={`url(#tour-mask-${stepIndex})`}
+              style={{ pointerEvents: "all", cursor: "pointer" }}
+              onClick={dismiss}
             />
-            {/* Highlight ring */}
+            {/* Highlight ring — decorative, no pointer events */}
             {targetRect && (
               <rect
                 x={targetRect.left - PADDING}
@@ -159,6 +187,7 @@ export function SpotlightTour({ steps, onComplete, storageKey, devMode = true }:
                 fill="none"
                 stroke="rgba(255,255,255,0.55)"
                 strokeWidth="2"
+                style={{ pointerEvents: "none" }}
               />
             )}
           </motion.svg>
@@ -283,33 +312,26 @@ export function PredictionWalkthrough({ onComplete }: PredictionWalkthroughProps
       steps={HUB_STEPS}
       onComplete={onComplete}
       storageKey={WALKTHROUGH_HUB_KEY}
-      devMode={true}
     />
   )
 }
 
 // ─── Hooks ────────────────────────────────────────────────────────────────────
 
-export function useShouldShowWalkthrough(_hasPredictions: boolean): boolean {
+export function useShouldShowWalkthrough(hasPredictions: boolean): boolean {
   const [show, setShow] = useState(false)
   useEffect(() => {
-    if (typeof window === "undefined") return
-    // DEV: always show — for prod restore:
-    // const seen = localStorage.getItem(WALKTHROUGH_HUB_KEY)
-    // if (!seen && !_hasPredictions) setShow(true)
-    setShow(true)
-  }, [])
+    const seen = localStorage.getItem(WALKTHROUGH_HUB_KEY)
+    if (!seen && !hasPredictions) setShow(true)
+  }, [hasPredictions])
   return show
 }
 
 export function useShouldShowFormWalkthrough(): boolean {
   const [show, setShow] = useState(false)
   useEffect(() => {
-    if (typeof window === "undefined") return
-    // DEV: always show — for prod restore:
-    // const seen = localStorage.getItem(WALKTHROUGH_FORM_KEY)
-    // if (!seen) setShow(true)
-    setShow(true)
+    const seen = localStorage.getItem(WALKTHROUGH_FORM_KEY)
+    if (!seen) setShow(true)
   }, [])
   return show
 }

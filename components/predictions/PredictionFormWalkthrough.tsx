@@ -40,7 +40,6 @@ export function PredictionFormWalkthrough({ onComplete }: PredictionFormWalkthro
       steps={FORM_STEPS}
       onComplete={onComplete}
       storageKey={WALKTHROUGH_FORM_KEY}
-      devMode={true}
     />
   )
 }

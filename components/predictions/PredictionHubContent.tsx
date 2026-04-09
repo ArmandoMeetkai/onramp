@@ -4,13 +4,13 @@ import { useState, useEffect } from "react"
 import { motion } from "framer-motion"
 import { PageTransition } from "@/components/layout/PageTransition"
 import { PredictionMarketCard } from "./PredictionMarketCard"
-import { PredictionWalkthrough, useShouldShowWalkthrough } from "./PredictionWalkthrough"
+import { PredictionWalkthrough, useShouldShowWalkthrough, WALKTHROUGH_HUB_KEY } from "./PredictionWalkthrough"
 import { PredictionSummary } from "./PredictionSummary"
 import { PredictionPortfolioChip } from "./PredictionPortfolioChip"
 import { usePredictionStore } from "@/store/usePredictionStore"
-import { usePortfolioStore } from "@/store/usePortfolioStore"
 import { useUserStore } from "@/store/useUserStore"
 import { cn } from "@/lib/utils"
+import { HelpCircle } from "lucide-react"
 import type { PredictionMarket } from "@/data/predictionMarkets"
 
 const statusFilters = [
@@ -37,14 +37,21 @@ export function PredictionHubContent({ markets }: PredictionHubContentProps) {
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("active")
   const [assetFilter, setAssetFilter] = useState<AssetFilter>("all")
   const [walkthroughDone, setWalkthroughDone] = useState(false)
+  const [forceWalkthrough, setForceWalkthrough] = useState(false)
   const profile = useUserStore((s) => s.profile)
-  const _portfolioBalance = usePortfolioStore((s) => s.portfolio?.balance ?? 0)
   const getPredictionForMarket = usePredictionStore((s) => s.getPredictionForMarket)
   const getMarketOdds = usePredictionStore((s) => s.getMarketOdds)
   const checkPriceResolutions = usePredictionStore((s) => s.checkPriceResolutions)
   const userPredictions = usePredictionStore((s) => s.userPredictions)
 
-  const showWalkthrough = useShouldShowWalkthrough(userPredictions.length > 0)
+  const autoShowWalkthrough = useShouldShowWalkthrough(userPredictions.length > 0)
+  const showWalkthrough = autoShowWalkthrough || forceWalkthrough
+
+  function handleReplayWalkthrough() {
+    localStorage.removeItem(WALKTHROUGH_HUB_KEY)
+    setWalkthroughDone(false)
+    setForceWalkthrough(true)
+  }
 
   useEffect(() => {
     if (profile) {
@@ -63,9 +70,18 @@ export function PredictionHubContent({ markets }: PredictionHubContentProps) {
       <div className="py-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="font-heading text-2xl font-bold tracking-tight">
-              Predictions
-            </h1>
+            <div className="flex items-center gap-2">
+              <h1 className="font-heading text-2xl font-bold tracking-tight">
+                Predictions
+              </h1>
+              <button
+                onClick={handleReplayWalkthrough}
+                aria-label="How it works"
+                className="text-muted-foreground transition-colors hover:text-foreground"
+              >
+                <HelpCircle className="h-5 w-5" />
+              </button>
+            </div>
             <p className="mt-1 text-muted-foreground">
               Predict crypto outcomes. Learn to think probabilistically.
             </p>
@@ -78,42 +94,40 @@ export function PredictionHubContent({ markets }: PredictionHubContentProps) {
         {/* Summary — only when user has predictions */}
         {userPredictions.length > 0 && <PredictionSummary />}
 
-        {/* Asset filter */}
-        <div id="pred-filters" className="mt-5">
-        <div className="flex gap-2 overflow-x-auto">
-          {assetFilters.map((filter) => (
-            <button
-              key={filter.value}
-              onClick={() => setAssetFilter(filter.value)}
-              className={cn(
-                "shrink-0 rounded-full px-4 py-2 text-sm font-medium transition-colors",
-                assetFilter === filter.value
-                  ? "bg-primary text-primary-foreground"
-                  : "bg-muted text-muted-foreground hover:text-foreground"
-              )}
-            >
-              {filter.label}
-            </button>
-          ))}
-        </div>
-
-        {/* Status filter */}
-        <div className="mt-2 flex gap-2">
-          {statusFilters.map((filter) => (
-            <button
-              key={filter.value}
-              onClick={() => setStatusFilter(filter.value)}
-              className={cn(
-                "rounded-full px-3 py-1.5 text-xs font-medium transition-colors",
-                statusFilter === filter.value
-                  ? "bg-muted text-foreground"
-                  : "text-muted-foreground hover:text-foreground"
-              )}
-            >
-              {filter.label}
-            </button>
-          ))}
-        </div>
+        {/* Filters */}
+        <div id="pred-filters" className="mt-5 space-y-2">
+          <div className="flex gap-2 overflow-x-auto">
+            {assetFilters.map((filter) => (
+              <button
+                key={filter.value}
+                onClick={() => setAssetFilter(filter.value)}
+                className={cn(
+                  "shrink-0 rounded-full px-4 py-2 text-sm font-medium transition-colors",
+                  assetFilter === filter.value
+                    ? "bg-primary text-primary-foreground"
+                    : "bg-muted text-muted-foreground hover:text-foreground"
+                )}
+              >
+                {filter.label}
+              </button>
+            ))}
+          </div>
+          <div className="flex gap-2">
+            {statusFilters.map((filter) => (
+              <button
+                key={filter.value}
+                onClick={() => setStatusFilter(filter.value)}
+                className={cn(
+                  "rounded-full px-3 py-1.5 text-xs font-medium transition-colors",
+                  statusFilter === filter.value
+                    ? "bg-muted text-foreground"
+                    : "text-muted-foreground hover:text-foreground"
+                )}
+              >
+                {filter.label}
+              </button>
+            ))}
+          </div>
         </div>
 
         <div className="mt-5 space-y-3">
@@ -149,7 +163,7 @@ export function PredictionHubContent({ markets }: PredictionHubContentProps) {
 
       {/* Walkthrough overlay — first time only */}
       {showWalkthrough && !walkthroughDone && (
-        <PredictionWalkthrough onComplete={() => setWalkthroughDone(true)} />
+        <PredictionWalkthrough onComplete={() => { setWalkthroughDone(true); setForceWalkthrough(false) }} />
       )}
     </PageTransition>
   )

@@ -5,7 +5,7 @@ import { ChevronDown, X } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
 import { usePortfolioStore } from "@/store/usePortfolioStore"
 import { usePriceStore } from "@/store/usePriceStore"
-import { cn } from "@/lib/utils"
+import { cn, formatCrypto } from "@/lib/utils"
 
 const ASSETS = ["BTC", "ETH", "SOL"] as const
 
@@ -13,12 +13,6 @@ const COIN_COLORS: Record<string, string> = {
   BTC: "text-[oklch(0.72_0.12_55)]",
   ETH: "text-[oklch(0.65_0.1_280)]",
   SOL: "text-[oklch(0.72_0.15_310)]",
-}
-
-function formatCrypto(amount: number, asset: string): string {
-  if (asset === "BTC") return amount.toFixed(6)
-  if (asset === "ETH") return amount.toFixed(4)
-  return amount.toFixed(2)
 }
 
 export function PredictionPortfolioChip() {

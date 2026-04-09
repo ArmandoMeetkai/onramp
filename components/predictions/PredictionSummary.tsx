@@ -9,10 +9,18 @@ import { cn, formatCrypto } from "@/lib/utils"
 const ASSETS = ["BTC", "ETH", "SOL"] as const
 
 export function PredictionSummary() {
+  // Subscribe to the raw data so useMemo recomputes when either changes
+  const userPredictions = usePredictionStore((s) => s.userPredictions)
   const getPredictionStats = usePredictionStore((s) => s.getPredictionStats)
-  const getPrice = usePriceStore((s) => s.getPrice)
+  const btcPrice = usePriceStore((s) => s.getPrice("BTC"))
+  const ethPrice = usePriceStore((s) => s.getPrice("ETH"))
+  const solPrice = usePriceStore((s) => s.getPrice("SOL"))
 
-  const stats = useMemo(() => getPredictionStats(), [getPredictionStats])
+  const stats = useMemo(
+    () => getPredictionStats(),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [userPredictions, getPredictionStats, btcPrice, ethPrice, solPrice]
+  )
 
   const { perCoin, totalNetUsd, counts } = stats
 
@@ -59,7 +67,8 @@ export function PredictionSummary() {
           {activeCoins.map((asset) => {
             const coin = perCoin[asset]
             const hasResolved = coin.returned > 0 || (coin.staked > 0 && coin.net < 0)
-            const netUsd = coin.net * getPrice(asset)
+            // netUsd comes pre-calculated from getPredictionStats via live prices
+            const netUsd = coin.net * (asset === "BTC" ? btcPrice : asset === "ETH" ? ethPrice : solPrice)
             const coinPositive = coin.net > 0
             const coinNeutral = coin.net === 0
 
