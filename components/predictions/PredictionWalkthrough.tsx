@@ -284,7 +284,7 @@ const HUB_STEPS: TourStep[] = [
     label: "2 of 4 · Your balance",
     title: "Your practice balance",
     description:
-      "This number is the total value of your practice portfolio in USD. You use those coins to make predictions — never real money.",
+      "This number is the total value of your practice portfolio in USD. You use those coins to make predictions, never real money.",
     targetId: "pred-balance",
     tooltipSide: "below",
   },

@@ -167,7 +167,7 @@ export function PredictionPlaceForm({ holdings, onPlace }: PredictionPlaceFormPr
             <div className="flex items-center gap-1.5 mb-2">
               <p className="text-xs font-medium text-muted-foreground">Your prediction</p>
               <InfoTip label="">
-                Read the question at the top of the page. If you think it will happen, tap YES. If you think it won&apos;t, tap NO. There&apos;s no partial answer — just your best call.
+                Read the question at the top of the page. If you think it will happen, tap YES. If you think it won&apos;t, tap NO. There&apos;s no partial answer, just your best call.
               </InfoTip>
             </div>
             <div className="flex gap-3">
@@ -253,7 +253,7 @@ export function PredictionPlaceForm({ holdings, onPlace }: PredictionPlaceFormPr
             {isSubmitting
               ? "Placing..."
               : position
-                ? `Confirm ${position.toUpperCase()} — ${formatCrypto(cryptoAmount, selectedAsset)} ${selectedAsset}`
+                ? `Confirm ${position.toUpperCase()} · ${formatCrypto(cryptoAmount, selectedAsset)} ${selectedAsset}`
                 : "Choose YES or NO"
             }
           </Button>

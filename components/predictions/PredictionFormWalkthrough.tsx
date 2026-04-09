@@ -16,7 +16,7 @@ const FORM_STEPS: TourStep[] = [
     label: "2 of 3 · YES or NO",
     title: "Your prediction",
     description:
-      "Read the market question at the top. Tap YES if you think it will happen, or NO if you think it won't. No in-between — just your best call.",
+      "Read the market question at the top. Tap YES if you think it will happen, or NO if you think it won't. No in-between, just your best call.",
     targetId: "pred-yes-no",
     tooltipSide: "above",
   },
