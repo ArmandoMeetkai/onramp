@@ -52,11 +52,11 @@ export default function PredictionDetailPage({
   const [justPlaced, setJustPlaced] = useState(false)
 
   const handlePlace = useCallback(
-    (position: "yes" | "no", amount: number) => {
-      if (profile) {
-        placePrediction(profile.id, marketId, position, amount)
-        setJustPlaced(true)
-      }
+    async (position: "yes" | "no", amount: number): Promise<boolean> => {
+      if (!profile) return false
+      const success = await placePrediction(profile.id, marketId, position, amount)
+      if (success) setJustPlaced(true)
+      return success
     },
     [profile, marketId, placePrediction]
   )

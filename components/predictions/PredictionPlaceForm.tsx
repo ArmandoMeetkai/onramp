@@ -11,7 +11,7 @@ interface PredictionPlaceFormProps {
   asset: "BTC" | "ETH" | "SOL"
   holdingAmount: number
   currentPrice: number
-  onPlace: (position: "yes" | "no", usdAmount: number) => void
+  onPlace: (position: "yes" | "no", usdAmount: number) => Promise<boolean>
 }
 
 const USD_AMOUNTS = [10, 25, 50, 100] as const
@@ -45,7 +45,8 @@ export function PredictionPlaceForm({
   async function handleSubmit() {
     if (!canPlace || !position || isSubmitting) return
     setIsSubmitting(true)
-    onPlace(position, usdAmount)
+    const success = await onPlace(position, usdAmount)
+    if (!success) setIsSubmitting(false)
   }
 
   return (
