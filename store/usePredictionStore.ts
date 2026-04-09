@@ -31,11 +31,20 @@ export const usePredictionStore = create<PredictionState>((set, get) => ({
 
   hydrate: async (userId) => {
     try {
-      const predictions = await db.userPredictions
+      const all = await db.userPredictions
         .where("userId")
         .equals(userId)
         .toArray()
-      set({ userPredictions: predictions })
+
+      // Clean up predictions from old schema (missing cryptoAmount)
+      const valid = all.filter((p) => p.cryptoAmount != null)
+      const invalid = all.filter((p) => p.cryptoAmount == null)
+
+      if (invalid.length > 0) {
+        await db.userPredictions.bulkDelete(invalid.map((p) => p.id))
+      }
+
+      set({ userPredictions: valid })
     } catch {
       set({ userPredictions: [] })
     }
