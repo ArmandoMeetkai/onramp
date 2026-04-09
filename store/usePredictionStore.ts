@@ -98,8 +98,9 @@ export const usePredictionStore = create<PredictionState>((set, get) => ({
       .filter((h) => h.amount > 0.000001)
 
     const updatedPortfolio = { ...portfolio, holdings: updatedHoldings }
-    usePortfolioStore.setState({ portfolio: updatedPortfolio })
 
+    // Optimistic update — apply to memory first for instant UI response
+    usePortfolioStore.setState({ portfolio: updatedPortfolio })
     set({ userPredictions: [...userPredictions, prediction] })
 
     try {
@@ -108,7 +109,11 @@ export const usePredictionStore = create<PredictionState>((set, get) => ({
         db.portfolios.put(updatedPortfolio),
       ])
     } catch {
-      console.error("Failed to persist prediction")
+      // DB write failed — rollback both stores to keep memory consistent with DB
+      usePortfolioStore.setState({ portfolio })
+      set({ userPredictions })
+      console.error("Failed to persist prediction — rolled back")
+      return false
     }
 
     return true
@@ -140,6 +145,19 @@ export const usePredictionStore = create<PredictionState>((set, get) => ({
     const updatedPredictions = userPredictions.map((p) =>
       p.id === prediction.id ? resolved : p
     )
+
+    // Write resolved prediction to DB FIRST — prevents double-payout if subsequent
+    // writes fail. checkPriceResolutions guards with !p.resolved, so once this is
+    // persisted the market will never resolve again on reload.
+    try {
+      await db.userPredictions.put(resolved)
+    } catch {
+      console.error("Failed to persist market resolution — aborting payout")
+      return
+    }
+
+    // Safe to update memory now: DB already marks this as resolved
+    set({ userPredictions: updatedPredictions })
 
     // Credit winnings back to holdings
     if (payoutCrypto > 0) {
@@ -173,14 +191,6 @@ export const usePredictionStore = create<PredictionState>((set, get) => ({
           console.error("Failed to persist payout")
         }
       }
-    }
-
-    set({ userPredictions: updatedPredictions })
-
-    try {
-      await db.userPredictions.put(resolved)
-    } catch {
-      console.error("Failed to persist market resolution")
     }
   },
 

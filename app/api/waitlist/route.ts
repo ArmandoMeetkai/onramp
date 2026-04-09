@@ -15,9 +15,19 @@ export async function POST(request: Request) {
 
     const entry = `${new Date().toISOString()},${email}\n`
 
-    // Persist to local CSV file as MVP storage
-    const filePath = join(process.cwd(), "waitlist.csv")
-    await appendFile(filePath, entry, "utf-8")
+    // Log to stdout — always captured by Vercel function logs
+    console.log(`[waitlist] ${entry.trim()}`)
+
+    // Attempt file persistence: /tmp is writable on Vercel, CWD is writable locally
+    const paths = [join("/tmp", "waitlist.csv"), join(process.cwd(), "waitlist.csv")]
+    for (const filePath of paths) {
+      try {
+        await appendFile(filePath, entry, "utf-8")
+        break
+      } catch {
+        // Try next path
+      }
+    }
 
     return NextResponse.json({ success: true })
   } catch {

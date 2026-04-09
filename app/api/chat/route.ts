@@ -55,10 +55,17 @@ export async function POST(request: Request) {
       content: typeof m.content === "string" ? m.content.slice(0, MAX_CONTENT_LENGTH) : "",
     }))
 
-    const systemPrompt = buildSystemPrompt(
-      userProfile?.experienceLevel ?? "new",
-      userProfile?.riskStyle ?? "moderate"
-    )
+    // Whitelist values before interpolating into the system prompt to prevent injection
+    const VALID_EXPERIENCE = new Set(["new", "beginner", "intermediate", "advanced"])
+    const VALID_RISK = new Set(["conservative", "moderate", "aggressive"])
+    const experienceLevel = VALID_EXPERIENCE.has(userProfile?.experienceLevel)
+      ? userProfile.experienceLevel
+      : "new"
+    const riskStyle = VALID_RISK.has(userProfile?.riskStyle)
+      ? userProfile.riskStyle
+      : "moderate"
+
+    const systemPrompt = buildSystemPrompt(experienceLevel, riskStyle)
 
     const stream = anthropic.messages.stream({
       model: "claude-sonnet-4-6",

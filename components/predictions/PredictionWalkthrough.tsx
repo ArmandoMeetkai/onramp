@@ -118,7 +118,11 @@ export function SpotlightTour({ steps, onComplete, storageKey }: SpotlightTourPr
 
   function dismiss() {
     setIsVisible(false)
-    localStorage.setItem(storageKey, "1")
+    try {
+      localStorage.setItem(storageKey, "1")
+    } catch {
+      // Safari Private Browsing — tour won't persist but that's acceptable
+    }
     dismissTimerRef.current = setTimeout(onComplete, 300)
   }
 

@@ -13,7 +13,11 @@ export function Header() {
     const next = !isDark
     setIsDark(next)
     document.documentElement.classList.toggle("dark", next)
-    localStorage.setItem("onramp-theme", next ? "dark" : "light")
+    try {
+      localStorage.setItem("onramp-theme", next ? "dark" : "light")
+    } catch {
+      // Safari Private Browsing throws QuotaExceededError — visual state still works
+    }
   }
 
   return (

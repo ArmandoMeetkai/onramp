@@ -39,13 +39,15 @@ export default function ReadyPage() {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ email: trimmed }),
         })
-        localStorage.setItem(WAITLIST_KEY, trimmed)
-        setIsSubmitted(true)
       } catch {
-        // Fallback to localStorage only
-        localStorage.setItem(WAITLIST_KEY, trimmed)
-        setIsSubmitted(true)
+        // Network error — still save locally below
       } finally {
+        try {
+          localStorage.setItem(WAITLIST_KEY, trimmed)
+        } catch {
+          // Safari Private Browsing — localStorage unavailable
+        }
+        setIsSubmitted(true)
         setIsSubmitting(false)
       }
     },

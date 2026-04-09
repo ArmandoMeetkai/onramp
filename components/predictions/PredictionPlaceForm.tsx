@@ -50,8 +50,10 @@ export function PredictionPlaceForm({ holdings, onPlace }: PredictionPlaceFormPr
   async function handleSubmit() {
     if (!canPlace || !position || isSubmitting) return
     setIsSubmitting(true)
-    const success = await onPlace(position, selectedAsset, usdAmount)
-    if (!success) setIsSubmitting(false)
+    await onPlace(position, selectedAsset, usdAmount)
+    // Always reset — on success the parent unmounts this form;
+    // on failure it stays visible and the button must re-enable
+    setIsSubmitting(false)
   }
 
   if (!hasAnyHoldings) {
