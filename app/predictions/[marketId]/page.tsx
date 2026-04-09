@@ -2,7 +2,7 @@
 
 import { use, useCallback, useState } from "react"
 import { useRouter } from "next/navigation"
-import { ArrowLeft, Clock, Check, Lock } from "lucide-react"
+import { ArrowLeft, Clock, Check, Lock, HelpCircle } from "lucide-react"
 import Link from "next/link"
 import { motion } from "framer-motion"
 import { Badge } from "@/components/ui/badge"
@@ -17,7 +17,7 @@ import { usePortfolioStore } from "@/store/usePortfolioStore"
 import { usePriceStore } from "@/store/usePriceStore"
 import { useUserStore } from "@/store/useUserStore"
 import { PredictionFormWalkthrough } from "@/components/predictions/PredictionFormWalkthrough"
-import { useShouldShowFormWalkthrough } from "@/components/predictions/PredictionWalkthrough"
+import { useShouldShowFormWalkthrough, WALKTHROUGH_FORM_KEY } from "@/components/predictions/PredictionWalkthrough"
 import { getTimeRemaining } from "@/lib/utils"
 
 export default function PredictionDetailPage({
@@ -40,7 +40,9 @@ export default function PredictionDetailPage({
   const odds = getMarketOdds(marketId)
   const [justPlaced, setJustPlaced] = useState(false)
   const [formWalkthroughDone, setFormWalkthroughDone] = useState(false)
-  const showFormWalkthrough = useShouldShowFormWalkthrough()
+  const [forceFormWalkthrough, setForceFormWalkthrough] = useState(false)
+  const autoShowFormWalkthrough = useShouldShowFormWalkthrough()
+  const showFormWalkthrough = autoShowFormWalkthrough || forceFormWalkthrough
 
   const handlePlace = useCallback(
     async (position: "yes" | "no", asset: "BTC" | "ETH" | "SOL", amount: number): Promise<boolean> => {
@@ -94,9 +96,22 @@ export default function PredictionDetailPage({
         >
           <div className="flex items-start justify-between">
             <span className="text-4xl">{market.coverEmoji}</span>
-            <Badge variant="secondary" className="rounded-lg px-3 py-1 text-sm font-medium">
-              About: {market.asset}
-            </Badge>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => {
+                  try { localStorage.removeItem(WALKTHROUGH_FORM_KEY) } catch {}
+                  setFormWalkthroughDone(false)
+                  setForceFormWalkthrough(true)
+                }}
+                className="rounded-lg p-1 text-muted-foreground transition-colors hover:text-foreground"
+                aria-label="How predictions work"
+              >
+                <HelpCircle className="h-5 w-5" />
+              </button>
+              <Badge variant="secondary" className="rounded-lg px-3 py-1 text-sm font-medium">
+                About: {market.asset}
+              </Badge>
+            </div>
           </div>
           <h1 className="mt-4 font-heading text-xl font-bold tracking-tight leading-tight">
             {market.question}
@@ -245,7 +260,7 @@ export default function PredictionDetailPage({
 
         {/* Form walkthrough — only when form is actually rendered */}
         {isActive && !hasEnded && !formWalkthroughDone && showFormWalkthrough && (
-          <PredictionFormWalkthrough onComplete={() => setFormWalkthroughDone(true)} />
+          <PredictionFormWalkthrough onComplete={() => { setFormWalkthroughDone(true); setForceFormWalkthrough(false) }} />
         )}
 
         {/* Educational content */}
