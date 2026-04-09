@@ -87,7 +87,7 @@ export function PredictionMarketCard({
                 : "bg-danger/15 text-danger"
             )}
           >
-            You: {userPrediction.position.toUpperCase()} · {userPrediction.cryptoAmount.toFixed(userPrediction.asset === "BTC" ? 6 : 4)} {userPrediction.asset}
+            You: {userPrediction.position.toUpperCase()} · {(userPrediction.cryptoAmount ?? 0).toFixed(userPrediction.asset === "BTC" ? 6 : 4)} {userPrediction.asset ?? ""}
           </Badge>
           {isResolved && (
             <Badge
@@ -97,9 +97,9 @@ export function PredictionMarketCard({
               )}
             >
               {userWon ? (
-                <><Check className="mr-1 inline h-3 w-3" />Won +{((userPrediction.payoutCrypto ?? 0) - userPrediction.cryptoAmount).toFixed(userPrediction.asset === "BTC" ? 6 : 4)} {userPrediction.asset}</>
+                <><Check className="mr-1 inline h-3 w-3" />Won +{((userPrediction.payoutCrypto ?? 0) - (userPrediction.cryptoAmount ?? 0)).toFixed(userPrediction.asset === "BTC" ? 6 : 4)} {userPrediction.asset ?? ""}</>
               ) : (
-                <><X className="mr-1 inline h-3 w-3" />Lost {userPrediction.cryptoAmount.toFixed(userPrediction.asset === "BTC" ? 6 : 4)} {userPrediction.asset}</>
+                <><X className="mr-1 inline h-3 w-3" />Lost {(userPrediction.cryptoAmount ?? 0).toFixed(userPrediction.asset === "BTC" ? 6 : 4)} {userPrediction.asset ?? ""}</>
               )}
             </Badge>
           )}

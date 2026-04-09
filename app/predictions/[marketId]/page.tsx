@@ -174,10 +174,10 @@ export default function PredictionDetailPage({
                 {userPrediction.position.toUpperCase()}
               </p>
               <p className="mt-1 text-sm font-medium">
-                {userPrediction.cryptoAmount.toFixed(userPrediction.asset === "BTC" ? 6 : 4)} {userPrediction.asset}
+                {(userPrediction.cryptoAmount ?? 0).toFixed(userPrediction.asset === "BTC" ? 6 : 4)} {userPrediction.asset ?? ""}
               </p>
               <p className="text-xs text-muted-foreground">
-                ~${Math.round(userPrediction.cryptoAmount * (getPrice(userPrediction.asset) || userPrediction.priceAtPrediction))}
+                ~${Math.round((userPrediction.cryptoAmount ?? 0) * (getPrice(userPrediction.asset ?? "BTC") || userPrediction.priceAtPrediction || 0))}
                 {hasEnded ? " — Awaiting resolution" : ""}
               </p>
             </div>
