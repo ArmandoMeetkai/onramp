@@ -167,7 +167,7 @@ export function PredictionHubContent({ markets }: PredictionHubContentProps) {
 
       {/* Walkthrough overlay — first time only */}
       {showWalkthrough && !walkthroughDone && (
-        <PredictionWalkthrough onComplete={() => { setWalkthroughDone(true); setForceWalkthrough(false) }} />
+        <PredictionWalkthrough onComplete={() => { setWalkthroughDone(true); setForceWalkthrough(false); window.scrollTo(0, 0) }} />
       )}
     </PageTransition>
   )

@@ -40,93 +40,85 @@ export function SpotlightTour({ steps, onComplete, storageKey }: SpotlightTourPr
   const [stepIndex, setStepIndex] = useState(0)
   const [isVisible, setIsVisible] = useState(false)
   const [targetRect, setTargetRect] = useState<TargetRect | null>(null)
-  const scrollTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const dismissTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const tooltipRef = useRef<HTMLDivElement>(null)
 
   const step = steps[stepIndex]
   const isLast = stepIndex === steps.length - 1
 
-  // Measure target element, returns a cleanup fn to cancel the pending timer
+  // Pure measurement — NEVER scrolls. If element is off-screen, returns null
+  // and the tooltip renders in its floating fallback position.
   const measureTarget = useCallback((id: string | undefined) => {
-    if (scrollTimerRef.current) clearTimeout(scrollTimerRef.current)
-
-    if (!id) {
-      setTargetRect(null)
-      return
-    }
+    if (!id) { setTargetRect(null); return }
     const el = document.getElementById(id)
-    if (!el) {
-      setTargetRect(null)
-      return
-    }
+    if (!el) { setTargetRect(null); return }
 
-    const doMeasure = () => {
-      const r = el.getBoundingClientRect()
+    const r = el.getBoundingClientRect()
+    const vh = window.innerHeight || document.documentElement.clientHeight
+    const isInViewport = r.bottom > 0 && r.top < vh
+
+    if (isInViewport) {
       setTargetRect({ left: r.left, top: r.top, width: r.width, height: r.height })
-    }
-
-    el.scrollIntoView({ behavior: "smooth", block: "center" })
-    // Wait for scroll to settle before measuring
-    scrollTimerRef.current = setTimeout(doMeasure, 450)
-  }, [])
-
-  // Re-measure on window resize / orientation change
-  useEffect(() => {
-    function handleResize() {
-      measureTarget(step.targetId)
-    }
-    window.addEventListener("resize", handleResize)
-    window.addEventListener("orientationchange", handleResize)
-    return () => {
-      window.removeEventListener("resize", handleResize)
-      window.removeEventListener("orientationchange", handleResize)
-    }
-  }, [step.targetId, measureTarget])
-
-  // Cleanup all timers on unmount
-  useEffect(() => {
-    return () => {
-      if (scrollTimerRef.current) clearTimeout(scrollTimerRef.current)
-      if (dismissTimerRef.current) clearTimeout(dismissTimerRef.current)
+    } else {
+      setTargetRect(null)
     }
   }, [])
 
+  const dismiss = useCallback(() => {
+    setIsVisible(false)
+    try { localStorage.setItem(storageKey, "1") } catch { /* Safari PB */ }
+    dismissTimerRef.current = setTimeout(onComplete, 300)
+  }, [storageKey, onComplete])
+
+  // Fade in after a short delay
   useEffect(() => {
-    const timer = setTimeout(() => setIsVisible(true), 300)
-    return () => clearTimeout(timer)
+    const t = setTimeout(() => setIsVisible(true), 300)
+    return () => clearTimeout(t)
   }, [])
 
+  // Measure whenever the step changes or the overlay becomes visible
   useEffect(() => {
     if (isVisible) measureTarget(step.targetId)
   }, [isVisible, step.targetId, measureTarget])
 
-  function goNext() {
-    if (!isLast) {
-      setTargetRect(null)
-      setStepIndex((s) => s + 1)
-    } else {
-      dismiss()
+  // Re-measure on scroll, resize, orientation — the tour adapts passively
+  // without ever calling scrollIntoView or any other DOM-mutating API.
+  useEffect(() => {
+    if (!isVisible) return
+    function reMeasure() { measureTarget(step.targetId) }
+    window.addEventListener("scroll", reMeasure, { passive: true })
+    window.addEventListener("resize", reMeasure)
+    window.addEventListener("orientationchange", reMeasure)
+    return () => {
+      window.removeEventListener("scroll", reMeasure)
+      window.removeEventListener("resize", reMeasure)
+      window.removeEventListener("orientationchange", reMeasure)
     }
+  }, [isVisible, step.targetId, measureTarget])
+
+  // Dismiss on Escape key
+  useEffect(() => {
+    function onKey(e: KeyboardEvent) { if (e.key === "Escape") dismiss() }
+    window.addEventListener("keydown", onKey)
+    return () => window.removeEventListener("keydown", onKey)
+  }, [dismiss])
+
+
+  // Cleanup timer on unmount
+  useEffect(() => {
+    return () => { if (dismissTimerRef.current) clearTimeout(dismissTimerRef.current) }
+  }, [])
+
+  function goNext() {
+    if (!isLast) { setTargetRect(null); setStepIndex((s) => s + 1) }
+    else dismiss()
   }
 
   function goBack() {
-    if (stepIndex > 0) {
-      setTargetRect(null)
-      setStepIndex((s) => s - 1)
-    }
+    if (stepIndex > 0) { setTargetRect(null); setStepIndex((s) => s - 1) }
   }
 
-  function dismiss() {
-    setIsVisible(false)
-    try {
-      localStorage.setItem(storageKey, "1")
-    } catch {
-      // Safari Private Browsing — tour won't persist but that's acceptable
-    }
-    dismissTimerRef.current = setTimeout(onComplete, 300)
-  }
-
-  // Decide tooltip position
+  // Tooltip positioning — anchored to spotlight when visible, floating otherwise
   const windowHeight = typeof window !== "undefined" ? window.innerHeight : 800
   const spotlightBottom = targetRect ? targetRect.top + targetRect.height + PADDING : 0
   const spaceBelow = windowHeight - spotlightBottom - NAV_HEIGHT
@@ -147,7 +139,19 @@ export function SpotlightTour({ steps, onComplete, storageKey }: SpotlightTourPr
     <AnimatePresence>
       {isVisible && (
         <>
-          {/* SVG overlay — pointer-events on the dark area only, cutout passes through */}
+          {/* Click-capture overlay: blocks clicks from reaching page elements,
+              allows scroll via touch-action. Purely transparent — visuals are
+              handled by the SVG below. */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50"
+            style={{ touchAction: "pan-y pan-x" }}
+            onClick={dismiss}
+          />
+
+          {/* SVG visual overlay — pointer-events: none, purely decorative */}
           <motion.svg
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -171,16 +175,12 @@ export function SpotlightTour({ steps, onComplete, storageKey }: SpotlightTourPr
                 )}
               </mask>
             </defs>
-            {/* Dark overlay — gets pointer events so clicks on the dim area dismiss */}
             <rect
               width="100%"
               height="100%"
               fill="rgba(0,0,0,0.72)"
               mask={`url(#tour-mask-${stepIndex})`}
-              style={{ pointerEvents: "all", cursor: "pointer" }}
-              onClick={dismiss}
             />
-            {/* Highlight ring — decorative, no pointer events */}
             {targetRect && (
               <rect
                 x={targetRect.left - PADDING}
@@ -191,14 +191,13 @@ export function SpotlightTour({ steps, onComplete, storageKey }: SpotlightTourPr
                 fill="none"
                 stroke="rgba(255,255,255,0.55)"
                 strokeWidth="2"
-                style={{ pointerEvents: "none" }}
               />
             )}
           </motion.svg>
 
-          {/* Tooltip card — wait for measurement when step has a target */}
-          {(!step.targetId || targetRect) && (
+          {/* Tooltip card */}
           <motion.div
+            ref={tooltipRef}
             key={stepIndex}
             initial={{ opacity: 0, y: side === "below" ? 10 : -10 }}
             animate={{ opacity: 1, y: 0 }}
@@ -212,7 +211,6 @@ export function SpotlightTour({ steps, onComplete, storageKey }: SpotlightTourPr
             }
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Skip */}
             <button
               onClick={dismiss}
               className="absolute right-4 top-4 rounded-lg p-1 text-muted-foreground transition-colors hover:text-foreground"
@@ -221,7 +219,6 @@ export function SpotlightTour({ steps, onComplete, storageKey }: SpotlightTourPr
               <X className="h-4 w-4" />
             </button>
 
-            {/* Step label */}
             <p className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground pr-6">
               {step.label}
             </p>
@@ -231,7 +228,6 @@ export function SpotlightTour({ steps, onComplete, storageKey }: SpotlightTourPr
               {step.description}
             </p>
 
-            {/* Progress bar */}
             <div className="mt-4 h-1 rounded-full bg-muted overflow-hidden">
               <motion.div
                 className="h-full rounded-full bg-primary"
@@ -240,7 +236,6 @@ export function SpotlightTour({ steps, onComplete, storageKey }: SpotlightTourPr
               />
             </div>
 
-            {/* Navigation */}
             <div className="mt-3 flex items-center justify-between">
               {stepIndex === 0 ? (
                 <button
@@ -266,7 +261,6 @@ export function SpotlightTour({ steps, onComplete, storageKey }: SpotlightTourPr
               </Button>
             </div>
           </motion.div>
-          )}
         </>
       )}
     </AnimatePresence>
@@ -325,29 +319,31 @@ export function PredictionWalkthrough({ onComplete }: PredictionWalkthroughProps
 // ─── Hooks ────────────────────────────────────────────────────────────────────
 
 export function useShouldShowWalkthrough(hasPredictions: boolean): boolean {
-  const [show, setShow] = useState(false)
+  // null = not yet resolved (SSR / before first useEffect)
+  const [show, setShow] = useState<boolean | null>(null)
   useEffect(() => {
     try {
       const seen = localStorage.getItem(WALKTHROUGH_HUB_KEY)
-      if (!seen && !hasPredictions) setShow(true)
+      setShow(!seen && !hasPredictions)
     } catch {
-      // Safari Private Browsing — show the walkthrough by default
-      if (!hasPredictions) setShow(true)
+      // Safari Private Browsing
+      setShow(!hasPredictions)
     }
   }, [hasPredictions])
-  return show
+  return show === true
 }
 
 export function useShouldShowFormWalkthrough(): boolean {
-  const [show, setShow] = useState(false)
+  // null = not yet resolved (SSR / before first useEffect)
+  const [show, setShow] = useState<boolean | null>(null)
   useEffect(() => {
     try {
       const seen = localStorage.getItem(WALKTHROUGH_FORM_KEY)
-      if (!seen) setShow(true)
+      setShow(!seen)
     } catch {
-      // Safari Private Browsing — show the walkthrough by default
+      // Safari Private Browsing
       setShow(true)
     }
   }, [])
-  return show
+  return show === true
 }

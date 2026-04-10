@@ -19,8 +19,10 @@ export function InfoTip({ label, children, className }: InfoTipProps) {
   const [open, setOpen] = useState(false)
   const triggerRef = useRef<HTMLButtonElement>(null)
   const closeRef = useRef<HTMLButtonElement>(null)
+  const hasInteracted = useRef(false)
 
   useEffect(() => {
+    if (!hasInteracted.current) return
     if (open) {
       closeRef.current?.focus()
     } else {
@@ -32,7 +34,7 @@ export function InfoTip({ label, children, className }: InfoTipProps) {
     <span className={cn("inline-flex flex-col gap-1", className)}>
       <button
         ref={triggerRef}
-        onClick={() => setOpen((prev) => !prev)}
+        onClick={() => { hasInteracted.current = true; setOpen((prev) => !prev) }}
         className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
         aria-expanded={open}
         aria-label={label ? `Learn about ${label}` : "Learn more"}

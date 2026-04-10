@@ -260,7 +260,7 @@ export default function PredictionDetailPage({
 
         {/* Form walkthrough — only when form is actually rendered */}
         {isActive && !hasEnded && !formWalkthroughDone && showFormWalkthrough && (
-          <PredictionFormWalkthrough onComplete={() => { setFormWalkthroughDone(true); setForceFormWalkthrough(false) }} />
+          <PredictionFormWalkthrough onComplete={() => { setFormWalkthroughDone(true); setForceFormWalkthrough(false); window.scrollTo(0, 0) }} />
         )}
 
         {/* Educational content */}
