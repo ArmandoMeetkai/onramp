@@ -1,8 +1,18 @@
 import { create } from "zustand"
-import { db, type UserPrediction } from "@/lib/db"
-import { getMarketById, predictionMarkets } from "@/data/predictionMarkets"
+import { db, type UserPrediction, type PriceSnapshot } from "@/lib/db"
+import { getMarketById, allMarkets } from "@/data/predictionMarkets"
 import { usePriceStore } from "./usePriceStore"
-import { usePortfolioStore } from "./usePortfolioStore"
+import { usePredictionWalletStore } from "./usePredictionWalletStore"
+import { useProgressStore } from "./useProgressStore"
+
+export interface ResolvedMarketResult {
+  marketId: string
+  question: string
+  outcome: "yes" | "no"
+  won: boolean
+  payoutCrypto: number
+  asset: string
+}
 
 interface PredictionState {
   userPredictions: UserPrediction[]
@@ -13,14 +23,15 @@ interface PredictionState {
     marketId: string,
     position: "yes" | "no",
     asset: "BTC" | "ETH" | "SOL",
-    usdAmount: number
+    usdAmount: number,
+    reasoning?: string
   ) => Promise<boolean>
   resolveMarket: (
     userId: string,
     marketId: string,
     outcome: "yes" | "no"
   ) => Promise<void>
-  checkPriceResolutions: (userId: string) => Promise<void>
+  checkPriceResolutions: (userId: string) => Promise<ResolvedMarketResult[]>
 
   getPredictionForMarket: (marketId: string) => UserPrediction | undefined
   getMarketOdds: (marketId: string) => { yesPercent: number; noPercent: number }
@@ -29,6 +40,10 @@ interface PredictionState {
     perCoin: Record<"BTC" | "ETH" | "SOL", { staked: number; returned: number; net: number }>
     totalNetUsd: number
     counts: { total: number; wins: number; losses: number; pending: number }
+  }
+  getCalibrationData: () => {
+    buckets: { label: string; midpoint: number; total: number; correct: number; rate: number }[]
+    brierScore: number
   }
 }
 
@@ -59,21 +74,21 @@ export const usePredictionStore = create<PredictionState>((set, get) => ({
     }
   },
 
-  placePrediction: async (userId, marketId, position, asset, usdAmount) => {
+  placePrediction: async (userId, marketId, position, asset, usdAmount, reasoning) => {
     const { userPredictions } = get()
     const market = getMarketById(marketId)
     if (!market) return false
 
-    const portfolio = usePortfolioStore.getState().portfolio
-    if (!portfolio) return false
+    const wallet = usePredictionWalletStore.getState().wallet
+    if (!wallet) return false
 
     const price = usePriceStore.getState().getPrice(asset)
     if (price <= 0) return false
 
     const cryptoAmount = usdAmount / price
 
-    // Check user has enough of this asset
-    const holding = portfolio.holdings.find((h) => h.asset === asset)
+    // Check user has enough of this asset in their prediction wallet
+    const holding = wallet.holdings.find((h) => h.asset === asset)
     if (!holding || holding.amount < cryptoAmount) return false
 
     if (userPredictions.some((p) => p.marketId === marketId)) return false
@@ -89,10 +104,11 @@ export const usePredictionStore = create<PredictionState>((set, get) => ({
       timestamp: new Date(),
       resolved: false,
       payoutCrypto: null,
+      ...(reasoning ? { reasoning } : {}),
     }
 
-    // Debit from holdings
-    const updatedHoldings = portfolio.holdings
+    // Debit from prediction wallet holdings
+    const updatedHoldings = wallet.holdings
       .map((h) =>
         h.asset === asset
           ? { ...h, amount: h.amount - cryptoAmount }
@@ -100,20 +116,20 @@ export const usePredictionStore = create<PredictionState>((set, get) => ({
       )
       .filter((h) => h.amount > 0.000001)
 
-    const updatedPortfolio = { ...portfolio, holdings: updatedHoldings }
+    const updatedWallet = { ...wallet, holdings: updatedHoldings }
 
     // Optimistic update — apply to memory first for instant UI response
-    usePortfolioStore.setState({ portfolio: updatedPortfolio })
+    usePredictionWalletStore.setState({ wallet: updatedWallet })
     set({ userPredictions: [...userPredictions, prediction] })
 
     try {
-      await db.transaction("rw", db.userPredictions, db.portfolios, async () => {
+      await db.transaction("rw", db.userPredictions, db.predictionWallets, async () => {
         await db.userPredictions.put(prediction)
-        await db.portfolios.put(updatedPortfolio)
+        await db.predictionWallets.put(updatedWallet)
       })
     } catch {
       // Atomic transaction failed — rollback both stores
-      usePortfolioStore.setState({ portfolio })
+      usePredictionWalletStore.setState({ wallet })
       set({ userPredictions })
       console.error("Failed to persist prediction — rolled back")
       return false
@@ -149,21 +165,26 @@ export const usePredictionStore = create<PredictionState>((set, get) => ({
       p.id === prediction.id ? resolved : p
     )
 
-    // Build updated portfolio if a payout is owed
-    let updatedPortfolio = null as ReturnType<typeof usePortfolioStore.getState>["portfolio"]
+    // Build updated wallet if a payout is owed
+    let updatedWallet = null as ReturnType<typeof usePredictionWalletStore.getState>["wallet"]
     if (payoutCrypto > 0) {
-      const portfolio = usePortfolioStore.getState().portfolio
-      if (portfolio) {
-        const existingIndex = portfolio.holdings.findIndex(
+      const wallet = usePredictionWalletStore.getState().wallet
+      if (wallet) {
+        const existingIndex = wallet.holdings.findIndex(
           (h) => h.asset === prediction.asset
         )
-        const holdings = [...portfolio.holdings]
+        const holdings = [...wallet.holdings]
 
         if (existingIndex >= 0) {
           const existing = holdings[existingIndex]
+          const currentPrice = usePriceStore.getState().getPrice(prediction.asset)
+          const payoutPrice = currentPrice > 0 ? currentPrice : prediction.priceAtPrediction
+          const totalCost = existing.avgBuyPrice * existing.amount + payoutPrice * payoutCrypto
+          const totalAmount = existing.amount + payoutCrypto
           holdings[existingIndex] = {
             ...existing,
-            amount: existing.amount + payoutCrypto,
+            amount: totalAmount,
+            avgBuyPrice: totalAmount > 0 ? totalCost / totalAmount : payoutPrice,
           }
         } else {
           const price = usePriceStore.getState().getPrice(prediction.asset)
@@ -174,17 +195,16 @@ export const usePredictionStore = create<PredictionState>((set, get) => ({
           })
         }
 
-        updatedPortfolio = { ...portfolio, holdings }
+        updatedWallet = { ...wallet, holdings }
       }
     }
 
-    // Atomic Dexie transaction: both prediction and portfolio are persisted together.
-    // If either write fails, neither is committed — no double-payout and no lost winnings.
+    // Atomic Dexie transaction: both prediction and wallet are persisted together.
     try {
-      if (updatedPortfolio) {
-        await db.transaction("rw", db.userPredictions, db.portfolios, async () => {
+      if (updatedWallet) {
+        await db.transaction("rw", db.userPredictions, db.predictionWallets, async () => {
           await db.userPredictions.put(resolved)
-          await db.portfolios.put(updatedPortfolio!)
+          await db.predictionWallets.put(updatedWallet!)
         })
       } else {
         await db.userPredictions.put(resolved)
@@ -196,16 +216,38 @@ export const usePredictionStore = create<PredictionState>((set, get) => ({
 
     // DB write succeeded — safe to update memory
     set({ userPredictions: updatedPredictions })
-    if (updatedPortfolio) {
-      usePortfolioStore.setState({ portfolio: updatedPortfolio })
+    if (updatedWallet) {
+      usePredictionWalletStore.setState({ wallet: updatedWallet })
+    }
+
+    // Recalculate confidence score since prediction accuracy changed
+    const progress = useProgressStore.getState().progress
+    if (progress) {
+      const { total, correct } = get().getPredictionAccuracy()
+      const score = Math.min(
+        100,
+        progress.cardsViewed * 2 +
+        progress.simulationsRun * 3 +
+        progress.explanationsOpened * 2 +
+        progress.lessonsCompleted.length * 5 +
+        (progress.replaysCompleted ?? 0) * 4 +
+        total * 3 +
+        correct * 5
+      )
+      if (score !== progress.confidenceScore) {
+        const updated = { ...progress, confidenceScore: score }
+        useProgressStore.setState({ progress: updated })
+        db.progress.put(updated).catch(() => {})
+      }
     }
   },
 
   checkPriceResolutions: async (userId) => {
     const { userPredictions } = get()
     const now = new Date()
+    const resolved: ResolvedMarketResult[] = []
 
-    for (const market of predictionMarkets) {
+    for (const market of allMarkets) {
       if (market.status !== "active") continue
       if (new Date(market.resolutionDate) > now) continue
 
@@ -222,9 +264,43 @@ export const usePredictionStore = create<PredictionState>((set, get) => ({
         market.resolutionThreshold != null &&
         market.resolutionDirection
       ) {
-        const price = usePriceStore.getState().getPrice(market.resolutionAsset)
+        // Use a persisted snapshot so the resolution price is locked the first
+        // time we detect the market has passed its date. This prevents the
+        // outcome from flipping if the user opens the app days later when the
+        // live price has moved.
+        let snapshot: PriceSnapshot | undefined
+        try {
+          snapshot = await db.priceSnapshots.get(market.id)
+        } catch {
+          // Table may not exist yet on first upgrade
+        }
+
+        let price: number
+        if (snapshot) {
+          price = snapshot.price
+        } else {
+          price = usePriceStore.getState().getPrice(market.resolutionAsset)
+          if (price > 0) {
+            try {
+              await db.priceSnapshots.put({
+                marketId: market.id,
+                asset: market.resolutionAsset,
+                price,
+                capturedAt: new Date(),
+              })
+            } catch {
+              // Non-critical — resolve with live price this time
+            }
+          }
+        }
+
         if (price > 0) {
-          const above = price >= market.resolutionThreshold
+          // Weekly markets use threshold 0 — compare closing price against the
+          // price the user saw when they placed their prediction (week open proxy)
+          const threshold = market.resolutionThreshold === 0
+            ? prediction.priceAtPrediction
+            : market.resolutionThreshold
+          const above = price >= threshold
           outcome =
             (market.resolutionDirection === "above" && above) ||
             (market.resolutionDirection === "below" && !above)
@@ -239,11 +315,27 @@ export const usePredictionStore = create<PredictionState>((set, get) => ({
         resolvingMarkets.add(market.id)
         try {
           await get().resolveMarket(userId, market.id, outcome)
+          // Read the resolved prediction from store — single source of truth
+          const resolvedPrediction = get().userPredictions.find(
+            (p) => p.id === prediction.id
+          )
+          if (resolvedPrediction?.resolved) {
+            resolved.push({
+              marketId: market.id,
+              question: market.question,
+              outcome,
+              won: (resolvedPrediction.payoutCrypto ?? 0) > 0,
+              payoutCrypto: resolvedPrediction.payoutCrypto ?? 0,
+              asset: prediction.asset,
+            })
+          }
         } finally {
           resolvingMarkets.delete(market.id)
         }
       }
     }
+
+    return resolved
   },
 
   getPredictionForMarket: (marketId) => {
@@ -317,6 +409,61 @@ export const usePredictionStore = create<PredictionState>((set, get) => ({
       perCoin,
       totalNetUsd,
       counts: { total: predictions.length, wins, losses, pending },
+    }
+  },
+
+  getCalibrationData: () => {
+    const resolved = get().userPredictions.filter((p) => p.resolved)
+    if (resolved.length === 0) {
+      return { buckets: [], brierScore: 0 }
+    }
+
+    // Group resolved predictions into confidence buckets.
+    // The user's implied confidence is the odds % of the side they chose.
+    const bucketDefs = [
+      { label: "5-25%", min: 5, max: 25, midpoint: 15 },
+      { label: "25-50%", min: 25, max: 50, midpoint: 37.5 },
+      { label: "50-75%", min: 50, max: 75, midpoint: 62.5 },
+      { label: "75-95%", min: 75, max: 95, midpoint: 85 },
+    ]
+
+    const buckets = bucketDefs.map((def) => ({ ...def, total: 0, correct: 0, rate: 0 }))
+
+    let brierSum = 0
+
+    for (const p of resolved) {
+      const odds = get().getMarketOdds(p.marketId)
+      const sidePercent = p.position === "yes" ? odds.yesPercent : odds.noPercent
+      const won = (p.payoutCrypto ?? 0) > 0
+
+      // Find the matching bucket
+      for (const bucket of buckets) {
+        if (sidePercent >= bucket.min && sidePercent < bucket.max) {
+          bucket.total++
+          if (won) bucket.correct++
+          break
+        }
+      }
+      // Handle edge case: sidePercent === 95 goes in the last bucket
+      if (sidePercent >= 95) {
+        buckets[3].total++
+        if (won) buckets[3].correct++
+      }
+
+      // Brier score: mean squared error between predicted probability and outcome
+      const predicted = sidePercent / 100
+      const actual = won ? 1 : 0
+      brierSum += (predicted - actual) ** 2
+    }
+
+    // Calculate rates
+    for (const bucket of buckets) {
+      bucket.rate = bucket.total > 0 ? bucket.correct / bucket.total : 0
+    }
+
+    return {
+      buckets: buckets.filter((b) => b.total > 0),
+      brierScore: brierSum / resolved.length,
     }
   },
 }))

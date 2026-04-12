@@ -89,6 +89,23 @@ export function PredictionResolutionBanner({
           {fmtCrypto(payoutCrypto, prediction.asset)} {prediction.asset} added to your holdings
         </div>
       )}
+
+      {prediction.reasoning && (
+        <div className="mt-4 rounded-xl bg-muted/40 px-4 py-3 text-left">
+          <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground mb-1">
+            What you wrote before
+          </p>
+          <p className="text-xs text-muted-foreground leading-relaxed italic">
+            &ldquo;{prediction.reasoning}&rdquo;
+          </p>
+          <p className="mt-2 text-[10px] text-muted-foreground/60">
+            {userWon
+              ? "Your reasoning held up. What did you get right?"
+              : "What would you think differently next time?"
+            }
+          </p>
+        </div>
+      )}
     </motion.div>
   )
 }

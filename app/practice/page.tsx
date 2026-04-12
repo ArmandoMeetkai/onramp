@@ -173,8 +173,8 @@ export default function PracticePage() {
           >
             <p className="text-sm font-semibold">💡 How this works</p>
             <p className="text-xs text-muted-foreground leading-relaxed">
-              You start with <strong className="text-foreground">$10,000 in play money</strong>. 
-              Buy and sell Bitcoin, Ethereum, or Solana to practice reading the market. 
+              You start with <strong className="text-foreground">$10,000 in play money</strong>.
+              Buy and sell Bitcoin, Ethereum, or Solana to practice reading the market.
               Nothing here is real. Experiment freely!
             </p>
           </motion.div>
@@ -367,7 +367,7 @@ export default function PracticePage() {
                 </span>
               </div>
               <p className="text-xs text-muted-foreground">
-                Predict crypto outcomes with your practice cash
+                Ready to test your skills? Predict real market outcomes
               </p>
             </div>
             <ArrowRight className="h-4 w-4 text-accent transition-transform group-hover:translate-x-0.5" />

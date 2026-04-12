@@ -1,15 +1,18 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
+import { toast } from "sonner"
 import { motion } from "framer-motion"
 import { PageTransition } from "@/components/layout/PageTransition"
 import { PredictionMarketCard } from "./PredictionMarketCard"
 import { PredictionWalkthrough, useShouldShowWalkthrough, WALKTHROUGH_HUB_KEY } from "./PredictionWalkthrough"
 import { PredictionSummary } from "./PredictionSummary"
+import { PredictionCalibration } from "./PredictionCalibration"
 import { PredictionPortfolioChip } from "./PredictionPortfolioChip"
+import { PredictionTradeSheet } from "./PredictionTradeSheet"
 import { usePredictionStore } from "@/store/usePredictionStore"
 import { useUserStore } from "@/store/useUserStore"
-import { cn } from "@/lib/utils"
+import { cn, formatCrypto } from "@/lib/utils"
 import { HelpCircle } from "lucide-react"
 import type { PredictionMarket } from "@/data/predictionMarkets"
 
@@ -33,16 +36,29 @@ interface PredictionHubContentProps {
   markets: PredictionMarket[]
 }
 
+function readSession<T>(key: string, fallback: T): T {
+  try { const v = sessionStorage.getItem(key); return v ? (v as T) : fallback } catch { return fallback }
+}
+
 export function PredictionHubContent({ markets }: PredictionHubContentProps) {
-  const [statusFilter, setStatusFilter] = useState<StatusFilter>("active")
-  const [assetFilter, setAssetFilter] = useState<AssetFilter>("all")
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>(() => readSession("pred-status-filter", "active" as StatusFilter))
+  const [assetFilter, setAssetFilter] = useState<AssetFilter>(() => readSession("pred-asset-filter", "all" as AssetFilter))
   const [walkthroughDone, setWalkthroughDone] = useState(false)
   const [forceWalkthrough, setForceWalkthrough] = useState(false)
+  const [tradeOpen, setTradeOpen] = useState(false)
   const profileId = useUserStore((s) => s.profile?.id)
   const getPredictionForMarket = usePredictionStore((s) => s.getPredictionForMarket)
   const getMarketOdds = usePredictionStore((s) => s.getMarketOdds)
   const checkPriceResolutions = usePredictionStore((s) => s.checkPriceResolutions)
   const userPredictions = usePredictionStore((s) => s.userPredictions)
+
+  // Persist filters to sessionStorage
+  useEffect(() => {
+    try { sessionStorage.setItem("pred-status-filter", statusFilter) } catch {}
+  }, [statusFilter])
+  useEffect(() => {
+    try { sessionStorage.setItem("pred-asset-filter", assetFilter) } catch {}
+  }, [assetFilter])
 
   const autoShowWalkthrough = useShouldShowWalkthrough(userPredictions.length > 0)
   const showWalkthrough = autoShowWalkthrough || forceWalkthrough
@@ -59,7 +75,19 @@ export function PredictionHubContent({ markets }: PredictionHubContentProps) {
 
   useEffect(() => {
     if (profileId) {
-      checkPriceResolutions(profileId)
+      checkPriceResolutions(profileId).then((resolved) => {
+        for (const r of resolved) {
+          if (r.won) {
+            toast.success(`You won! +${formatCrypto(r.payoutCrypto, r.asset)} ${r.asset}`, {
+              description: r.question,
+            })
+          } else {
+            toast.error("Market resolved against you", {
+              description: r.question,
+            })
+          }
+        }
+      })
     }
   }, [profileId, checkPriceResolutions])
 
@@ -87,16 +115,21 @@ export function PredictionHubContent({ markets }: PredictionHubContentProps) {
               </button>
             </div>
             <p className="mt-1 text-muted-foreground">
-              Predict crypto outcomes. Learn to think probabilistically.
+              Buy crypto, stake it on outcomes, test your instincts.
             </p>
           </div>
           <div id="pred-balance">
-            <PredictionPortfolioChip />
+            <PredictionPortfolioChip onBuy={() => setTradeOpen(true)} />
           </div>
         </div>
 
-        {/* Summary — only when user has predictions */}
-        {userPredictions.length > 0 && <PredictionSummary />}
+        {/* Summary & Calibration — only when user has predictions */}
+        {userPredictions.length > 0 && (
+          <div className="mt-5 space-y-3">
+            <PredictionSummary />
+            <PredictionCalibration />
+          </div>
+        )}
 
         {/* Filters */}
         <div id="pred-filters" className="mt-5 space-y-2">
@@ -169,6 +202,8 @@ export function PredictionHubContent({ markets }: PredictionHubContentProps) {
       {showWalkthrough && !walkthroughDone && (
         <PredictionWalkthrough onComplete={() => { setWalkthroughDone(true); setForceWalkthrough(false); window.scrollTo(0, 0) }} />
       )}
+
+      <PredictionTradeSheet open={tradeOpen} onOpenChange={setTradeOpen} />
     </PageTransition>
   )
 }

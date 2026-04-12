@@ -80,8 +80,22 @@ export interface UserPrediction {
   timestamp: Date
   resolved: boolean
   payoutCrypto: number | null
+  reasoning?: string
 }
 
+export interface PredictionWallet {
+  userId: string
+  balance: number
+  holdings: Holding[]
+  transactions: Transaction[]
+}
+
+export interface PriceSnapshot {
+  marketId: string
+  asset: string
+  price: number
+  capturedAt: Date
+}
 
 const db = new Dexie("OnrampDB") as Dexie & {
   profiles: EntityTable<UserProfile, "id">
@@ -91,6 +105,8 @@ const db = new Dexie("OnrampDB") as Dexie & {
   priceCache: EntityTable<PriceCacheEntry, "id">
   completedReplays: EntityTable<CompletedReplayEntry, "id">
   userPredictions: EntityTable<UserPrediction, "id">
+  priceSnapshots: EntityTable<PriceSnapshot, "marketId">
+  predictionWallets: EntityTable<PredictionWallet, "userId">
 }
 
 db.version(2).stores({
@@ -118,6 +134,29 @@ db.version(4).stores({
   priceCache: "id",
   completedReplays: "id, userId, eventId",
   userPredictions: "id, userId, marketId, timestamp",
+})
+
+db.version(5).stores({
+  profiles: "id, name",
+  progress: "userId",
+  simulations: "id, userId, scenarioId, timestamp",
+  portfolios: "userId",
+  priceCache: "id",
+  completedReplays: "id, userId, eventId",
+  userPredictions: "id, userId, marketId, timestamp",
+  priceSnapshots: "marketId",
+})
+
+db.version(6).stores({
+  profiles: "id, name",
+  progress: "userId",
+  simulations: "id, userId, scenarioId, timestamp",
+  portfolios: "userId",
+  priceCache: "id",
+  completedReplays: "id, userId, eventId",
+  userPredictions: "id, userId, marketId, timestamp",
+  priceSnapshots: "marketId",
+  predictionWallets: "userId",
 })
 
 export { db }

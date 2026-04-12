@@ -20,6 +20,15 @@ const categoryLabels: Record<string, string> = {
   community: "Community",
 }
 
+// Deterministic count from market ID — always the same for the same market
+function getSimulatedCount(id: string): number {
+  let hash = 0
+  for (let i = 0; i < id.length; i++) {
+    hash = ((hash << 5) - hash + id.charCodeAt(i)) | 0
+  }
+  return 150 + Math.abs(hash % 350) // 150-500 range
+}
+
 export function PredictionMarketCard({
   market,
   odds,
@@ -57,6 +66,9 @@ export function PredictionMarketCard({
             </Badge>
             <span className="text-[11px] text-muted-foreground">
               {getTimeRemaining(market.resolutionDate)}
+            </span>
+            <span className="text-[11px] text-muted-foreground/50">
+              · {getSimulatedCount(market.id)} predictions
             </span>
           </div>
         </div>

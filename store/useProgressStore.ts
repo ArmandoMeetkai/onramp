@@ -1,5 +1,6 @@
 import { create } from "zustand"
 import { db, type UserProgress } from "@/lib/db"
+import { usePredictionStore } from "./usePredictionStore"
 
 function getTodayISO(): string {
   return new Date().toISOString().split("T")[0]
@@ -12,12 +13,15 @@ function getYesterdayISO(): string {
 }
 
 function calculateConfidence(progress: UserProgress): number {
+  const { total, correct } = usePredictionStore.getState().getPredictionAccuracy()
   const score =
     progress.cardsViewed * 2 +
     progress.simulationsRun * 3 +
     progress.explanationsOpened * 2 +
     progress.lessonsCompleted.length * 5 +
-    (progress.replaysCompleted ?? 0) * 4
+    (progress.replaysCompleted ?? 0) * 4 +
+    total * 3 +
+    correct * 5
   return Math.min(100, score)
 }
 

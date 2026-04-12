@@ -274,13 +274,13 @@ const HUB_STEPS: TourStep[] = [
     label: "1 of 4 · Welcome",
     title: "What are Predictions?",
     description:
-      "Each market asks one question about crypto. You pick YES or NO and stake some of your practice portfolio. If you're right, you earn more crypto. If not, you lose what you staked.",
+      "Each market asks one question about crypto. You buy crypto with your prediction wallet, then stake it on your answer. If you're right, you earn more. If not, you lose what you staked.",
   },
   {
-    label: "2 of 4 · Your balance",
-    title: "Your practice balance",
+    label: "2 of 4 · Your wallet",
+    title: "Your prediction wallet",
     description:
-      "This number is the total value of your practice portfolio in USD. You use those coins to make predictions, never real money.",
+      "This is your prediction balance. You start with $1,000 to buy crypto and stake it on markets. Tap it to see your holdings breakdown.",
     targetId: "pred-balance",
     tooltipSide: "below",
   },

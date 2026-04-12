@@ -13,10 +13,11 @@ import { PredictionPlaceForm } from "@/components/predictions/PredictionPlaceFor
 import { PredictionResolutionBanner } from "@/components/predictions/PredictionResolutionBanner"
 import { getMarketById } from "@/data/predictionMarkets"
 import { usePredictionStore } from "@/store/usePredictionStore"
-import { usePortfolioStore } from "@/store/usePortfolioStore"
+import { usePredictionWalletStore } from "@/store/usePredictionWalletStore"
 import { usePriceStore } from "@/store/usePriceStore"
 import { useUserStore } from "@/store/useUserStore"
 import { PredictionFormWalkthrough } from "@/components/predictions/PredictionFormWalkthrough"
+import { PredictionTradeSheet } from "@/components/predictions/PredictionTradeSheet"
 import { useShouldShowFormWalkthrough, WALKTHROUGH_FORM_KEY } from "@/components/predictions/PredictionWalkthrough"
 import { getTimeRemaining } from "@/lib/utils"
 
@@ -30,7 +31,7 @@ export default function PredictionDetailPage({
   const market = getMarketById(marketId)
   const profile = useUserStore((s) => s.profile)
 
-  const portfolio = usePortfolioStore((s) => s.portfolio)
+  const wallet = usePredictionWalletStore((s) => s.wallet)
   const getPrice = usePriceStore((s) => s.getPrice)
   const getPredictionForMarket = usePredictionStore((s) => s.getPredictionForMarket)
   const getMarketOdds = usePredictionStore((s) => s.getMarketOdds)
@@ -39,15 +40,16 @@ export default function PredictionDetailPage({
   const userPrediction = getPredictionForMarket(marketId)
   const odds = getMarketOdds(marketId)
   const [justPlaced, setJustPlaced] = useState(false)
+  const [tradeOpen, setTradeOpen] = useState(false)
   const [formWalkthroughDone, setFormWalkthroughDone] = useState(false)
   const [forceFormWalkthrough, setForceFormWalkthrough] = useState(false)
   const autoShowFormWalkthrough = useShouldShowFormWalkthrough()
   const showFormWalkthrough = autoShowFormWalkthrough || forceFormWalkthrough
 
   const handlePlace = useCallback(
-    async (position: "yes" | "no", asset: "BTC" | "ETH" | "SOL", amount: number): Promise<boolean> => {
+    async (position: "yes" | "no", asset: "BTC" | "ETH" | "SOL", amount: number, reasoning?: string): Promise<boolean> => {
       if (!profile) return false
-      const success = await placePrediction(profile.id, marketId, position, asset, amount)
+      const success = await placePrediction(profile.id, marketId, position, asset, amount, reasoning)
       if (success) setJustPlaced(true)
       return success
     },
@@ -196,7 +198,15 @@ export default function PredictionDetailPage({
                   <span className="font-semibold text-foreground">
                     {new Date(market.resolutionDate).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}
                   </span>
-                  . If you&apos;re right, you&apos;ll get your crypto back plus a bonus. If not, you lose what you staked — that&apos;s how real investors learn to think probabilistically.
+                  . If you&apos;re right, you get your crypto back plus a bonus. If not, you lose what you staked. That&apos;s how real investors think probabilistically.
+                </div>
+              )}
+              {userPrediction.reasoning && (
+                <div className="mt-4 rounded-xl bg-muted/40 px-4 py-3">
+                  <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground mb-1">Your reasoning</p>
+                  <p className="text-xs text-muted-foreground leading-relaxed italic">
+                    &ldquo;{userPrediction.reasoning}&rdquo;
+                  </p>
                 </div>
               )}
               {hasEnded && (
@@ -214,12 +224,12 @@ export default function PredictionDetailPage({
                 >
                   More predictions
                 </Link>
-                <Link
-                  href="/practice"
+                <button
+                  onClick={() => setTradeOpen(true)}
                   className="flex-1 rounded-xl border border-border bg-card py-3 text-center text-sm font-medium transition-colors hover:border-primary/30"
                 >
-                  Back to portfolio
-                </Link>
+                  Buy more crypto
+                </button>
               </div>
             )}
           </motion.div>
@@ -250,10 +260,11 @@ export default function PredictionDetailPage({
             <PredictionPlaceForm
               holdings={(["BTC", "ETH", "SOL"] as const).map((a) => ({
                 asset: a,
-                amount: portfolio?.holdings.find((h) => h.asset === a)?.amount ?? 0,
+                amount: wallet?.holdings.find((h) => h.asset === a)?.amount ?? 0,
                 price: getPrice(a),
               }))}
               onPlace={handlePlace}
+              onBuy={() => setTradeOpen(true)}
             />
           </div>
         )}
@@ -281,6 +292,8 @@ export default function PredictionDetailPage({
           </p>
         </div>
       </div>
+
+      <PredictionTradeSheet open={tradeOpen} onOpenChange={setTradeOpen} />
     </PageTransition>
   )
 }

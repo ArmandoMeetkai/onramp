@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from "next"
 import { Inter, DM_Sans } from "next/font/google"
-import Script from "next/script"
 import { ClientShell } from "@/components/layout/ClientShell"
+import { Toaster } from "sonner"
 import "./globals.css"
 
 const inter = Inter({
@@ -57,22 +57,21 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning className={`${inter.variable} ${dmSans.variable} h-full`}>
-      <body className="min-h-full flex flex-col antialiased" suppressHydrationWarning>
-        <Script
-          id="theme-init"
-          strategy="beforeInteractive"
+      <head>
+        <script
           dangerouslySetInnerHTML={{
             __html: `(function(){try{var t=localStorage.getItem('onramp-theme');if(t==='light'){document.documentElement.classList.remove('dark')}else{document.documentElement.classList.add('dark')}}catch(e){document.documentElement.classList.add('dark')}})()`,
           }}
         />
-        <Script
-          id="sw-register"
-          strategy="beforeInteractive"
+      </head>
+      <body className="min-h-full flex flex-col antialiased" suppressHydrationWarning>
+        <script
           dangerouslySetInnerHTML={{
             __html: `(function(){if(!('serviceWorker' in navigator))return;if(location.hostname==='localhost'||location.hostname==='127.0.0.1'){navigator.serviceWorker.getRegistrations().then(function(regs){if(regs.length>0){Promise.all(regs.map(function(r){return r.unregister()})).then(function(){if('caches' in window){caches.keys().then(function(keys){Promise.all(keys.map(function(k){return caches.delete(k)}))})}})}});return;}navigator.serviceWorker.register('/sw.js').then(function(reg){reg.update()})})()`,
           }}
         />
         <ClientShell>{children}</ClientShell>
+        <Toaster position="top-center" richColors closeButton />
       </body>
     </html>
   )

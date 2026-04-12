@@ -1,9 +1,9 @@
 "use client"
 
 import { useState, useRef, useEffect, useMemo } from "react"
-import { ChevronDown, X } from "lucide-react"
+import { ChevronDown, X, Plus } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
-import { usePortfolioStore } from "@/store/usePortfolioStore"
+import { usePredictionWalletStore } from "@/store/usePredictionWalletStore"
 import { usePriceStore } from "@/store/usePriceStore"
 import { cn, formatCrypto } from "@/lib/utils"
 
@@ -15,11 +15,15 @@ const COIN_COLORS: Record<string, string> = {
   SOL: "text-[oklch(0.72_0.15_310)]",
 }
 
-export function PredictionPortfolioChip() {
+interface PredictionPortfolioChipProps {
+  onBuy?: () => void
+}
+
+export function PredictionPortfolioChip({ onBuy }: PredictionPortfolioChipProps) {
   const [open, setOpen] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
 
-  const portfolio = usePortfolioStore((s) => s.portfolio)
+  const portfolio = usePredictionWalletStore((s) => s.wallet)
   const getPrice = usePriceStore((s) => s.getPrice)
 
   // Close on outside click
@@ -84,7 +88,7 @@ export function PredictionPortfolioChip() {
             {/* Header */}
             <div className="flex items-center justify-between px-4 py-3 border-b border-border">
               <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
-                Portfolio
+                Wallet
               </p>
               <button
                 onClick={() => setOpen(false)}
@@ -140,6 +144,19 @@ export function PredictionPortfolioChip() {
                 ${totalUsd.toLocaleString(undefined, { maximumFractionDigits: 0 })}
               </p>
             </div>
+
+            {/* Buy Crypto button */}
+            {onBuy && (
+              <div className="px-4 py-3 border-t border-border">
+                <button
+                  onClick={() => { setOpen(false); onBuy() }}
+                  className="flex w-full items-center justify-center gap-1.5 rounded-xl bg-accent/15 py-2.5 text-xs font-semibold text-accent transition-colors hover:bg-accent/25"
+                >
+                  <Plus className="h-3.5 w-3.5" />
+                  Buy Crypto
+                </button>
+              </div>
+            )}
           </motion.div>
         )}
       </AnimatePresence>
