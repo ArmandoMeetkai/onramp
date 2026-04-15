@@ -1,14 +1,17 @@
 "use client"
 
 import Link from "next/link"
-import { Compass, BarChart3, MessageCircle, Clock, TrendingUp, ChevronRight, ArrowRight } from "lucide-react"
+import { Compass, BarChart3, MessageCircle, Clock, TrendingUp, Wallet, ChevronRight, ArrowRight } from "lucide-react"
 import { motion } from "framer-motion"
 import { useUserStore } from "@/store/useUserStore"
 import { useProgressStore } from "@/store/useProgressStore"
+import { useTestnetWalletStore } from "@/store/useTestnetWalletStore"
+import { useTestnetGraduation } from "@/hooks/useTestnetGraduation"
 import { ConfidenceScore } from "@/components/shared/ConfidenceScore"
 import { StreakBadge } from "@/components/shared/StreakBadge"
 import { DisclaimerBanner } from "@/components/shared/DisclaimerBanner"
 import { ReadyCTA } from "@/components/shared/ReadyCTA"
+import { formatPracticeTokensShort } from "@/lib/testnet"
 
 function getGreeting(name: string): string {
   const hour = new Date().getHours()
@@ -60,6 +63,9 @@ const quickActions = [
 export function HomeContent() {
   const profile = useUserStore((s) => s.profile)
   const progress = useProgressStore((s) => s.progress)
+  const testnetWallet = useTestnetWalletStore((s) => s.wallet)
+  const testnetBalances = useTestnetWalletStore((s) => s.balances)
+  const { isEligible } = useTestnetGraduation()
 
   if (!profile) return null
 
@@ -142,7 +148,37 @@ export function HomeContent() {
         </Link>
       </motion.div>
 
-      {(progress?.confidenceScore ?? 0) >= 60 && (
+      {/* Practice wallet CTA — shown when eligible */}
+      {isEligible && (
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 0.55 }}
+          className="mt-4"
+        >
+          <Link
+            href="/wallet"
+            className="group relative flex items-center gap-4 overflow-hidden rounded-2xl border border-primary/30 bg-gradient-to-r from-primary/10 via-primary/5 to-transparent p-5 transition-all duration-200 hover:border-primary/50 hover:shadow-md active:scale-[0.98]"
+          >
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-primary/15">
+              <Wallet className="h-5 w-5 text-primary" />
+            </div>
+            <div className="flex-1">
+              <p className="font-semibold leading-snug">
+                {testnetWallet ? "Practice wallet" : "Your crypto wallet"}
+              </p>
+              <p className="mt-0.5 text-sm text-muted-foreground">
+                {testnetWallet && testnetBalances.ethereum !== null
+                  ? `${formatPracticeTokensShort(testnetBalances.ethereum)} ETH`
+                  : "Get tokens for predictions"}
+              </p>
+            </div>
+            <ArrowRight className="h-4 w-4 text-primary transition-transform group-hover:translate-x-0.5" />
+          </Link>
+        </motion.div>
+      )}
+
+      {(progress?.confidenceScore ?? 0) >= 60 && !isEligible && (
         <div className="mt-8">
           <ReadyCTA
             headline="Ready to make it real?"

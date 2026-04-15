@@ -8,6 +8,7 @@ import { usePortfolioStore } from "@/store/usePortfolioStore"
 import { useReplayStore } from "@/store/useReplayStore"
 import { usePredictionStore } from "@/store/usePredictionStore"
 import { usePredictionWalletStore } from "@/store/usePredictionWalletStore"
+import { useTestnetWalletStore } from "@/store/useTestnetWalletStore"
 import { formatCrypto } from "@/lib/utils"
 
 export function useHydration() {
@@ -27,6 +28,7 @@ export function useHydration() {
             useReplayStore.getState().hydrate(profile.id),
             usePredictionStore.getState().hydrate(profile.id),
             usePredictionWalletStore.getState().hydrate(profile.id),
+            useTestnetWalletStore.getState().hydrate(profile.id),
           ])
 
           // Initialize prediction wallet if it doesn't exist yet

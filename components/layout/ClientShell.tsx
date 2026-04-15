@@ -13,7 +13,20 @@ function ScrollToTop() {
   return null
 }
 
+const STANDALONE_ROUTES = ["/faucet"]
+
 export function ClientShell({ children }: { children: ReactNode }) {
+  const pathname = usePathname()
+  const isStandalone = STANDALONE_ROUTES.some((r) => pathname.startsWith(r))
+
+  if (isStandalone) {
+    return (
+      <MotionConfig reducedMotion="user">
+        {children}
+      </MotionConfig>
+    )
+  }
+
   return (
     <MotionConfig reducedMotion="user">
       <ScrollToTop />

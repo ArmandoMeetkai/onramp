@@ -97,6 +97,50 @@ export interface PriceSnapshot {
   capturedAt: Date
 }
 
+export interface ChainKeys {
+  address: string
+  encryptedKey: string
+  salt: string
+  iv: string
+}
+
+export interface TestnetBalances {
+  ethereum: string  // wei as string (bigint serialized)
+  solana: number    // lamports
+  bitcoin: number   // satoshis
+}
+
+export interface TestnetWallet {
+  userId: string
+  /** Ethereum Sepolia */
+  address: string
+  encryptedPrivateKey: string
+  encryptionSalt: string
+  encryptionIV: string
+  /** Solana Devnet */
+  solana: ChainKeys | null
+  /** Bitcoin Testnet */
+  bitcoin: ChainKeys | null
+  /** Persisted balances */
+  balances: TestnetBalances
+  createdAt: Date
+}
+
+export type TestnetChain = "ethereum" | "solana" | "bitcoin"
+
+export interface TestnetTransaction {
+  id: string
+  userId: string
+  chain: TestnetChain
+  type: "faucet" | "send" | "receive"
+  hash: string
+  to: string
+  from: string
+  amount: string
+  status: "pending" | "confirmed" | "failed"
+  timestamp: Date
+}
+
 const db = new Dexie("OnrampDB") as Dexie & {
   profiles: EntityTable<UserProfile, "id">
   progress: EntityTable<UserProgress, "userId">
@@ -107,6 +151,8 @@ const db = new Dexie("OnrampDB") as Dexie & {
   userPredictions: EntityTable<UserPrediction, "id">
   priceSnapshots: EntityTable<PriceSnapshot, "marketId">
   predictionWallets: EntityTable<PredictionWallet, "userId">
+  testnetWallets: EntityTable<TestnetWallet, "userId">
+  testnetTransactions: EntityTable<TestnetTransaction, "id">
 }
 
 db.version(2).stores({
@@ -157,6 +203,43 @@ db.version(6).stores({
   userPredictions: "id, userId, marketId, timestamp",
   priceSnapshots: "marketId",
   predictionWallets: "userId",
+})
+
+db.version(7).stores({
+  profiles: "id, name",
+  progress: "userId",
+  simulations: "id, userId, scenarioId, timestamp",
+  portfolios: "userId",
+  priceCache: "id",
+  completedReplays: "id, userId, eventId",
+  userPredictions: "id, userId, marketId, timestamp",
+  priceSnapshots: "marketId",
+  predictionWallets: "userId",
+  testnetWallets: "userId",
+  testnetTransactions: "id, userId, hash, timestamp",
+})
+
+db.version(8).stores({
+  profiles: "id, name",
+  progress: "userId",
+  simulations: "id, userId, scenarioId, timestamp",
+  portfolios: "userId",
+  priceCache: "id",
+  completedReplays: "id, userId, eventId",
+  userPredictions: "id, userId, marketId, timestamp",
+  priceSnapshots: "marketId",
+  predictionWallets: "userId",
+  testnetWallets: "userId",
+  testnetTransactions: "id, userId, chain, hash, timestamp",
+}).upgrade((tx) => {
+  // Migrate existing transactions to include chain field
+  return tx.table("testnetTransactions").toCollection().modify((t: Record<string, unknown>) => {
+    if (!t.chain) t.chain = "ethereum"
+    if (t.amountWei && !t.amount) {
+      t.amount = t.amountWei
+      delete t.amountWei
+    }
+  })
 })
 
 export { db }

@@ -4,6 +4,7 @@ import Link from "next/link"
 import { ArrowRight } from "lucide-react"
 import { motion } from "framer-motion"
 import { cn } from "@/lib/utils"
+import { useTestnetGraduation } from "@/hooks/useTestnetGraduation"
 
 interface ReadyCTAProps {
   headline: string
@@ -16,6 +17,9 @@ export function ReadyCTA({
   subtext,
   variant = "default",
 }: ReadyCTAProps) {
+  const { isEligible } = useTestnetGraduation()
+  const href = isEligible ? "/wallet" : "/ready"
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 8 }}
@@ -23,7 +27,7 @@ export function ReadyCTA({
       transition={{ duration: 0.4 }}
     >
       <Link
-        href="/ready"
+        href={href}
         className={cn(
           "group flex items-center justify-between rounded-2xl p-4 transition-all duration-200 active:scale-[0.98]",
           variant === "default"
@@ -36,10 +40,14 @@ export function ReadyCTA({
             "font-semibold",
             variant === "default" ? "text-primary" : "text-foreground"
           )}>
-            {headline}
+            {isEligible ? "Unlock your crypto wallet" : headline}
           </p>
-          {subtext && (
-            <p className="mt-0.5 text-xs text-muted-foreground">{subtext}</p>
+          {(subtext || isEligible) && (
+            <p className="mt-0.5 text-xs text-muted-foreground">
+              {isEligible
+                ? "Use real tokens for predictions"
+                : subtext}
+            </p>
           )}
         </div>
         <ArrowRight className={cn(

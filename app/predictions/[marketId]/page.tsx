@@ -13,9 +13,9 @@ import { PredictionPlaceForm } from "@/components/predictions/PredictionPlaceFor
 import { PredictionResolutionBanner } from "@/components/predictions/PredictionResolutionBanner"
 import { getMarketById } from "@/data/predictionMarkets"
 import { usePredictionStore } from "@/store/usePredictionStore"
-import { usePredictionWalletStore } from "@/store/usePredictionWalletStore"
 import { usePriceStore } from "@/store/usePriceStore"
 import { useUserStore } from "@/store/useUserStore"
+import { usePredictionHoldings } from "@/hooks/usePredictionHoldings"
 import { PredictionFormWalkthrough } from "@/components/predictions/PredictionFormWalkthrough"
 import { PredictionTradeSheet } from "@/components/predictions/PredictionTradeSheet"
 import { useShouldShowFormWalkthrough, WALKTHROUGH_FORM_KEY } from "@/components/predictions/PredictionWalkthrough"
@@ -31,7 +31,7 @@ export default function PredictionDetailPage({
   const market = getMarketById(marketId)
   const profile = useUserStore((s) => s.profile)
 
-  const wallet = usePredictionWalletStore((s) => s.wallet)
+  const { isGraduated, holdings: predictionHoldings } = usePredictionHoldings()
   const getPrice = usePriceStore((s) => s.getPrice)
   const getPredictionForMarket = usePredictionStore((s) => s.getPredictionForMarket)
   const getMarketOdds = usePredictionStore((s) => s.getMarketOdds)
@@ -258,13 +258,10 @@ export default function PredictionDetailPage({
         {isActive && !hasEnded && (
           <div className="mt-5" id="pred-form-section">
             <PredictionPlaceForm
-              holdings={(["BTC", "ETH", "SOL"] as const).map((a) => ({
-                asset: a,
-                amount: wallet?.holdings.find((h) => h.asset === a)?.amount ?? 0,
-                price: getPrice(a),
-              }))}
+              holdings={predictionHoldings}
               onPlace={handlePlace}
-              onBuy={() => setTradeOpen(true)}
+              onBuy={isGraduated ? undefined : () => setTradeOpen(true)}
+              walletLink={isGraduated ? "/wallet" : undefined}
             />
           </div>
         )}

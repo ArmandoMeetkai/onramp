@@ -1,13 +1,11 @@
 "use client"
 
-import { useState, useRef, useEffect, useMemo } from "react"
-import { ChevronDown, X, Plus } from "lucide-react"
+import { useState, useRef, useEffect } from "react"
+import { ChevronDown, X, Plus, Wallet } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
-import { usePredictionWalletStore } from "@/store/usePredictionWalletStore"
-import { usePriceStore } from "@/store/usePriceStore"
+import Link from "next/link"
 import { cn, formatCrypto } from "@/lib/utils"
-
-const ASSETS = ["BTC", "ETH", "SOL"] as const
+import { usePredictionHoldings } from "@/hooks/usePredictionHoldings"
 
 const COIN_COLORS: Record<string, string> = {
   BTC: "text-[oklch(0.72_0.12_55)]",
@@ -23,10 +21,8 @@ export function PredictionPortfolioChip({ onBuy }: PredictionPortfolioChipProps)
   const [open, setOpen] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
 
-  const portfolio = usePredictionWalletStore((s) => s.wallet)
-  const getPrice = usePriceStore((s) => s.getPrice)
+  const { isGraduated, holdings, cashBalance, totalUsd } = usePredictionHoldings()
 
-  // Close on outside click
   useEffect(() => {
     function handleClick(e: MouseEvent) {
       if (ref.current && !ref.current.contains(e.target as Node)) {
@@ -37,20 +33,7 @@ export function PredictionPortfolioChip({ onBuy }: PredictionPortfolioChipProps)
     return () => document.removeEventListener("mousedown", handleClick)
   }, [open])
 
-  const breakdown = useMemo(() => {
-    if (!portfolio) return []
-    return ASSETS.map((asset) => {
-      const holding = portfolio.holdings.find((h) => h.asset === asset)
-      const amount = holding?.amount ?? 0
-      const price = getPrice(asset)
-      const usdValue = amount * price
-      return { asset, amount, price, usdValue }
-    }).filter((c) => c.amount > 0)
-  }, [portfolio, getPrice])
-
-  const cashBalance = portfolio?.balance ?? 0
-  const holdingsUsd = breakdown.reduce((s, c) => s + c.usdValue, 0)
-  const totalUsd = cashBalance + holdingsUsd
+  const breakdown = holdings.filter((h) => h.amount > 0)
 
   return (
     <div ref={ref} className="relative">
@@ -65,6 +48,7 @@ export function PredictionPortfolioChip({ onBuy }: PredictionPortfolioChipProps)
         aria-expanded={open}
         aria-label="View portfolio breakdown"
       >
+        {isGraduated && <Wallet className="h-3 w-3" />}
         ${totalUsd.toLocaleString(undefined, { maximumFractionDigits: 0 })}
         <motion.span
           animate={{ rotate: open ? 180 : 0 }}
@@ -88,7 +72,7 @@ export function PredictionPortfolioChip({ onBuy }: PredictionPortfolioChipProps)
             {/* Header */}
             <div className="flex items-center justify-between px-4 py-3 border-b border-border">
               <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
-                Wallet
+                {isGraduated ? "Testnet Wallet" : "Wallet"}
               </p>
               <button
                 onClick={() => setOpen(false)}
@@ -117,14 +101,14 @@ export function PredictionPortfolioChip({ onBuy }: PredictionPortfolioChipProps)
                       </span>
                     </div>
                     <span className="text-xs font-semibold">
-                      ${coin.usdValue.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                      ${(coin.amount * coin.price).toLocaleString(undefined, { maximumFractionDigits: 0 })}
                     </span>
                   </div>
                 ))
               )}
 
-              {/* Cash row */}
-              {cashBalance > 0 && (
+              {/* Cash row — only for non-graduated */}
+              {!isGraduated && cashBalance > 0 && (
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <span className="text-xs font-bold w-7 text-muted-foreground">USD</span>
@@ -145,9 +129,18 @@ export function PredictionPortfolioChip({ onBuy }: PredictionPortfolioChipProps)
               </p>
             </div>
 
-            {/* Buy Crypto button */}
-            {onBuy && (
-              <div className="px-4 py-3 border-t border-border">
+            {/* Action button */}
+            <div className="px-4 py-3 border-t border-border">
+              {isGraduated ? (
+                <Link
+                  href="/wallet"
+                  onClick={() => setOpen(false)}
+                  className="flex w-full items-center justify-center gap-1.5 rounded-xl bg-accent/15 py-2.5 text-xs font-semibold text-accent transition-colors hover:bg-accent/25"
+                >
+                  <Wallet className="h-3.5 w-3.5" />
+                  Get more tokens
+                </Link>
+              ) : onBuy ? (
                 <button
                   onClick={() => { setOpen(false); onBuy() }}
                   className="flex w-full items-center justify-center gap-1.5 rounded-xl bg-accent/15 py-2.5 text-xs font-semibold text-accent transition-colors hover:bg-accent/25"
@@ -155,8 +148,8 @@ export function PredictionPortfolioChip({ onBuy }: PredictionPortfolioChipProps)
                   <Plus className="h-3.5 w-3.5" />
                   Buy Crypto
                 </button>
-              </div>
-            )}
+              ) : null}
+            </div>
           </motion.div>
         )}
       </AnimatePresence>

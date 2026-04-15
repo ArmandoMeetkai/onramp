@@ -2,7 +2,7 @@
 
 import { useState, useCallback } from "react"
 import { useRouter } from "next/navigation"
-import { ArrowLeft, Check, Sparkles, TrendingUp, ArrowRight } from "lucide-react"
+import { ArrowLeft, Check, Sparkles, TrendingUp, Wallet, ArrowRight } from "lucide-react"
 import { motion } from "framer-motion"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
@@ -12,6 +12,7 @@ import { PageTransition } from "@/components/layout/PageTransition"
 import { ReadyHero } from "@/components/ready/ReadyHero"
 import { ConfidenceScore } from "@/components/shared/ConfidenceScore"
 import { useProgressStore } from "@/store/useProgressStore"
+import { useTestnetGraduation } from "@/hooks/useTestnetGraduation"
 
 const WAITLIST_KEY = "onramp-waitlist-email"
 
@@ -54,6 +55,7 @@ export default function ReadyPage() {
     [email, isSubmitting]
   )
 
+  const { isEligible } = useTestnetGraduation()
   const confidenceScore = progress?.confidenceScore ?? 0
   const replaysCompleted = progress?.replaysCompleted ?? 0
   const lessonsCompleted = progress?.lessonsCompleted.length ?? 0
@@ -87,6 +89,32 @@ export default function ReadyPage() {
             calm, safe experience. Be the first to know.
           </p>
         </motion.div>
+
+        {/* Practice wallet CTA when eligible */}
+        {isEligible && (
+          <motion.div
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.45, duration: 0.4 }}
+            className="mt-6"
+          >
+            <Link
+              href="/wallet"
+              className="group flex items-center gap-4 overflow-hidden rounded-2xl border border-primary/30 bg-gradient-to-r from-primary/10 via-primary/5 to-transparent p-4 transition-all hover:border-primary/50 hover:shadow-md active:scale-[0.98]"
+            >
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/15">
+                <Wallet className="h-5 w-5 text-primary" />
+              </div>
+              <div className="flex-1">
+                <p className="text-sm font-semibold">Your crypto wallet is ready</p>
+                <p className="text-xs text-muted-foreground">
+                  Get tokens and use them for predictions
+                </p>
+              </div>
+              <ArrowRight className="h-4 w-4 text-primary transition-transform group-hover:translate-x-0.5" />
+            </Link>
+          </motion.div>
+        )}
 
         {/* Waitlist form or success state — above the fold */}
         <motion.div

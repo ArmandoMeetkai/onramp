@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { User } from "lucide-react"
+import { User, Wallet, ArrowRight } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
 import { ReadyCTA } from "@/components/shared/ReadyCTA"
@@ -11,6 +11,9 @@ import { StreakBadge } from "@/components/shared/StreakBadge"
 import { useUserStore } from "@/store/useUserStore"
 import { useProgressStore } from "@/store/useProgressStore"
 import { usePredictionStore } from "@/store/usePredictionStore"
+import { useTestnetWalletStore } from "@/store/useTestnetWalletStore"
+import { useTestnetGraduation } from "@/hooks/useTestnetGraduation"
+import { truncateAddress, formatPracticeTokensShort } from "@/lib/testnet"
 
 const experienceLabels: Record<string, string> = {
   new: "Completely new",
@@ -30,6 +33,9 @@ export default function ProfilePage() {
   const progress = useProgressStore((s) => s.progress)
   const predictionAccuracy = usePredictionStore((s) => s.getPredictionAccuracy)
   const userPredictions = usePredictionStore((s) => s.userPredictions)
+  const testnetWallet = useTestnetWalletStore((s) => s.wallet)
+  const testnetBalances = useTestnetWalletStore((s) => s.balances)
+  const { isEligible } = useTestnetGraduation()
 
   if (!profile) {
     return (
@@ -123,6 +129,48 @@ export default function ProfilePage() {
             )
           })()}
         </div>
+
+        {/* Practice wallet section */}
+        {(isEligible || testnetWallet) && (
+          <>
+            <Separator className="my-6" />
+            <div className="space-y-3">
+              <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+                Crypto Wallet
+              </h2>
+              <Link
+                href="/wallet"
+                className="group flex items-center gap-4 rounded-2xl border border-border bg-card p-4 transition-all hover:border-primary/30"
+              >
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10">
+                  <Wallet className="h-5 w-5 text-primary" />
+                </div>
+                <div className="flex-1">
+                  {testnetWallet ? (
+                    <>
+                      <p className="text-sm font-semibold">
+                        {testnetBalances.ethereum !== null
+                          ? `${formatPracticeTokensShort(testnetBalances.ethereum)} ETH`
+                          : "Practice wallet"}
+                      </p>
+                      <p className="text-xs text-muted-foreground font-mono">
+                        {truncateAddress(testnetWallet.address)}
+                      </p>
+                    </>
+                  ) : (
+                    <>
+                      <p className="text-sm font-semibold">Unlock your crypto wallet</p>
+                      <p className="text-xs text-muted-foreground">
+                        Get tokens for predictions
+                      </p>
+                    </>
+                  )}
+                </div>
+                <ArrowRight className="h-4 w-4 text-muted-foreground transition-transform group-hover:translate-x-0.5" />
+              </Link>
+            </div>
+          </>
+        )}
 
         <Separator className="my-6" />
 
