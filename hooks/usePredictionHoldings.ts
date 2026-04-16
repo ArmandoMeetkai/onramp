@@ -11,6 +11,9 @@ import { formatBtcTokens } from "@/lib/bitcoin"
 import type { HoldingWithPrice } from "@/components/predictions/PredictionPlaceForm"
 
 const ASSETS = ["BTC", "ETH", "SOL"] as const
+const WEI_PER_ETH = 1e18
+const LAMPORTS_PER_SOL = 1e9
+const SATS_PER_BTC = 1e8
 
 /**
  * Returns the holdings to use for predictions, depending on graduation status.
@@ -32,14 +35,11 @@ export function usePredictionHoldings() {
       return ASSETS.map((asset) => {
         let amount = 0
         if (asset === "ETH" && testnetBalances.ethereum !== null) {
-          // Convert wei to ETH
-          amount = Number(testnetBalances.ethereum) / 1e18
+          amount = Number(testnetBalances.ethereum) / WEI_PER_ETH
         } else if (asset === "SOL" && testnetBalances.solana !== null) {
-          // Convert lamports to SOL
-          amount = testnetBalances.solana / 1e9
+          amount = testnetBalances.solana / LAMPORTS_PER_SOL
         } else if (asset === "BTC" && testnetBalances.bitcoin !== null) {
-          // Convert satoshis to BTC
-          amount = testnetBalances.bitcoin / 1e8
+          amount = testnetBalances.bitcoin / SATS_PER_BTC
         }
         return { asset, amount, price: getPrice(asset) }
       })
@@ -62,9 +62,9 @@ export function usePredictionHoldings() {
 
   const formatBalance = (asset: string, amount: number): string => {
     if (isGraduated) {
-      if (asset === "ETH") return formatEthShort(BigInt(Math.floor(amount * 1e18)))
-      if (asset === "SOL") return formatSolTokens(Math.floor(amount * 1e9))
-      if (asset === "BTC") return formatBtcTokens(Math.floor(amount * 1e8))
+      if (asset === "ETH") return formatEthShort(BigInt(Math.floor(amount * WEI_PER_ETH)))
+      if (asset === "SOL") return formatSolTokens(Math.floor(amount * LAMPORTS_PER_SOL))
+      if (asset === "BTC") return formatBtcTokens(Math.floor(amount * SATS_PER_BTC))
     }
     return amount.toFixed(asset === "BTC" ? 6 : 4)
   }

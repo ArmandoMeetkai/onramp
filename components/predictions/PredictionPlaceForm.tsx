@@ -247,6 +247,7 @@ export function PredictionPlaceForm({ holdings, onPlace, onBuy, walletLink }: Pr
                       setCustomInput("")
                     }}
                     disabled={tooMuch}
+                    title={tooMuch ? `Not enough ${selectedAsset}` : undefined}
                     className={cn(
                       "flex-1 flex flex-col items-center rounded-xl py-2 transition-all duration-200",
                       !isCustom && usdAmount === a
@@ -298,7 +299,7 @@ export function PredictionPlaceForm({ holdings, onPlace, onBuy, walletLink }: Pr
           {position && (
             <div className="rounded-xl bg-primary/5 border border-primary/20 px-4 py-3 text-center">
               <p className="text-xs text-muted-foreground">
-                You are betting <span className="font-semibold text-foreground">{position.toUpperCase()}</span>
+                You are predicting <span className="font-semibold text-foreground">{position.toUpperCase()}</span>
               </p>
               <p className="mt-1 text-xl font-bold">
                 {formatCrypto(cryptoAmount, selectedAsset)} {selectedAsset}

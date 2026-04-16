@@ -203,7 +203,7 @@ export function SpotlightTour({ steps, onComplete, storageKey }: SpotlightTourPr
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0 }}
             transition={{ type: "spring", stiffness: 280, damping: 28 }}
-            className="fixed inset-x-4 z-51 mx-auto max-w-[420px] rounded-2xl border border-border bg-card p-5 shadow-xl"
+            className="fixed inset-x-4 z-[51] mx-auto max-w-[420px] rounded-2xl border border-border bg-card p-5 shadow-xl"
             style={
               targetRect && tooltipTop !== undefined
                 ? { top: Math.max(8, tooltipTop) }

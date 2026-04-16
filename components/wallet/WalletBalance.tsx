@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion"
 import { useTestnetWalletStore } from "@/store/useTestnetWalletStore"
+import { usePriceStore } from "@/store/usePriceStore"
 import { formatEthShort } from "@/lib/testnet"
 import { formatSolTokens } from "@/lib/solana"
 import { formatBtcTokens } from "@/lib/bitcoin"
@@ -15,19 +16,28 @@ const chainUnits = {
 export function WalletBalance() {
   const balances = useTestnetWalletStore((s) => s.balances)
   const activeChain = useTestnetWalletStore((s) => s.activeChain)
+  const getPrice = usePriceStore((s) => s.getPrice)
 
-  const displayBalance = (() => {
-    if (activeChain === "ethereum") {
-      return balances.ethereum !== null ? formatEthShort(balances.ethereum) : "0"
+  const asset = chainUnits[activeChain]
+
+  const { displayBalance, nativeAmount } = (() => {
+    if (activeChain === "ethereum" && balances.ethereum !== null) {
+      const amount = Number(balances.ethereum) / 1e18
+      return { displayBalance: formatEthShort(balances.ethereum), nativeAmount: amount }
     }
-    if (activeChain === "solana") {
-      return balances.solana !== null ? formatSolTokens(balances.solana) : "0"
+    if (activeChain === "solana" && balances.solana !== null) {
+      const amount = balances.solana / 1e9
+      return { displayBalance: formatSolTokens(balances.solana), nativeAmount: amount }
     }
-    if (activeChain === "bitcoin") {
-      return balances.bitcoin !== null ? formatBtcTokens(balances.bitcoin) : "0"
+    if (activeChain === "bitcoin" && balances.bitcoin !== null) {
+      const amount = balances.bitcoin / 1e8
+      return { displayBalance: formatBtcTokens(balances.bitcoin), nativeAmount: amount }
     }
-    return "0"
+    return { displayBalance: "0", nativeAmount: 0 }
   })()
+
+  const price = getPrice(asset)
+  const usdValue = nativeAmount * price
 
   return (
     <motion.div
@@ -41,7 +51,14 @@ export function WalletBalance() {
         <p className="font-heading text-3xl font-bold tracking-tight">
           {displayBalance}
         </p>
-        <p className="text-sm text-muted-foreground">{chainUnits[activeChain]}</p>
+        <div className="flex items-center gap-2">
+          <p className="text-sm text-muted-foreground">{asset}</p>
+          {usdValue > 0 && (
+            <p className="text-sm text-muted-foreground">
+              ~${usdValue.toLocaleString(undefined, { maximumFractionDigits: 2 })}
+            </p>
+          )}
+        </div>
       </div>
     </motion.div>
   )

@@ -65,6 +65,7 @@ export const usePredictionStore = create<PredictionState>((set, get) => ({
       const invalid = all.filter((p) => p.cryptoAmount == null)
 
       if (invalid.length > 0) {
+        console.warn(`[Predictions] Removing ${invalid.length} predictions from old schema (missing cryptoAmount)`)
         await db.userPredictions.bulkDelete(invalid.map((p) => p.id))
       }
 
@@ -138,7 +139,7 @@ export const usePredictionStore = create<PredictionState>((set, get) => ({
     return true
   },
 
-  resolveMarket: async (userId, marketId, outcome) => {
+  resolveMarket: async (_userId, marketId, outcome) => {
     const { userPredictions } = get()
 
     const prediction = userPredictions.find(
@@ -436,18 +437,17 @@ export const usePredictionStore = create<PredictionState>((set, get) => ({
       const sidePercent = p.position === "yes" ? odds.yesPercent : odds.noPercent
       const won = (p.payoutCrypto ?? 0) > 0
 
-      // Find the matching bucket
+      // Find the matching bucket (last bucket includes upper bound: 75-95)
       for (const bucket of buckets) {
-        if (sidePercent >= bucket.min && sidePercent < bucket.max) {
+        const isLastBucket = bucket === buckets[buckets.length - 1]
+        const inBucket = isLastBucket
+          ? sidePercent >= bucket.min && sidePercent <= bucket.max
+          : sidePercent >= bucket.min && sidePercent < bucket.max
+        if (inBucket) {
           bucket.total++
           if (won) bucket.correct++
           break
         }
-      }
-      // Handle edge case: sidePercent === 95 goes in the last bucket
-      if (sidePercent >= 95) {
-        buckets[3].total++
-        if (won) buckets[3].correct++
       }
 
       // Brier score: mean squared error between predicted probability and outcome

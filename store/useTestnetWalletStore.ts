@@ -5,6 +5,8 @@ import { encryptPrivateKey } from "@/lib/crypto"
 
 const DEFAULT_BALANCES = { ethereum: "0", solana: 0, bitcoin: 0 }
 
+let hydratingUserId: string | null = null
+
 interface ChainBalances {
   ethereum: bigint | null
   solana: number | null
@@ -22,7 +24,7 @@ interface TestnetWalletState {
   hydrate: (userId: string) => Promise<void>
   createWallet: (userId: string) => Promise<void>
   setActiveChain: (chain: TestnetChain) => void
-  fetchBalance: (chain?: TestnetChain) => Promise<void>
+  fetchBalance: () => Promise<void>
   fetchAllBalances: () => Promise<void>
   creditBalance: (chain: TestnetChain, amount: string) => Promise<void>
   debitBalance: (chain: TestnetChain, amount: string) => Promise<boolean>
@@ -41,6 +43,9 @@ export const useTestnetWalletStore = create<TestnetWalletState>((set, get) => ({
   isFetchingBalance: false,
 
   hydrate: async (userId) => {
+    // Prevent concurrent hydrations generating duplicate keys
+    if (hydratingUserId === userId) return
+    hydratingUserId = userId
     try {
       const wallet = await db.testnetWallets.get(userId)
       if (wallet) {
@@ -97,6 +102,8 @@ export const useTestnetWalletStore = create<TestnetWalletState>((set, get) => ({
       }
     } catch {
       set({ wallet: null, transactions: [] })
+    } finally {
+      hydratingUserId = null
     }
   },
 

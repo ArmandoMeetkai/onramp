@@ -56,15 +56,17 @@ function WalletContent() {
         ) : hasWallet ? (
           <>
             <WalletDashboard />
-            <button
-              onClick={async () => {
-                await resetWallet()
-                window.location.reload()
-              }}
-              className="mt-6 w-full rounded-xl border border-destructive/30 py-2.5 text-xs text-destructive hover:bg-destructive/10 transition-colors"
-            >
-              Reset wallet balances (dev only)
-            </button>
+            {process.env.NODE_ENV === "development" && (
+              <button
+                onClick={async () => {
+                  await resetWallet()
+                  window.location.reload()
+                }}
+                className="mt-6 w-full rounded-xl border border-destructive/30 py-2.5 text-xs text-destructive hover:bg-destructive/10 transition-colors"
+              >
+                Reset wallet balances (dev only)
+              </button>
+            )}
           </>
         ) : (
           <div className="py-6 text-center">

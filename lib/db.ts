@@ -239,6 +239,8 @@ db.version(8).stores({
       t.amount = t.amountWei
       delete t.amountWei
     }
+  }).catch((err) => {
+    console.warn("[DB v8] Migration failed, continuing:", err)
   })
 })
 

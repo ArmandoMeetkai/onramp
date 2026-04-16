@@ -32,12 +32,9 @@ export function PredictionCalibration() {
             How well your confidence matches reality
           </p>
         </div>
-        <div className="text-right">
+        <div className="text-right" title={`Brier score: ${brierScore.toFixed(3)}`}>
           <p className={cn("text-sm font-bold", brier.color)}>
             {brier.label}
-          </p>
-          <p className="text-[10px] text-muted-foreground">
-            Brier: {brierScore.toFixed(2)}
           </p>
         </div>
       </div>

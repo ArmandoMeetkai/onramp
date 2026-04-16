@@ -24,21 +24,34 @@ export function WalletReceiveSheet({
   onOpenChange,
 }: WalletReceiveSheetProps) {
   const wallet = useTestnetWalletStore((s) => s.wallet)
+  const activeChain = useTestnetWalletStore((s) => s.activeChain)
   const [copied, setCopied] = useState(false)
 
+  const activeAddress = (() => {
+    if (!wallet) return null
+    if (activeChain === "ethereum") return wallet.address
+    if (activeChain === "solana") return wallet.solana?.address ?? null
+    if (activeChain === "bitcoin") return wallet.bitcoin?.address ?? null
+    return null
+  })()
+
+  const chainLabel = activeChain === "ethereum" ? "Ethereum Sepolia"
+    : activeChain === "solana" ? "Solana Devnet"
+    : "Bitcoin Testnet"
+
   const handleCopy = useCallback(async () => {
-    if (!wallet) return
+    if (!activeAddress) return
     try {
-      await navigator.clipboard.writeText(wallet.address)
+      await navigator.clipboard.writeText(activeAddress)
       setCopied(true)
-      toast.success("Address copied!")
+      toast.success(`${chainLabel} address copied!`)
       setTimeout(() => setCopied(false), 2000)
     } catch {
       toast.error("Could not copy address")
     }
-  }, [wallet])
+  }, [activeAddress, chainLabel])
 
-  if (!wallet) return null
+  if (!wallet || !activeAddress) return null
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
@@ -54,10 +67,10 @@ export function WalletReceiveSheet({
           {/* Address card */}
           <div className="rounded-xl bg-muted/50 p-5 text-center">
             <p className="text-xs text-muted-foreground mb-2">
-              Your wallet address
+              Your {chainLabel} address
             </p>
             <p className="font-mono text-sm text-foreground break-all leading-relaxed">
-              {wallet.address}
+              {activeAddress}
             </p>
           </div>
 
