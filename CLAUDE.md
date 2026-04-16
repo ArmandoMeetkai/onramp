@@ -65,13 +65,17 @@ export function useSimulation(s: any) {
 
 ## PROJECT SUMMARY
 
-**Onramp** — "The first safe place to think before entering crypto."
+**Onramp** — "The first safe place to think before entering crypto, with a guided on-ramp when you're ready."
 
-A beginner-friendly PWA for people curious about crypto. NOT a trading platform, wallet, or exchange. It helps users understand scenarios, simulate outcomes safely, and build confidence.
+A beginner-friendly PWA for people curious about crypto. The core positioning is still safety-first learning: users understand scenarios, simulate outcomes, and build confidence before touching real markets. Phases 10-11 added an **optional testnet on-ramp**: after users graduate (meeting learning milestones), they unlock a multi-chain testnet wallet and prediction markets where they stake real testnet tokens (zero monetary value) on yes/no questions about crypto.
+
+**Demo scope.** This is a demo/presentation project. There is no production backend, no real-money flows, and wallets only ever touch public testnets (Sepolia, Solana Devnet, Bitcoin Testnet). Rate-limiting, key storage, and API routes are sized for a local/demo context — **do not port these patterns to a mainnet product without redesign**.
 
 ### Tech stack
 
 Next.js 15+ (App Router) · TypeScript strict · Tailwind CSS 4 · shadcn/ui · Zustand · Dexie.js · lucide-react · Framer Motion · Claude API · Bun
+
+**Crypto libs (testnet-only):** `viem` (Sepolia), `@solana/web3.js` (Devnet), `@scure/btc-signer` + `@noble/curves` (Bitcoin Testnet). Key management via Web Crypto (PBKDF2 + AES-256-GCM) in `lib/crypto.ts`. Toasts: `sonner`.
 
 ### UI direction
 
@@ -79,6 +83,7 @@ Warm fintech, not crypto-bro. Forest green (`oklch(0.45 0.1 155)`) + burnt amber
 
 ### Key features
 
+**Learning / simulation:**
 - Decision Cards with probability visualization and simulation slider
 - Scenario Replay ("Time Travel") — relive 5 real crypto events (Terra Luna crash, Bitcoin halving 2024, FTX collapse, Bitcoin ATH 2021, Ethereum Merge), make decisions at the critical moment, see animated outcomes
 - Practice Portfolio ($10k simulated, buy/sell BTC/ETH/SOL)
@@ -86,8 +91,17 @@ Warm fintech, not crypto-bro. Forest green (`oklch(0.45 0.1 155)`) + burnt amber
 - AI Chat (Claude API, never gives financial advice)
 - Confidence Score + Streak system (replays contribute 4 points each)
 - CoinGecko API for real prices (with offline fallback)
-- "Ready to make it real?" waitlist page + contextual CTAs (monetization funnel)
-- E2E testing suite (59 Playwright tests)
+
+**Business model / on-ramp:**
+- Prediction markets (yes/no questions on BTC/ETH/SOL, with odds bar and calibration score)
+- Testnet multi-chain wallet (Sepolia ETH, Solana Devnet, Bitcoin Testnet) unlocked via graduation
+- Graduation gate: confidence ≥ 50, ≥ 3 lessons, ≥ 2 predictions → wallet unlocks
+- Simulated faucet page (`/faucet`, TestDrip branding) for testnet tokens
+- Contextual "Ready to make it real?" CTAs + waitlist page (`/ready`)
+- Mode banner ("Practice" vs "Testnet") across the app
+
+**Platform:**
+- E2E testing suite (59 Playwright tests, pre-graduation flows)
 - PWA installable
 
 ### Build phases
@@ -101,8 +115,28 @@ Warm fintech, not crypto-bro. Forest green (`oklch(0.45 0.1 155)`) + burnt amber
 - **Phase 7**: Scenario Replay — Time Travel feature (5 historical events, animated charts, 3-phase replay experience, Dexie persistence)
 - **Phase 8**: E2E testing with Playwright (59 tests across all features)
 - **Phase 9**: "Ready to make it real?" waitlist page, contextual CTAs, palette upgrade (Forest + Amber), em dash cleanup, styling audit
+- **Phase 10**: Prediction markets business model — markets data, place form (coin / YES-NO / amount), odds bar, calibration scoring, resolution banner, prediction store, walkthrough spotlight
+- **Phase 11**: Testnet wallet + graduation — multi-chain wallet (ETH/SOL/BTC), Dexie v7-v8 schema with encrypted keys, faucet API route, graduation gate, mode banner, graduation progress bar, send/receive/setup sheets
 
 **After every phase**: run `bun run build` and fix all errors before proceeding.
+
+### Wallet security model (Phase 11)
+
+- **Testnet-only.** Keys live in IndexedDB, encrypted with AES-256-GCM derived via PBKDF2 (100k iterations) from the userId + random salt (`lib/crypto.ts`).
+- **Threat model.** Protects against casual IndexedDB inspection. Does NOT protect against an attacker with the userId and device access — userId is not a real passphrase.
+- **Never port this for mainnet.** `lib/crypto.ts` is explicit about this in a header comment. Any mainnet design must use hardware-backed keys, user-chosen passphrases, or an SSS/MPC scheme.
+- **Faucet.** `app/api/faucet/route.ts` uses an in-memory rate-limit Map (1 request / address / 24h). Sufficient for local demo; **not sufficient for a real deploy** — multiple lambdas bypass it. Re-add Upstash/Redis before shipping.
+- **Alchemy key.** `ALCHEMY_API_KEY` is server-only. If the faucet ever goes public, re-introduce the Redis rate limit first.
+
+### Graduation criteria (Phase 11)
+
+Hook: `hooks/useTestnetGraduation.ts`. User is `isEligible` when ALL milestones met:
+
+- Confidence score ≥ 50
+- Completed lessons ≥ 3
+- Predictions placed ≥ 2
+
+`hasWallet` becomes true once the user creates a testnet wallet (via WalletSetupSheet). The combined state `isEligible && hasWallet` drives the "Testnet" vs "Practice" mode across Header, ModeBanner, PredictionPortfolioChip, and PredictionPlaceForm.
 
 ### Key files added in Phase 7-9
 
@@ -116,3 +150,33 @@ Warm fintech, not crypto-bro. Forest green (`oklch(0.45 0.1 155)`) + burnt amber
 - `/components/shared/ReadyCTA.tsx` — Reusable CTA component with `default` and `subtle` variants. Appears contextually: Home (confidence >= 60), Replay (after completion), Practice (portfolio in profit), Profile (always visible)
 - `/e2e/` — Playwright test suites: onboarding, navigation, explore, practice, learn, chat, profile, replay
 - `playwright.config.ts` — Playwright config with Chromium, dev server auto-start
+
+### Key files added in Phase 10 (Prediction markets)
+
+- `/data/predictionMarkets.ts` — market definitions (question, asset, odds seed, resolution criteria, educational context)
+- `/store/usePredictionStore.ts` — Zustand store: place/get/resolve predictions, market odds, calibration
+- `/store/usePredictionWalletStore.ts` — separate wallet balance for non-graduated practice mode
+- `/hooks/usePredictionHoldings.ts` — unified holdings view across practice + testnet (WEI_PER_ETH, LAMPORTS_PER_SOL, SATS_PER_BTC constants live here)
+- `/app/predictions/page.tsx` + `/app/predictions/[marketId]/page.tsx` — hub + detail pages
+- `/components/predictions/` — PredictionOddsBar, PredictionPlaceForm, PredictionTradeSheet, PredictionPortfolioChip, PredictionResolutionBanner, PredictionCalibration, PredictionEducational, PredictionHubContent, PredictionMarketCard
+- `/components/predictions/PredictionWalkthrough.tsx` — shared SpotlightTour engine + `WALKTHROUGH_HUB_KEY`, `WALKTHROUGH_FORM_KEY`, `WALKTHROUGH_NO_HOLDINGS_KEY`
+- `/components/predictions/PredictionFormWalkthrough.tsx` — 3-step form walkthrough (coin / YES-NO / amount)
+- `/components/predictions/PredictionNoHoldingsWalkthrough.tsx` — 2-step conceptual walkthrough when the user has no crypto yet
+
+### Key files added in Phase 11 (Testnet wallet + graduation)
+
+- `/app/wallet/page.tsx` — wallet dashboard (chain tabs, balance, send/receive)
+- `/app/faucet/page.tsx` — standalone TestDrip faucet page (independent layout)
+- `/app/api/faucet/route.ts` — faucet POST endpoint (in-memory rate limit, Alchemy fallback)
+- `/lib/crypto.ts` — AES-256-GCM encryption for private keys (testnet only)
+- `/lib/testnet.ts` — Sepolia client, `formatEthShort`, `parseEthAmount`, explorer URLs
+- `/lib/bitcoin.ts` — Bitcoin Testnet keypair generation + signing
+- `/lib/solana.ts` — Solana Devnet keypair + RPC helpers
+- `/lib/db.ts` — Dexie schema v7-v8: `testnetWallets`, `testnetTransactions`
+- `/store/useTestnetWalletStore.ts` — wallet state: hydrate, createWallet, fetchAllBalances, send/receive, reset
+- `/hooks/useTestnetGraduation.ts` — graduation eligibility (milestones + hasWallet)
+- `/hooks/useHydration.ts` — SSR-safe hydration guard
+- `/components/wallet/` — WalletDashboard, WalletBalance, WalletAddress, WalletGraduationGate, WalletReceiveSheet, WalletSendSheet, WalletSetupSheet, WalletTransactionList, WalletFaucetCard, WalletEducational
+- `/components/layout/ModeBanner.tsx` — "Practice" vs "Testnet" global banner
+- `/components/layout/GraduationProgressBar.tsx` — thin progress bar, color switches at eligibility
+- `/components/layout/ClientShell.tsx` — standalone route support (no AppShell for `/faucet`)

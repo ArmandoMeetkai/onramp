@@ -13,7 +13,7 @@ import { useProgressStore } from "@/store/useProgressStore"
 import { usePredictionStore } from "@/store/usePredictionStore"
 import { useTestnetWalletStore } from "@/store/useTestnetWalletStore"
 import { useTestnetGraduation } from "@/hooks/useTestnetGraduation"
-import { truncateAddress, formatPracticeTokensShort } from "@/lib/testnet"
+import { truncateAddress, formatEthShort } from "@/lib/testnet"
 
 const experienceLabels: Record<string, string> = {
   new: "Completely new",
@@ -150,7 +150,7 @@ export default function ProfilePage() {
                     <>
                       <p className="text-sm font-semibold">
                         {testnetBalances.ethereum !== null
-                          ? `${formatPracticeTokensShort(testnetBalances.ethereum)} ETH`
+                          ? `${formatEthShort(testnetBalances.ethereum)} ETH`
                           : "Practice wallet"}
                       </p>
                       <p className="text-xs text-muted-foreground font-mono">

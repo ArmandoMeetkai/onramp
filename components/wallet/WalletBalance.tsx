@@ -3,7 +3,7 @@
 import { motion } from "framer-motion"
 import { useTestnetWalletStore } from "@/store/useTestnetWalletStore"
 import { usePriceStore } from "@/store/usePriceStore"
-import { formatEthShort } from "@/lib/testnet"
+import { formatEthShort, baseUnitsToAmount } from "@/lib/testnet"
 import { formatSolTokens } from "@/lib/solana"
 import { formatBtcTokens } from "@/lib/bitcoin"
 
@@ -22,16 +22,22 @@ export function WalletBalance() {
 
   const { displayBalance, nativeAmount } = (() => {
     if (activeChain === "ethereum" && balances.ethereum !== null) {
-      const amount = Number(balances.ethereum) / 1e18
-      return { displayBalance: formatEthShort(balances.ethereum), nativeAmount: amount }
+      return {
+        displayBalance: formatEthShort(balances.ethereum),
+        nativeAmount: baseUnitsToAmount("ethereum", balances.ethereum),
+      }
     }
     if (activeChain === "solana" && balances.solana !== null) {
-      const amount = balances.solana / 1e9
-      return { displayBalance: formatSolTokens(balances.solana), nativeAmount: amount }
+      return {
+        displayBalance: formatSolTokens(balances.solana),
+        nativeAmount: baseUnitsToAmount("solana", balances.solana),
+      }
     }
     if (activeChain === "bitcoin" && balances.bitcoin !== null) {
-      const amount = balances.bitcoin / 1e8
-      return { displayBalance: formatBtcTokens(balances.bitcoin), nativeAmount: amount }
+      return {
+        displayBalance: formatBtcTokens(balances.bitcoin),
+        nativeAmount: baseUnitsToAmount("bitcoin", balances.bitcoin),
+      }
     }
     return { displayBalance: "0", nativeAmount: 0 }
   })()

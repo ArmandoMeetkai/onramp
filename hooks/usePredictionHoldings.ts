@@ -5,15 +5,12 @@ import { usePredictionWalletStore } from "@/store/usePredictionWalletStore"
 import { useTestnetWalletStore } from "@/store/useTestnetWalletStore"
 import { usePriceStore } from "@/store/usePriceStore"
 import { useTestnetGraduation } from "./useTestnetGraduation"
-import { formatEthShort } from "@/lib/testnet"
+import { formatEthShort, WEI_PER_ETH, LAMPORTS_PER_SOL, SATS_PER_BTC, baseUnitsToAmount } from "@/lib/testnet"
 import { formatSolTokens } from "@/lib/solana"
 import { formatBtcTokens } from "@/lib/bitcoin"
 import type { HoldingWithPrice } from "@/components/predictions/PredictionPlaceForm"
 
 const ASSETS = ["BTC", "ETH", "SOL"] as const
-const WEI_PER_ETH = 1e18
-const LAMPORTS_PER_SOL = 1e9
-const SATS_PER_BTC = 1e8
 
 /**
  * Returns the holdings to use for predictions, depending on graduation status.
@@ -31,16 +28,11 @@ export function usePredictionHoldings() {
 
   const holdings: HoldingWithPrice[] = useMemo(() => {
     if (isGraduated) {
-      // Map testnet balances to holdings format
       return ASSETS.map((asset) => {
-        let amount = 0
-        if (asset === "ETH" && testnetBalances.ethereum !== null) {
-          amount = Number(testnetBalances.ethereum) / WEI_PER_ETH
-        } else if (asset === "SOL" && testnetBalances.solana !== null) {
-          amount = testnetBalances.solana / LAMPORTS_PER_SOL
-        } else if (asset === "BTC" && testnetBalances.bitcoin !== null) {
-          amount = testnetBalances.bitcoin / SATS_PER_BTC
-        }
+        const amount =
+          asset === "ETH" ? baseUnitsToAmount("ethereum", testnetBalances.ethereum)
+          : asset === "SOL" ? baseUnitsToAmount("solana", testnetBalances.solana)
+          : baseUnitsToAmount("bitcoin", testnetBalances.bitcoin)
         return { asset, amount, price: getPrice(asset) }
       })
     }

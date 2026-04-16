@@ -4,6 +4,7 @@ import { Sun, Moon, User } from "lucide-react"
 import { useState } from "react"
 import Link from "next/link"
 import { useTestnetGraduation } from "@/hooks/useTestnetGraduation"
+import { cn } from "@/lib/utils"
 
 export function Header() {
   const { isEligible, hasWallet } = useTestnetGraduation()
@@ -30,13 +31,12 @@ export function Header() {
           Onramp
         </Link>
         <span
-          className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-semibold ${
-            isTestnet
-              ? "bg-primary/15 text-primary"
-              : "bg-accent/15 text-accent"
-          }`}
+          className={cn(
+            "inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-semibold",
+            isTestnet ? "bg-primary/15 text-primary" : "bg-accent/15 text-accent"
+          )}
         >
-          <span className={`h-1 w-1 rounded-full ${isTestnet ? "bg-primary" : "bg-accent"}`} />
+          <span className={cn("h-1 w-1 rounded-full", isTestnet ? "bg-primary" : "bg-accent")} />
           {isTestnet ? "Testnet" : "Practice"}
         </span>
       </div>

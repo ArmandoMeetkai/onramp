@@ -11,7 +11,7 @@ import { ConfidenceScore } from "@/components/shared/ConfidenceScore"
 import { StreakBadge } from "@/components/shared/StreakBadge"
 import { DisclaimerBanner } from "@/components/shared/DisclaimerBanner"
 import { ReadyCTA } from "@/components/shared/ReadyCTA"
-import { formatPracticeTokensShort } from "@/lib/testnet"
+import { formatEthShort } from "@/lib/testnet"
 
 function getGreeting(name: string): string {
   const hour = new Date().getHours()
@@ -167,7 +167,7 @@ export function HomeContent() {
               </p>
               <p className="mt-0.5 text-sm text-muted-foreground">
                 {testnetWallet && testnetBalances.ethereum !== null
-                  ? `${formatPracticeTokensShort(testnetBalances.ethereum)} ETH`
+                  ? `${formatEthShort(testnetBalances.ethereum)} ETH`
                   : "Get tokens for predictions"}
               </p>
             </div>

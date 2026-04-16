@@ -14,7 +14,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { WalletEducational } from "./WalletEducational"
 import { useTestnetWalletStore } from "@/store/useTestnetWalletStore"
-import { truncateAddress, getExplorerTxUrl } from "@/lib/testnet"
+import { truncateAddress, getExplorerTxUrl, baseUnitsToAmount } from "@/lib/testnet"
 import { getSolExplorerTxUrl, isValidSolAddress } from "@/lib/solana"
 import { getBtcExplorerTxUrl, isValidBtcTestnetAddress } from "@/lib/bitcoin"
 
@@ -64,12 +64,7 @@ export function WalletSendSheet({ open, onOpenChange }: WalletSendSheetProps) {
   const presets = presetsByChain[activeChain]
   const chainLabel = chainLabels[activeChain]
 
-  const currentBalance = (() => {
-    if (activeChain === "ethereum") return Number(balances.ethereum ?? BigInt(0)) / 1e18
-    if (activeChain === "solana") return (balances.solana ?? 0) / 1e9
-    if (activeChain === "bitcoin") return (balances.bitcoin ?? 0) / 1e8
-    return 0
-  })()
+  const currentBalance = baseUnitsToAmount(activeChain, balances[activeChain])
 
   const parsedAmount = Number.parseFloat(amount) || 0
   const hasAmount = parsedAmount > 0

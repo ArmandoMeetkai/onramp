@@ -1,5 +1,6 @@
 import { createPublicClient, http, formatEther, parseEther } from "viem"
 import { sepolia } from "viem/chains"
+import type { TestnetChain } from "@/lib/db"
 
 export const SEPOLIA_CHAIN = sepolia
 
@@ -7,6 +8,20 @@ export const publicClient = createPublicClient({
   chain: sepolia,
   transport: http(),
 })
+
+// Base-unit divisors per chain. Single source of truth — used by wallet
+// balance display, send sheet, and prediction holdings.
+export const WEI_PER_ETH = 1e18
+export const LAMPORTS_PER_SOL = 1e9
+export const SATS_PER_BTC = 1e8
+
+/** Convert raw base units (wei / lamports / satoshis) to a decimal token amount. */
+export function baseUnitsToAmount(chain: TestnetChain, balance: bigint | number | null): number {
+  if (balance == null) return 0
+  if (chain === "ethereum") return Number(balance) / WEI_PER_ETH
+  if (chain === "solana") return Number(balance) / LAMPORTS_PER_SOL
+  return Number(balance) / SATS_PER_BTC
+}
 
 /** Format wei to a short numeric string */
 export function formatEthShort(wei: bigint): string {
@@ -20,16 +35,10 @@ export function formatEthShort(wei: bigint): string {
   return num.toFixed(2)
 }
 
-/** @deprecated Use formatEthShort */
-export const formatPracticeTokensShort = formatEthShort
-
 /** Parse a user-entered ETH amount string to wei */
 export function parseEthAmount(amount: string): bigint {
   return parseEther(amount)
 }
-
-/** @deprecated Use parseEthAmount */
-export const parsePracticeTokens = parseEthAmount
 
 /** Truncate an address for display: 0x1234...abcd */
 export function truncateAddress(address: string): string {
