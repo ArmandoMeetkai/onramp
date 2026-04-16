@@ -7,12 +7,14 @@ import { useTestnetGraduation } from "@/hooks/useTestnetGraduation"
 export function GraduationProgressBar() {
   const { isEligible, hasWallet, milestones } = useTestnetGraduation()
 
-  const weightedProgress = milestones.reduce(
+  // Graduation requires 3 learning milestones + wallet creation — count as 4 steps
+  // so the bar stays honest: 100% only when the user is actually Live, not just eligible.
+  const milestonesProgress = milestones.reduce(
     (sum, m) => sum + Math.min(m.current / m.required, 1),
-    0
-  ) / milestones.length
-
-  const percentage = weightedProgress * 100
+    0,
+  )
+  const walletProgress = hasWallet ? 1 : 0
+  const percentage = ((milestonesProgress + walletProgress) / (milestones.length + 1)) * 100
   const isFullyGraduated = isEligible && hasWallet
 
   return (
@@ -25,7 +27,7 @@ export function GraduationProgressBar() {
       aria-label="Graduation progress"
     >
       <motion.div
-        className={cn("h-full", isEligible ? "bg-primary" : "bg-accent")}
+        className={cn("h-full", isFullyGraduated ? "bg-primary" : "bg-accent")}
         initial={{ width: 0 }}
         animate={{
           width: `${percentage}%`,
