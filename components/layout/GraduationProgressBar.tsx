@@ -25,14 +25,7 @@ export function GraduationProgressBar() {
       aria-label="Graduation progress"
     >
       <motion.div
-        className={cn(
-          "h-full",
-          isFullyGraduated
-            ? "bg-primary"
-            : isEligible
-              ? "bg-primary"
-              : "bg-accent"
-        )}
+        className={cn("h-full", isEligible ? "bg-primary" : "bg-accent")}
         initial={{ width: 0 }}
         animate={{
           width: `${percentage}%`,
