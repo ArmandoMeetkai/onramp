@@ -72,7 +72,7 @@ export function PredictionPortfolioChip({ onBuy }: PredictionPortfolioChipProps)
             {/* Header */}
             <div className="flex items-center justify-between px-4 py-3 border-b border-border">
               <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
-                {isGraduated ? "Testnet Wallet" : "Wallet"}
+                {isGraduated ? "Testnet Wallet" : "Prediction Balance"}
               </p>
               <button
                 onClick={() => setOpen(false)}
@@ -120,6 +120,15 @@ export function PredictionPortfolioChip({ onBuy }: PredictionPortfolioChipProps)
                 </div>
               )}
             </div>
+
+            {/* Explanation */}
+            {!isGraduated && (
+              <div className="px-4 py-2 border-t border-border">
+                <p className="text-[10px] text-muted-foreground leading-relaxed">
+                  Separate from Practice portfolio. Buy crypto here to stake on predictions.
+                </p>
+              </div>
+            )}
 
             {/* Total */}
             <div className="flex items-center justify-between px-4 py-3 border-t border-border bg-muted/30">

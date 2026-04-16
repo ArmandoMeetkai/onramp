@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useCallback } from "react"
+import { useState, useCallback, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { ArrowLeft, Check, TrendingUp } from "lucide-react"
 import {
@@ -15,6 +15,7 @@ import { Input } from "@/components/ui/input"
 import { InfoTip } from "@/components/shared/InfoTip"
 import { cn, formatCrypto } from "@/lib/utils"
 import { usePredictionWalletStore } from "@/store/usePredictionWalletStore"
+import { useUserStore } from "@/store/useUserStore"
 import { usePriceStore } from "@/store/usePriceStore"
 import { TradeAssetStep } from "@/components/portfolio/trade/TradeAssetStep"
 import { TradeConfirmStep } from "@/components/portfolio/trade/TradeConfirmStep"
@@ -36,10 +37,19 @@ export function PredictionTradeSheet({ open, onOpenChange }: PredictionTradeShee
   const [amount, setAmount] = useState("")
 
   const wallet = usePredictionWalletStore((s) => s.wallet)
+  const initializeWallet = usePredictionWalletStore((s) => s.initializeWallet)
   const buy = usePredictionWalletStore((s) => s.buy)
   const sell = usePredictionWalletStore((s) => s.sell)
+  const profileId = useUserStore((s) => s.profile?.id)
   const getPrice = usePriceStore((s) => s.getPrice)
   const getName = usePriceStore((s) => s.getName)
+
+  // Ensure prediction wallet exists when sheet opens
+  useEffect(() => {
+    if (open && !wallet && profileId) {
+      initializeWallet(profileId)
+    }
+  }, [open, wallet, profileId, initializeWallet])
 
   const holdings = wallet?.holdings ?? []
   const price = getPrice(selectedAsset)

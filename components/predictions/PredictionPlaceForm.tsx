@@ -65,6 +65,7 @@ export function PredictionPlaceForm({ holdings, onPlace, onBuy, walletLink }: Pr
         <p className="text-sm font-semibold mb-3">Make your prediction</p>
         {walletLink ? (
           <Link
+            id="pred-get-started-cta"
             href={walletLink}
             className="group flex w-full items-center gap-4 rounded-xl border border-accent/30 bg-accent/5 p-4 text-left transition-all hover:border-accent/50 active:scale-[0.98]"
           >
@@ -81,13 +82,17 @@ export function PredictionPlaceForm({ holdings, onPlace, onBuy, walletLink }: Pr
           </Link>
         ) : onBuy ? (
           <button
+            id="pred-get-started-cta"
             onClick={onBuy}
             className="group flex w-full items-center gap-4 rounded-xl border border-accent/30 bg-accent/5 p-4 text-left transition-all hover:border-accent/50 active:scale-[0.98]"
           >
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-accent/15">
+              <Wallet className="h-5 w-5 text-accent" />
+            </div>
             <div className="flex-1">
-              <p className="text-sm font-semibold">Buy crypto to start predicting</p>
+              <p className="text-sm font-semibold">Buy crypto with your practice wallet</p>
               <p className="mt-1 text-xs text-muted-foreground">
-                You need BTC, ETH, or SOL in your wallet to make a prediction.
+                Use your $1,000 practice balance to buy BTC, ETH, or SOL — then stake it on your prediction.
               </p>
             </div>
             <ArrowRight className="h-4 w-4 text-accent transition-transform group-hover:translate-x-0.5" />
@@ -186,8 +191,9 @@ export function PredictionPlaceForm({ holdings, onPlace, onBuy, walletLink }: Pr
             onClick={onBuy}
             className="group flex w-full items-center gap-3 rounded-xl border border-accent/30 bg-accent/5 p-4 text-left transition-all hover:border-accent/50 active:scale-[0.98]"
           >
+            <Wallet className="h-5 w-5 text-accent shrink-0" />
             <div className="flex-1">
-              <p className="text-sm font-semibold">Buy {selectedAsset} first</p>
+              <p className="text-sm font-semibold">Buy {selectedAsset} with practice balance</p>
               <p className="mt-0.5 text-xs text-muted-foreground">Or choose another coin above</p>
             </div>
             <ArrowRight className="h-4 w-4 text-accent" />
@@ -247,7 +253,6 @@ export function PredictionPlaceForm({ holdings, onPlace, onBuy, walletLink }: Pr
                       setCustomInput("")
                     }}
                     disabled={tooMuch}
-                    title={tooMuch ? `Not enough ${selectedAsset}` : undefined}
                     className={cn(
                       "flex-1 flex flex-col items-center rounded-xl py-2 transition-all duration-200",
                       !isCustom && usdAmount === a
@@ -258,7 +263,7 @@ export function PredictionPlaceForm({ holdings, onPlace, onBuy, walletLink }: Pr
                   >
                     <span className="text-sm font-semibold">${a}</span>
                     <span className="text-[10px] opacity-70">
-                      {formatCrypto(crypto, selectedAsset)}
+                      {tooMuch ? "Insufficient" : formatCrypto(crypto, selectedAsset)}
                     </span>
                   </button>
                 )

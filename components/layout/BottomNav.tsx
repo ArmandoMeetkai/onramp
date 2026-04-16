@@ -4,12 +4,13 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { Home, BarChart3, TrendingUp, BookOpen, MessageCircle } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { GraduationProgressBar } from "./GraduationProgressBar"
 
 const navItems = [
   { href: "/", label: "Home", icon: Home },
-  { href: "/practice", label: "Practice", icon: BarChart3 },
-  { href: "/predictions", label: "Predictions", icon: TrendingUp },
   { href: "/learn", label: "Learn", icon: BookOpen },
+  { href: "/practice", label: "Practice", icon: BarChart3 },
+  { href: "/predictions", label: "Predict", icon: TrendingUp },
   { href: "/chat", label: "Chat", icon: MessageCircle },
 ] as const
 
@@ -18,10 +19,11 @@ export function BottomNav() {
 
   return (
     <nav
-      className="fixed bottom-0 left-0 right-0 z-50 border-t border-border bg-surface pb-[env(safe-area-inset-bottom)]"
+      className="fixed bottom-0 left-0 right-0 z-50 bg-surface pb-[env(safe-area-inset-bottom)]"
       role="navigation"
       aria-label="Main navigation"
     >
+      <GraduationProgressBar />
       <div className="mx-auto flex max-w-[480px] items-center justify-around">
         {navItems.map(({ href, label, icon: Icon }) => {
           const isActive = href === "/" ? pathname === "/" : pathname.startsWith(href)

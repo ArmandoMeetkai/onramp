@@ -9,6 +9,7 @@ export function cn(...inputs: ClassValue[]) {
 export function formatCrypto(amount: number, asset: string): string {
   if (asset === "BTC") return parseFloat(amount.toFixed(6)).toString()
   if (asset === "ETH") return parseFloat(amount.toFixed(4)).toString()
+  if (asset === "SOL") return parseFloat(amount.toFixed(4)).toString()
   return parseFloat(amount.toFixed(2)).toString()
 }
 

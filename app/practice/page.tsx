@@ -144,7 +144,7 @@ export default function PracticePage() {
         </h1>
         <div className="mt-2 rounded-xl bg-accent/10 px-3 py-2">
           <p className="text-center text-xs font-medium text-accent">
-            This is a simulation. No real money is involved.
+            Simulation only — separate from your Prediction balance.
           </p>
         </div>
 

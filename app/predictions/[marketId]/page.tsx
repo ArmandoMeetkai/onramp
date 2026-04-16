@@ -17,8 +17,9 @@ import { usePriceStore } from "@/store/usePriceStore"
 import { useUserStore } from "@/store/useUserStore"
 import { usePredictionHoldings } from "@/hooks/usePredictionHoldings"
 import { PredictionFormWalkthrough } from "@/components/predictions/PredictionFormWalkthrough"
+import { PredictionNoHoldingsWalkthrough } from "@/components/predictions/PredictionNoHoldingsWalkthrough"
 import { PredictionTradeSheet } from "@/components/predictions/PredictionTradeSheet"
-import { useShouldShowFormWalkthrough, WALKTHROUGH_FORM_KEY } from "@/components/predictions/PredictionWalkthrough"
+import { useShouldShowFormWalkthrough, useShouldShowNoHoldingsWalkthrough, WALKTHROUGH_FORM_KEY, WALKTHROUGH_NO_HOLDINGS_KEY } from "@/components/predictions/PredictionWalkthrough"
 import { getTimeRemaining } from "@/lib/utils"
 
 export default function PredictionDetailPage({
@@ -41,10 +42,13 @@ export default function PredictionDetailPage({
   const odds = getMarketOdds(marketId)
   const [justPlaced, setJustPlaced] = useState(false)
   const [tradeOpen, setTradeOpen] = useState(false)
-  const [formWalkthroughDone, setFormWalkthroughDone] = useState(false)
-  const [forceFormWalkthrough, setForceFormWalkthrough] = useState(false)
+  const [walkthroughDone, setWalkthroughDone] = useState(false)
+  const [forceWalkthrough, setForceWalkthrough] = useState(false)
   const autoShowFormWalkthrough = useShouldShowFormWalkthrough()
-  const showFormWalkthrough = autoShowFormWalkthrough || forceFormWalkthrough
+  const autoShowNoHoldingsWalkthrough = useShouldShowNoHoldingsWalkthrough()
+  const showFormWalkthrough = autoShowFormWalkthrough || forceWalkthrough
+  const showNoHoldingsWalkthrough = autoShowNoHoldingsWalkthrough || forceWalkthrough
+  const hasAnyHoldings = predictionHoldings.some(h => h.amount > 0)
 
   const handlePlace = useCallback(
     async (position: "yes" | "no", asset: "BTC" | "ETH" | "SOL", amount: number, reasoning?: string): Promise<boolean> => {
@@ -55,6 +59,12 @@ export default function PredictionDetailPage({
     },
     [profile, marketId, placePrediction]
   )
+
+  const handleWalkthroughComplete = useCallback(() => {
+    setWalkthroughDone(true)
+    setForceWalkthrough(false)
+    window.scrollTo(0, 0)
+  }, [])
 
   if (!market) {
     return (
@@ -99,17 +109,22 @@ export default function PredictionDetailPage({
           <div className="flex items-start justify-between">
             <span className="text-4xl">{market.coverEmoji}</span>
             <div className="flex items-center gap-2">
-              <button
-                onClick={() => {
-                  try { localStorage.removeItem(WALKTHROUGH_FORM_KEY) } catch {}
-                  setFormWalkthroughDone(false)
-                  setForceFormWalkthrough(true)
-                }}
-                className="rounded-lg p-1 text-muted-foreground transition-colors hover:text-foreground"
-                aria-label="How predictions work"
-              >
-                <HelpCircle className="h-5 w-5" />
-              </button>
+              {!userPrediction && !hasEnded && (
+                <button
+                  onClick={() => {
+                    try {
+                      localStorage.removeItem(WALKTHROUGH_FORM_KEY)
+                      localStorage.removeItem(WALKTHROUGH_NO_HOLDINGS_KEY)
+                    } catch {}
+                    setWalkthroughDone(false)
+                    setForceWalkthrough(true)
+                  }}
+                  className="rounded-lg p-1 text-muted-foreground transition-colors hover:text-foreground"
+                  aria-label="How predictions work"
+                >
+                  <HelpCircle className="h-5 w-5" />
+                </button>
+              )}
               <Badge variant="secondary" className="rounded-lg px-3 py-1 text-sm font-medium">
                 About: {market.asset}
               </Badge>
@@ -266,9 +281,12 @@ export default function PredictionDetailPage({
           </div>
         )}
 
-        {/* Form walkthrough — only when form is actually rendered */}
-        {isActive && !hasEnded && !formWalkthroughDone && showFormWalkthrough && (
-          <PredictionFormWalkthrough onComplete={() => { setFormWalkthroughDone(true); setForceFormWalkthrough(false); window.scrollTo(0, 0) }} />
+        {/* Form walkthrough — shown when form is rendered. Picks the variant
+            based on whether the user has holdings (full form vs. "get crypto" CTA). */}
+        {isActive && !hasEnded && !walkthroughDone && (
+          hasAnyHoldings
+            ? showFormWalkthrough && <PredictionFormWalkthrough onComplete={handleWalkthroughComplete} />
+            : showNoHoldingsWalkthrough && <PredictionNoHoldingsWalkthrough onComplete={handleWalkthroughComplete} />
         )}
 
         {/* Educational content */}

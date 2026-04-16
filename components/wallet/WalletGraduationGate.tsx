@@ -9,13 +9,11 @@ interface WalletGraduationGateProps {
   milestones: GraduationMilestone[]
 }
 
-const milestoneIcons = [Target, BookOpen, TrendingUp]
-
-const milestoneLinks = [
-  { href: "/explore", label: "Keep exploring" },
-  { href: "/learn", label: "Take a lesson" },
-  { href: "/predictions", label: "Make a prediction" },
-]
+const milestoneConfig: Record<string, { icon: typeof Target; href: string; linkLabel: string }> = {
+  "Confidence score ≥ 50": { icon: Target, href: "/explore", linkLabel: "Keep exploring" },
+  "Complete 3+ lessons": { icon: BookOpen, href: "/learn", linkLabel: "Take a lesson" },
+  "Make 2+ predictions": { icon: TrendingUp, href: "/predictions", linkLabel: "Make a prediction" },
+}
 
 export function WalletGraduationGate({ milestones }: WalletGraduationGateProps) {
   const completedCount = milestones.filter((m) => m.completed).length
@@ -36,7 +34,7 @@ export function WalletGraduationGate({ milestones }: WalletGraduationGateProps) 
         </h1>
         <p className="mt-2 text-sm text-muted-foreground leading-relaxed max-w-xs mx-auto">
           Complete these milestones to unlock your wallet. Get free tokens
-          and use them for predictions on real blockchains.
+          and use them for predictions on test blockchains (no real money).
         </p>
       </motion.div>
 
@@ -68,8 +66,8 @@ export function WalletGraduationGate({ milestones }: WalletGraduationGateProps) 
       {/* Milestone cards */}
       <div className="mt-6 space-y-3">
         {milestones.map((milestone, index) => {
-          const Icon = milestoneIcons[index]
-          const link = milestoneLinks[index]
+          const config = milestoneConfig[milestone.label] ?? { icon: Target, href: "/", linkLabel: "Continue" }
+          const Icon = config.icon
           const progress = Math.min(
             milestone.current / milestone.required,
             1,
@@ -124,10 +122,10 @@ export function WalletGraduationGate({ milestones }: WalletGraduationGateProps) 
                   </div>
                   {!milestone.completed && (
                     <Link
-                      href={link.href}
+                      href={config.href}
                       className="mt-2 inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline"
                     >
-                      {link.label}
+                      {config.linkLabel}
                       <ArrowRight className="h-3 w-3" />
                     </Link>
                   )}

@@ -58,12 +58,22 @@ export function WalletSendSheet({ open, onOpenChange }: WalletSendSheetProps) {
   const [error, setError] = useState<string | null>(null)
 
   const activeChain = useTestnetWalletStore((s) => s.activeChain)
+  const balances = useTestnetWalletStore((s) => s.balances)
   const sendTransaction = useTestnetWalletStore((s) => s.sendTransaction)
 
   const presets = presetsByChain[activeChain]
   const chainLabel = chainLabels[activeChain]
 
-  const hasAmount = !!amount && Number.parseFloat(amount) > 0
+  const currentBalance = (() => {
+    if (activeChain === "ethereum") return Number(balances.ethereum ?? BigInt(0)) / 1e18
+    if (activeChain === "solana") return (balances.solana ?? 0) / 1e9
+    if (activeChain === "bitcoin") return (balances.bitcoin ?? 0) / 1e8
+    return 0
+  })()
+
+  const parsedAmount = Number.parseFloat(amount) || 0
+  const hasAmount = parsedAmount > 0
+  const exceedsBalance = parsedAmount > currentBalance
 
   const reset = useCallback(() => {
     setStep("address")
@@ -187,23 +197,37 @@ export function WalletSendSheet({ open, onOpenChange }: WalletSendSheetProps) {
                     autoFocus
                   />
 
+                  <p className="text-xs text-muted-foreground text-right">
+                    Balance: {currentBalance.toFixed(activeChain === "bitcoin" ? 8 : 4)} {chainLabel}
+                  </p>
+
                   <div className="flex gap-2">
-                    {presets.map((preset) => (
-                      <button
-                        key={preset}
-                        onClick={() => setAmount(preset)}
-                        className={`flex-1 rounded-xl border border-border py-2.5 text-sm font-medium transition-colors hover:bg-muted ${
-                          amount === preset ? "border-primary bg-secondary" : ""
-                        }`}
-                      >
-                        {preset}
-                      </button>
-                    ))}
+                    {presets.map((preset) => {
+                      const tooMuch = Number.parseFloat(preset) > currentBalance
+                      return (
+                        <button
+                          key={preset}
+                          onClick={() => !tooMuch && setAmount(preset)}
+                          disabled={tooMuch}
+                          className={`flex-1 rounded-xl border border-border py-2.5 text-sm font-medium transition-colors hover:bg-muted ${
+                            amount === preset ? "border-primary bg-secondary" : ""
+                          } ${tooMuch ? "opacity-40 cursor-not-allowed" : ""}`}
+                        >
+                          {preset}
+                        </button>
+                      )
+                    })}
                   </div>
+
+                  {exceedsBalance && hasAmount && (
+                    <p className="text-sm text-destructive">
+                      Not enough {chainLabel}. Your balance is {currentBalance.toFixed(activeChain === "bitcoin" ? 8 : 4)}.
+                    </p>
+                  )}
 
                   <Button
                     onClick={() => setStep("confirm")}
-                    disabled={!hasAmount}
+                    disabled={!hasAmount || exceedsBalance}
                     className="h-12 w-full rounded-xl text-base font-semibold"
                   >
                     Review

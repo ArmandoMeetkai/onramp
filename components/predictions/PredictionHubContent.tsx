@@ -114,8 +114,8 @@ export function PredictionHubContent({ markets }: PredictionHubContentProps) {
                 <HelpCircle className="h-5 w-5" />
               </button>
             </div>
-            <p className="mt-1 text-muted-foreground">
-              Buy crypto, stake it on outcomes, test your instincts.
+            <p className="mt-1 text-sm text-muted-foreground">
+              Use your prediction balance to stake crypto on outcomes.
             </p>
           </div>
           <div id="pred-balance">

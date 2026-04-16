@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button"
 
 export const WALKTHROUGH_HUB_KEY = "onramp-predictions-hub-seen"
 export const WALKTHROUGH_FORM_KEY = "onramp-predictions-form-seen"
+export const WALKTHROUGH_NO_HOLDINGS_KEY = "onramp-predictions-no-holdings-seen"
 
 // ─── Shared types ─────────────────────────────────────────────────────────────
 
@@ -342,6 +343,19 @@ export function useShouldShowFormWalkthrough(): boolean {
       setShow(!seen)
     } catch {
       // Safari Private Browsing
+      setShow(true)
+    }
+  }, [])
+  return show === true
+}
+
+export function useShouldShowNoHoldingsWalkthrough(): boolean {
+  const [show, setShow] = useState<boolean | null>(null)
+  useEffect(() => {
+    try {
+      const seen = localStorage.getItem(WALKTHROUGH_NO_HOLDINGS_KEY)
+      setShow(!seen)
+    } catch {
       setShow(true)
     }
   }, [])

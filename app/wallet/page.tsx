@@ -75,7 +75,7 @@ function WalletContent() {
             </h1>
             <p className="mt-2 text-sm text-muted-foreground max-w-xs mx-auto leading-relaxed">
               You&apos;ve unlocked your crypto wallet. Get free tokens and
-              use them for predictions on real blockchains.
+              use them for predictions on test blockchains (no real money).
             </p>
             <Button
               onClick={() => setSetupOpen(true)}

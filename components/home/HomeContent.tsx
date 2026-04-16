@@ -124,27 +124,26 @@ export function HomeContent() {
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4, delay: 0.5 }}
-        className="mt-8"
       >
         <Link
           href="/predictions"
-          className="group relative flex items-center gap-4 overflow-hidden rounded-2xl border border-accent/30 bg-gradient-to-r from-accent/10 via-accent/5 to-transparent p-5 transition-all duration-200 hover:border-accent/50 hover:shadow-md active:scale-[0.98]"
+          className="group mt-8 flex items-center gap-4 overflow-hidden rounded-2xl border border-primary/30 bg-gradient-to-r from-primary/10 via-primary/5 to-transparent p-5 transition-all duration-200 hover:border-primary/50 hover:shadow-md active:scale-[0.98]"
         >
-          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-accent/15">
-            <TrendingUp className="h-5 w-5 text-accent" />
+          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-primary/15">
+            <TrendingUp className="h-5 w-5 text-primary" />
           </div>
           <div className="flex-1">
             <div className="flex items-center gap-2">
               <p className="font-semibold leading-snug">Predictions</p>
-              <span className="rounded-full bg-accent/20 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-accent">
+              <span className="rounded-full bg-primary/20 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-primary">
                 New
               </span>
             </div>
             <p className="mt-0.5 text-sm text-muted-foreground">
-              Think you know where crypto is heading? Put your cash on it.
+              Test your instincts — stake crypto on real market outcomes.
             </p>
           </div>
-          <ArrowRight className="h-4 w-4 text-accent transition-transform group-hover:translate-x-0.5" />
+          <ArrowRight className="h-4 w-4 text-primary transition-transform group-hover:translate-x-0.5" />
         </Link>
       </motion.div>
 
@@ -154,11 +153,10 @@ export function HomeContent() {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, delay: 0.55 }}
-          className="mt-4"
         >
           <Link
             href="/wallet"
-            className="group relative flex items-center gap-4 overflow-hidden rounded-2xl border border-primary/30 bg-gradient-to-r from-primary/10 via-primary/5 to-transparent p-5 transition-all duration-200 hover:border-primary/50 hover:shadow-md active:scale-[0.98]"
+            className="group mt-4 flex items-center gap-4 overflow-hidden rounded-2xl border border-primary/30 bg-gradient-to-r from-primary/10 via-primary/5 to-transparent p-5 transition-all duration-200 hover:border-primary/50 hover:shadow-md active:scale-[0.98]"
           >
             <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-primary/15">
               <Wallet className="h-5 w-5 text-primary" />

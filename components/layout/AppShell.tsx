@@ -5,6 +5,7 @@ import { useHydration } from "@/hooks/useHydration"
 import { ErrorState } from "@/components/shared/ErrorState"
 import { Header } from "./Header"
 import { BottomNav } from "./BottomNav"
+import { ModeBanner } from "./ModeBanner"
 
 interface AppShellProps {
   children: ReactNode
@@ -53,6 +54,7 @@ export function AppShell({ children }: AppShellProps) {
 
   return (
     <div className="flex min-h-dvh flex-col bg-background">
+      <ModeBanner />
       <div className="mx-auto w-full max-w-[480px]">
         <Header />
         <main className="flex-1 px-4 pb-24">{children}</main>
