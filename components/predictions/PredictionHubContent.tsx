@@ -13,7 +13,8 @@ import { PredictionTradeSheet } from "./PredictionTradeSheet"
 import { usePredictionStore } from "@/store/usePredictionStore"
 import { useUserStore } from "@/store/useUserStore"
 import { cn, formatCrypto } from "@/lib/utils"
-import { HelpCircle } from "lucide-react"
+import { HelpCircle, Sparkles, ArrowRight } from "lucide-react"
+import { usePredictionHoldings } from "@/hooks/usePredictionHoldings"
 import type { PredictionMarket } from "@/data/predictionMarkets"
 
 const statusFilters = [
@@ -51,6 +52,9 @@ export function PredictionHubContent({ markets }: PredictionHubContentProps) {
   const getMarketOdds = usePredictionStore((s) => s.getMarketOdds)
   const checkPriceResolutions = usePredictionStore((s) => s.checkPriceResolutions)
   const userPredictions = usePredictionStore((s) => s.userPredictions)
+  const { isGraduated, cashBalance, holdings } = usePredictionHoldings()
+  const hasAnyHoldings = holdings.some((h) => h.amount > 0)
+  const isBrandNew = !isGraduated && userPredictions.length === 0 && !hasAnyHoldings && cashBalance > 0
 
   // Persist filters to sessionStorage
   useEffect(() => {
@@ -122,6 +126,30 @@ export function PredictionHubContent({ markets }: PredictionHubContentProps) {
             <PredictionPortfolioChip onBuy={() => setTradeOpen(true)} />
           </div>
         </div>
+
+        {/* Welcome banner — only for brand-new users who haven't bought crypto or predicted yet */}
+        {isBrandNew && (
+          <motion.button
+            onClick={() => setTradeOpen(true)}
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.25, delay: 0.1 }}
+            className="group mt-5 flex w-full items-center gap-4 rounded-2xl border border-primary/20 bg-primary/5 p-4 text-left transition-all hover:border-primary/40 hover:bg-primary/10 active:scale-[0.99]"
+          >
+            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary/15">
+              <Sparkles className="h-5 w-5 text-primary" />
+            </div>
+            <div className="flex-1">
+              <p className="text-sm font-semibold text-primary">
+                You have ${cashBalance.toLocaleString()} to start
+              </p>
+              <p className="mt-0.5 text-xs text-muted-foreground leading-relaxed">
+                Buy BTC, ETH, or SOL here, then stake it on a prediction below.
+              </p>
+            </div>
+            <ArrowRight className="h-4 w-4 text-primary transition-transform group-hover:translate-x-0.5" />
+          </motion.button>
+        )}
 
         {/* Summary & Calibration — only when user has predictions */}
         {userPredictions.length > 0 && (
