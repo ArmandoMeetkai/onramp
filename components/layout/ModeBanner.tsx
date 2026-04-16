@@ -30,8 +30,8 @@ export function ModeBanner() {
             <div className={cn("h-1.5 w-1.5 rounded-full", isTestnet ? "bg-primary animate-pulse" : "bg-accent")} />
             <p className={cn("text-[11px] font-medium", isTestnet ? "text-primary" : "text-accent")}>
               {isTestnet
-                ? "Testnet Mode — trading with real blockchain tokens"
-                : "Practice Mode — using simulated balance"
+                ? "Live — predicting on real blockchain (testnet tokens)"
+                : "Training — simulate before you go live"
               }
             </p>
           </div>

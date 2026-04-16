@@ -186,6 +186,10 @@ export default function ProfilePage() {
             year: "numeric",
           })}
         </p>
+
+        <p className="mt-3 px-4 text-center text-[11px] leading-relaxed text-muted-foreground/80">
+          Everything here runs for real: wallets, signed transactions, on-chain balances, and predictions settle on public testnets (Sepolia, Solana Devnet, Bitcoin Testnet). The tokens have zero monetary value — the experience is not.
+        </p>
       </div>
     </PageTransition>
   )

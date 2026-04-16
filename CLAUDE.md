@@ -65,11 +65,13 @@ export function useSimulation(s: any) {
 
 ## PROJECT SUMMARY
 
-**Onramp** — "The first safe place to think before entering crypto, with a guided on-ramp when you're ready."
+**Onramp** — *"Learn crypto by making real predictions on blockchain — without risking a cent."*
 
-A beginner-friendly PWA for people curious about crypto. The core positioning is still safety-first learning: users understand scenarios, simulate outcomes, and build confidence before touching real markets. Phases 10-11 added an **optional testnet on-ramp**: after users graduate (meeting learning milestones), they unlock a multi-chain testnet wallet and prediction markets where they stake real testnet tokens (zero monetary value) on yes/no questions about crypto.
+The product is **prediction markets on testnet**: users stake real crypto (Sepolia ETH, Solana Devnet SOL, Bitcoin Testnet BTC) on yes/no questions about the market. Everything under the hood is real — keypair generation, signed transactions, on-chain balances, faucet top-ups. Only the tokens have zero monetary value.
 
-**Demo scope.** This is a demo/presentation project. There is no production backend, no real-money flows, and wallets only ever touch public testnets (Sepolia, Solana Devnet, Bitcoin Testnet). Rate-limiting, key storage, and API routes are sized for a local/demo context — **do not port these patterns to a mainnet product without redesign**.
+The learning layer (scenarios, replays, practice portfolio, lessons, AI chat) is the **on-ramp** to the real thing: users graduate into the testnet wallet by hitting learning milestones (confidence ≥ 50, ≥ 3 lessons, ≥ 2 predictions). Practice mode is preparation; testnet mode is the product.
+
+**Demo scope.** "Demo" means no production deployment, no monetization, no mainnet — not a limitation of the functionality. The wallet, faucet, predictions, and on-chain interactions all work end-to-end against public testnets. Rate-limiting, key storage, and API routes are sized for a local/demo context — **do not port these patterns to a mainnet product without redesign**.
 
 ### Tech stack
 
