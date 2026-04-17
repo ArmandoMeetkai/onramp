@@ -367,12 +367,17 @@ export const useTestnetWalletStore = create<TestnetWalletState>((set, get) => ({
     if (!wallet) return
     // Clear transactions
     await db.testnetTransactions.where("userId").equals(wallet.userId).delete()
-    // Reset balances to zero
-    const updated = { ...wallet, balances: { ethereum: "0", solana: 0, bitcoin: 0 } }
+    // Reset balances back to the starting welcome bonus (not zero) so the
+    // user can keep testing without having to faucet up from scratch.
+    const updated = { ...wallet, balances: WELCOME_BONUS }
     await db.testnetWallets.put(updated)
     set({
       wallet: updated,
-      balances: { ethereum: BigInt(0), solana: 0, bitcoin: 0 },
+      balances: {
+        ethereum: BigInt(WELCOME_BONUS.ethereum),
+        solana: WELCOME_BONUS.solana,
+        bitcoin: WELCOME_BONUS.bitcoin,
+      },
       transactions: [],
     })
   },

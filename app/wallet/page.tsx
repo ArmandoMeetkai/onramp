@@ -64,7 +64,7 @@ function WalletContent() {
                 }}
                 className="mt-6 w-full rounded-xl border border-destructive/30 py-2.5 text-xs text-destructive hover:bg-destructive/10 transition-colors"
               >
-                Reset wallet balances (dev only)
+                Reset to starter balance (dev only)
               </button>
             )}
           </>
