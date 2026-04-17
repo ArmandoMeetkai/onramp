@@ -239,12 +239,21 @@ export default function PredictionDetailPage({
                 >
                   More predictions
                 </Link>
-                <button
-                  onClick={() => setTradeOpen(true)}
-                  className="flex-1 rounded-xl border border-border bg-card py-3 text-center text-sm font-medium transition-colors hover:border-primary/30"
-                >
-                  Buy more crypto
-                </button>
+                {isGraduated ? (
+                  <Link
+                    href="/wallet"
+                    className="flex-1 rounded-xl border border-border bg-card py-3 text-center text-sm font-medium transition-colors hover:border-primary/30"
+                  >
+                    Get more tokens
+                  </Link>
+                ) : (
+                  <button
+                    onClick={() => setTradeOpen(true)}
+                    className="flex-1 rounded-xl border border-border bg-card py-3 text-center text-sm font-medium transition-colors hover:border-primary/30"
+                  >
+                    Buy more crypto
+                  </button>
+                )}
               </div>
             )}
           </motion.div>
