@@ -65,13 +65,22 @@ export function useSimulation(s: any) {
 
 ## PROJECT SUMMARY
 
-**Onramp** — *"Learn crypto by making real predictions on blockchain — without risking a cent."*
+**Onramp** — *"Learn crypto through a realistic wallet + prediction experience, without risking a cent."*
 
-The product is **prediction markets on testnet**: users stake real crypto (Sepolia ETH, Solana Devnet SOL, Bitcoin Testnet BTC) on yes/no questions about the market. Everything under the hood is real — keypair generation, signed transactions, on-chain balances, faucet top-ups. Only the tokens have zero monetary value.
+The product is **prediction markets backed by a multi-chain wallet**. Users progress from a fully simulated practice environment into a testnet-styled wallet (Sepolia ETH, Solana Devnet SOL, Bitcoin Testnet BTC) where they stake "crypto" on yes/no questions about the market. The learning layer (scenarios, replays, practice portfolio, lessons, AI chat) is the **on-ramp**: users graduate into the wallet by hitting milestones (confidence ≥ 50, ≥ 3 lessons, ≥ 2 predictions).
 
-The learning layer (scenarios, replays, practice portfolio, lessons, AI chat) is the **on-ramp** to the real thing: users graduate into the testnet wallet by hitting learning milestones (confidence ≥ 50, ≥ 3 lessons, ≥ 2 predictions). Practice mode is preparation; testnet mode is the product.
+**What is real vs simulated.** The split matters for reviewers:
 
-**Demo scope.** "Demo" means no production deployment, no monetization, no mainnet — not a limitation of the functionality. The wallet, faucet, predictions, and on-chain interactions all work end-to-end against public testnets. Rate-limiting, key storage, and API routes are sized for a local/demo context — **do not port these patterns to a mainnet product without redesign**.
+| Real | Simulated (for demo) |
+|---|---|
+| Keypair generation (via `viem`, `@solana/web3.js`, `@scure/btc-signer`) | Balances — stored in Dexie, not read from any RPC |
+| Addresses are technically valid on Sepolia/Devnet/Testnet | Faucet drops — `/faucet` page generates random tx hashes, never calls a real faucet |
+| AES-256-GCM encryption of private keys | `sendTransaction` — debits local Dexie balance, returns a random hash, never signs or broadcasts |
+| UI/UX flows, graduation logic, prediction resolution | Balance reads (`fetchBalance` comment says "no blockchain query") |
+
+There is **live-ready code** in `app/api/faucet/route.ts` that would call the Alchemy Sepolia faucet if wired to the faucet page and given `ALCHEMY_API_KEY` — but the current `/faucet` page uses its own simulated flow instead. This is intentional for demo speed and reliability.
+
+**Demo scope.** No production deployment, no monetization, no mainnet, no real on-chain traffic. The wallet/faucet/send flows are a high-fidelity simulation designed to feel real without depending on network state. Rate-limiting, key storage, and API routes are sized for a local/demo context — **do not port these patterns to a product that touches real funds**.
 
 ### Tech stack
 
@@ -124,11 +133,12 @@ Warm fintech, not crypto-bro. Forest green (`oklch(0.45 0.1 155)`) + burnt amber
 
 ### Wallet security model (Phase 11)
 
-- **Testnet-only.** Keys live in IndexedDB, encrypted with AES-256-GCM derived via PBKDF2 (100k iterations) from the userId + random salt (`lib/crypto.ts`).
+- **Testnet-styled, demo-grade.** Keys live in IndexedDB, encrypted with AES-256-GCM derived via PBKDF2 (100k iterations) from the userId + random salt (`lib/crypto.ts`).
 - **Threat model.** Protects against casual IndexedDB inspection. Does NOT protect against an attacker with the userId and device access — userId is not a real passphrase.
 - **Never port this for mainnet.** `lib/crypto.ts` is explicit about this in a header comment. Any mainnet design must use hardware-backed keys, user-chosen passphrases, or an SSS/MPC scheme.
-- **Faucet.** `app/api/faucet/route.ts` uses an in-memory rate-limit Map (1 request / address / 24h). Sufficient for local demo; **not sufficient for a real deploy** — multiple lambdas bypass it. Re-add Upstash/Redis before shipping.
+- **Faucet.** `app/faucet/page.tsx` simulates drops locally (random tx hash, stored in `localStorage`, applied via `creditBalance` on return). `app/api/faucet/route.ts` exists as a real Alchemy Sepolia integration and uses an in-memory rate-limit Map (1 / address / 24h), but is currently not wired to the page. If switching the page to call the API, re-add Upstash/Redis before public deploy.
 - **Alchemy key.** `ALCHEMY_API_KEY` is server-only. If the faucet ever goes public, re-introduce the Redis rate limit first.
+- **No on-chain traffic today.** `fetchBalance` reads from Dexie, `sendTransaction` writes a local debit + random hash. To make it truly on-chain: (1) wire `/faucet` page to `/api/faucet`, (2) replace `fetchBalance` with real RPC calls via the installed SDKs, (3) implement signing/broadcast in `sendTransaction` using the same SDKs.
 
 ### Graduation criteria (Phase 11)
 
