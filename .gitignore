@@ -13,6 +13,11 @@
 # testing
 /coverage
 
+# playwright outputs — videos, traces, screenshots (regenerated per run, sometimes huge)
+/test-results/
+/playwright-report/
+/playwright/.cache/
+
 # next.js
 /.next/
 /out/
