@@ -17,6 +17,13 @@ const milestoneConfig: Record<string, { icon: typeof Target; href: string; linkL
 
 export function WalletGraduationGate({ milestones }: WalletGraduationGateProps) {
   const completedCount = milestones.filter((m) => m.completed).length
+  const allComplete = completedCount === milestones.length
+  // Weighted progress — matches GraduationProgressBar so the aggregate fill
+  // reflects partial milestones instead of going 0 → full at each completion.
+  const weightedProgress = milestones.reduce(
+    (sum, m) => sum + Math.min(m.current / m.required, 1),
+    0,
+  ) / milestones.length
 
   return (
     <div className="py-6">
@@ -51,13 +58,11 @@ export function WalletGraduationGate({ milestones }: WalletGraduationGateProps) 
             {completedCount} of {milestones.length} completed
           </span>
         </div>
-        <div className="h-2 w-full rounded-full bg-muted">
+        <div className="h-1.5 w-full rounded-full bg-muted">
           <motion.div
-            className="h-full rounded-full bg-primary"
+            className={`h-full rounded-full ${allComplete ? "bg-primary" : "bg-accent"}`}
             initial={{ width: 0 }}
-            animate={{
-              width: `${(completedCount / milestones.length) * 100}%`,
-            }}
+            animate={{ width: `${weightedProgress * 100}%` }}
             transition={{ duration: 0.6, ease: "easeOut" }}
           />
         </div>
@@ -85,14 +90,14 @@ export function WalletGraduationGate({ milestones }: WalletGraduationGateProps) 
                 <div
                   className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${
                     milestone.completed
-                      ? "bg-success/10"
+                      ? "bg-primary/10"
                       : "bg-muted"
                   }`}
                 >
                   <Icon
                     className={`h-5 w-5 ${
                       milestone.completed
-                        ? "text-success"
+                        ? "text-primary"
                         : "text-muted-foreground"
                     }`}
                   />
@@ -103,7 +108,7 @@ export function WalletGraduationGate({ milestones }: WalletGraduationGateProps) 
                     <span
                       className={`text-xs font-medium ${
                         milestone.completed
-                          ? "text-success"
+                          ? "text-primary"
                           : "text-muted-foreground"
                       }`}
                     >
@@ -115,7 +120,7 @@ export function WalletGraduationGate({ milestones }: WalletGraduationGateProps) 
                   <div className="mt-2 h-1.5 w-full rounded-full bg-muted">
                     <div
                       className={`h-full rounded-full transition-all ${
-                        milestone.completed ? "bg-success" : "bg-primary"
+                        milestone.completed ? "bg-primary" : "bg-accent"
                       }`}
                       style={{ width: `${progress * 100}%` }}
                     />
