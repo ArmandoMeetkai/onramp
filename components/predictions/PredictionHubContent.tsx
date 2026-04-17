@@ -13,7 +13,8 @@ import { PredictionTradeSheet } from "./PredictionTradeSheet"
 import { usePredictionStore } from "@/store/usePredictionStore"
 import { useUserStore } from "@/store/useUserStore"
 import { cn, formatCrypto } from "@/lib/utils"
-import { HelpCircle, Sparkles, ArrowRight } from "lucide-react"
+import Link from "next/link"
+import { HelpCircle, Sparkles, ArrowRight, Droplets } from "lucide-react"
 import { usePredictionHoldings } from "@/hooks/usePredictionHoldings"
 import { ModeTag } from "@/components/shared/ModeTag"
 import type { PredictionMarket } from "@/data/predictionMarkets"
@@ -56,6 +57,8 @@ export function PredictionHubContent({ markets }: PredictionHubContentProps) {
   const { isGraduated, cashBalance, holdings } = usePredictionHoldings()
   const hasAnyHoldings = holdings.some((h) => h.amount > 0)
   const isBrandNew = !isGraduated && userPredictions.length === 0 && !hasAnyHoldings && cashBalance > 0
+  // Graduated user has everything staked (or never faucet'd) — nudge to /wallet
+  const needsTokens = isGraduated && !hasAnyHoldings
 
   // Persist filters to sessionStorage
   useEffect(() => {
@@ -151,6 +154,36 @@ export function PredictionHubContent({ markets }: PredictionHubContentProps) {
             </div>
             <ArrowRight className="h-4 w-4 text-primary transition-transform group-hover:translate-x-0.5" />
           </motion.button>
+        )}
+
+        {/* "Need more tokens" banner — graduated users with nothing free to stake */}
+        {needsTokens && (
+          <motion.div
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.25, delay: 0.1 }}
+            className="mt-5"
+          >
+            <Link
+              href="/wallet"
+              className="group flex w-full items-center gap-4 rounded-2xl border border-primary/20 bg-primary/5 p-4 text-left transition-all hover:border-primary/40 hover:bg-primary/10 active:scale-[0.99]"
+            >
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary/15">
+                <Droplets className="h-5 w-5 text-primary" />
+              </div>
+              <div className="flex-1">
+                <p className="text-sm font-semibold text-primary">
+                  {userPredictions.length > 0
+                    ? "Your tokens are all staked"
+                    : "No testnet tokens yet"}
+                </p>
+                <p className="mt-0.5 text-xs text-muted-foreground leading-relaxed">
+                  Grab free ETH, SOL, or BTC from the faucet to keep predicting.
+                </p>
+              </div>
+              <ArrowRight className="h-4 w-4 text-primary transition-transform group-hover:translate-x-0.5" />
+            </Link>
+          </motion.div>
         )}
 
         {/* Summary & Calibration — only when user has predictions */}
