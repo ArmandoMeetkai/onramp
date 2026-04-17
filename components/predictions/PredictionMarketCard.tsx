@@ -36,6 +36,7 @@ export function PredictionMarketCard({
 }: PredictionMarketCardProps) {
   const isResolved = market.status === "resolved" || userPrediction?.resolved
   const userWon = userPrediction?.resolved && (userPrediction.payoutCrypto ?? 0) > 0
+  const hasActivePrediction = !!userPrediction && !userPrediction.resolved
 
   return (
     <Link
@@ -48,7 +49,9 @@ export function PredictionMarketCard({
             : userPrediction?.resolved
               ? "border-danger/20"
               : "border-border"
-          : "border-border"
+          : hasActivePrediction
+            ? "border-primary/40 bg-primary/[0.025]"
+            : "border-border"
       )}
     >
       <div className="flex items-start gap-3">
@@ -64,6 +67,19 @@ export function PredictionMarketCard({
             <Badge variant="secondary" className="rounded-md px-1.5 py-0 text-[11px]">
               {categoryLabels[market.category]}
             </Badge>
+            {hasActivePrediction && (
+              <Badge
+                className={cn(
+                  "rounded-md px-1.5 py-0 text-[11px] font-bold border-0",
+                  userPrediction!.position === "yes"
+                    ? "bg-success/20 text-success"
+                    : "bg-danger/20 text-danger"
+                )}
+              >
+                <Check className="mr-0.5 inline h-3 w-3" />
+                You: {userPrediction!.position.toUpperCase()}
+              </Badge>
+            )}
             <span className="text-[11px] text-muted-foreground">
               {getTimeRemaining(market.resolutionDate)}
             </span>
@@ -91,7 +107,7 @@ export function PredictionMarketCard({
                 : "bg-danger/15 text-danger"
             )}
           >
-            You: {userPrediction.position.toUpperCase()} · {formatCrypto(userPrediction.cryptoAmount ?? 0, userPrediction.asset ?? "SOL")} {userPrediction.asset ?? "?"}
+            Stake: {formatCrypto(userPrediction.cryptoAmount ?? 0, userPrediction.asset ?? "SOL")} {userPrediction.asset ?? "?"}
           </Badge>
           {isResolved && (
             <Badge
