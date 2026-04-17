@@ -5,6 +5,16 @@ import { encryptPrivateKey } from "@/lib/crypto"
 
 const DEFAULT_BALANCES = { ethereum: "0", solana: 0, bitcoin: 0 }
 
+// Graduation welcome bonus — pre-funded balances so a brand-new testnet wallet
+// can immediately stake on predictions without having to visit the faucet first.
+// Roughly ≈$200-300 USD equivalent at typical prices. Users still use the faucet
+// to top up once they run out.
+const WELCOME_BONUS = {
+  ethereum: "50000000000000000", // 0.05 ETH in wei
+  solana: 500_000_000,            // 0.5 SOL in lamports
+  bitcoin: 200_000,               // 0.002 BTC in satoshis
+} as const
+
 interface ChainBalances {
   ethereum: bigint | null
   solana: number | null
@@ -151,14 +161,18 @@ export const useTestnetWalletStore = create<TestnetWalletState>((set, get) => ({
           salt: btcEncrypted.salt,
           iv: btcEncrypted.iv,
         },
-        balances: DEFAULT_BALANCES,
+        balances: WELCOME_BONUS,
         createdAt: new Date(),
       }
 
       await db.testnetWallets.put(wallet)
       set({
         wallet,
-        balances: { ethereum: BigInt(0), solana: 0, bitcoin: 0 },
+        balances: {
+          ethereum: BigInt(WELCOME_BONUS.ethereum),
+          solana: WELCOME_BONUS.solana,
+          bitcoin: WELCOME_BONUS.bitcoin,
+        },
       })
     } catch (error) {
       console.error("Failed to create testnet wallet:", error)

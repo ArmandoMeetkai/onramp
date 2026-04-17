@@ -115,11 +115,11 @@ export function WalletSetupSheet({
                     </div>
                     <div>
                       <p className="text-sm font-semibold">
-                        Learn by doing
+                        Welcome bonus included
                       </p>
                       <p className="text-xs text-muted-foreground">
-                        Use real blockchain transactions to stake on your
-                        predictions. Same mechanics as mainnet.
+                        Your new wallet arrives with a starter balance: 0.05 ETH,
+                        0.5 SOL, and 0.002 BTC — enough to start staking right away.
                       </p>
                     </div>
                   </div>
@@ -175,7 +175,7 @@ export function WalletSetupSheet({
                   Wallet created!
                 </h3>
                 <p className="mt-1 text-sm text-muted-foreground">
-                  Your crypto wallet is ready to use.
+                  Your starter balance is ready: 0.05 ETH · 0.5 SOL · 0.002 BTC.
                 </p>
 
                 {wallet && (
@@ -190,8 +190,9 @@ export function WalletSetupSheet({
                 )}
 
                 <WalletEducational title="What's next?">
-                  Get tokens from faucets, then use them for predictions. It works
-                  just like real crypto transactions.
+                  Head to <span className="font-semibold">Predict</span> to stake
+                  your tokens. When you run out, the faucet on this page tops you
+                  up for free.
                 </WalletEducational>
 
                 <Button

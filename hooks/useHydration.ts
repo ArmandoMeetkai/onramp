@@ -75,22 +75,27 @@ export function useHydration() {
   }, [hydrateUser])
 
   // Faucet drops can land while the user is off on /faucet (standalone route).
-  // We cover three return paths:
+  // We cover every return path we've seen so a manual refresh is never needed:
   //   1. New-tab faucet → tab switch — visibilitychange
   //   2. pageshow bfcache restore — some browsers use this for back/forward
   //   3. In-tab SPA navigation (back button from /faucet → /wallet) — pathname
-  // All three call the same drain fn; localStorage is cleared in the store so
-  // duplicate triggers are a no-op.
+  //   4. Window regains focus — belt-and-suspenders for browsers where
+  //      visibilitychange is flaky on tab-switch
+  // All call the same drain fn; localStorage is cleared in the store so
+  // duplicate triggers are a safe no-op.
   useEffect(() => {
     function onVisibility() {
       if (document.visibilityState === "visible") drainFaucetPending()
     }
     function onPageShow() { drainFaucetPending() }
+    function onFocus() { drainFaucetPending() }
     document.addEventListener("visibilitychange", onVisibility)
     window.addEventListener("pageshow", onPageShow)
+    window.addEventListener("focus", onFocus)
     return () => {
       document.removeEventListener("visibilitychange", onVisibility)
       window.removeEventListener("pageshow", onPageShow)
+      window.removeEventListener("focus", onFocus)
     }
   }, [])
 
