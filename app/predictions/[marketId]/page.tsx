@@ -20,6 +20,7 @@ import { PredictionFormWalkthrough } from "@/components/predictions/PredictionFo
 import { PredictionNoHoldingsWalkthrough } from "@/components/predictions/PredictionNoHoldingsWalkthrough"
 import { PredictionTradeSheet } from "@/components/predictions/PredictionTradeSheet"
 import { useShouldShowFormWalkthrough, useShouldShowNoHoldingsWalkthrough, WALKTHROUGH_FORM_KEY, WALKTHROUGH_NO_HOLDINGS_KEY } from "@/components/predictions/PredictionWalkthrough"
+import { ModeTag } from "@/components/shared/ModeTag"
 import { getTimeRemaining } from "@/lib/utils"
 
 export default function PredictionDetailPage({
@@ -192,9 +193,12 @@ export default function PredictionDetailPage({
                   </div>
                 )}
                 <div className="flex-1">
-                  <p className="text-sm font-semibold text-primary">
-                    {justPlaced ? "Prediction placed!" : "Your prediction"}
-                  </p>
+                  <div className="flex items-center gap-1.5">
+                    <p className="text-sm font-semibold text-primary">
+                      {justPlaced ? "Prediction placed!" : "Your prediction"}
+                    </p>
+                    <ModeTag />
+                  </div>
                   <p className="text-2xl font-bold leading-tight">
                     {userPrediction.position.toUpperCase()}
                   </p>

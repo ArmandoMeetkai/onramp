@@ -7,12 +7,20 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { InfoTip } from "@/components/shared/InfoTip"
+import { ModeTag } from "@/components/shared/ModeTag"
+import { useTestnetGraduation } from "@/hooks/useTestnetGraduation"
 import { cn, formatCrypto } from "@/lib/utils"
 
 export interface HoldingWithPrice {
   asset: "BTC" | "ETH" | "SOL"
   amount: number
   price: number
+}
+
+const CHAIN_SUFFIX: Record<"BTC" | "ETH" | "SOL", string> = {
+  BTC: "Testnet",
+  ETH: "Sepolia",
+  SOL: "Devnet",
 }
 
 interface PredictionPlaceFormProps {
@@ -25,6 +33,8 @@ interface PredictionPlaceFormProps {
 const USD_AMOUNTS = [10, 25, 50, 100] as const
 
 export function PredictionPlaceForm({ holdings, onPlace, onBuy, walletLink }: PredictionPlaceFormProps) {
+  const { isEligible, hasWallet } = useTestnetGraduation()
+  const isGraduated = isEligible && hasWallet
   const firstWithBalance = holdings.find((h) => h.amount > 0)
   const [selectedAsset, setSelectedAsset] = useState<"BTC" | "ETH" | "SOL">(
     firstWithBalance?.asset ?? "BTC"
@@ -108,7 +118,10 @@ export function PredictionPlaceForm({ holdings, onPlace, onBuy, walletLink }: Pr
       animate={{ opacity: 1, y: 0 }}
       className="rounded-2xl border border-border bg-card p-5 space-y-5"
     >
-      <p className="text-sm font-semibold">Make your prediction</p>
+      <div className="flex items-center justify-between">
+        <p className="text-sm font-semibold">Make your prediction</p>
+        <ModeTag />
+      </div>
 
       {/* Coin selector — shows balance in crypto, not USD */}
       <div id="pred-coin-selector">
@@ -118,6 +131,7 @@ export function PredictionPlaceForm({ holdings, onPlace, onBuy, walletLink }: Pr
         <div className="flex gap-2">
           {holdings.map((h) => {
             const hasFunds = h.amount > 0
+            const isSelected = selectedAsset === h.asset && hasFunds
             return (
               <button
                 key={h.asset}
@@ -129,7 +143,7 @@ export function PredictionPlaceForm({ holdings, onPlace, onBuy, walletLink }: Pr
                 disabled={!hasFunds}
                 className={cn(
                   "flex-1 rounded-xl py-3 px-2 transition-all duration-200 flex flex-col items-center gap-1",
-                  selectedAsset === h.asset && hasFunds
+                  isSelected
                     ? "bg-primary text-primary-foreground shadow-sm"
                     : "bg-muted text-muted-foreground hover:text-foreground",
                   !hasFunds && "opacity-40 cursor-not-allowed"
@@ -141,6 +155,11 @@ export function PredictionPlaceForm({ holdings, onPlace, onBuy, walletLink }: Pr
                     ? `${formatCrypto(h.amount, h.asset)} ${h.asset}`
                     : "0"}
                 </span>
+                {isGraduated && isSelected && (
+                  <span className="text-[9px] font-medium opacity-70 leading-none">
+                    {CHAIN_SUFFIX[h.asset]}
+                  </span>
+                )}
               </button>
             )
           })}
@@ -161,13 +180,21 @@ export function PredictionPlaceForm({ holdings, onPlace, onBuy, walletLink }: Pr
       {/* Balance summary */}
       <div className="rounded-xl bg-muted/50 px-4 py-3">
         <div className="flex items-center justify-between">
-          <p className="text-xs text-muted-foreground">Your {selectedAsset} balance</p>
+          <div className="flex items-center gap-1.5">
+            <p className="text-xs text-muted-foreground">Your {selectedAsset} balance</p>
+            <ModeTag size="xs" />
+          </div>
           <p className="text-xs text-muted-foreground">
             ~${holdingUsdValue.toLocaleString(undefined, { maximumFractionDigits: 0 })}
           </p>
         </div>
         <p className="mt-1 text-lg font-bold">
           {formatCrypto(holdingAmount, selectedAsset)} {selectedAsset}
+          {isGraduated && (
+            <span className="ml-1.5 text-[10px] font-medium text-muted-foreground">
+              · {CHAIN_SUFFIX[selectedAsset]}
+            </span>
+          )}
         </p>
       </div>
 

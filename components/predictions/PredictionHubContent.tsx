@@ -15,6 +15,7 @@ import { useUserStore } from "@/store/useUserStore"
 import { cn, formatCrypto } from "@/lib/utils"
 import { HelpCircle, Sparkles, ArrowRight } from "lucide-react"
 import { usePredictionHoldings } from "@/hooks/usePredictionHoldings"
+import { ModeTag } from "@/components/shared/ModeTag"
 import type { PredictionMarket } from "@/data/predictionMarkets"
 
 const statusFilters = [
@@ -110,6 +111,7 @@ export function PredictionHubContent({ markets }: PredictionHubContentProps) {
               <h1 className="font-heading text-2xl font-bold tracking-tight">
                 Predictions
               </h1>
+              <ModeTag />
               <button
                 onClick={handleReplayWalkthrough}
                 aria-label="How it works"

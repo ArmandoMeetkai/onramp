@@ -13,6 +13,12 @@ const chainUnits = {
   bitcoin: "BTC",
 } as const
 
+const chainNetwork = {
+  ethereum: "Sepolia",
+  solana: "Devnet",
+  bitcoin: "Testnet",
+} as const
+
 export function WalletBalance() {
   const balances = useTestnetWalletStore((s) => s.balances)
   const activeChain = useTestnetWalletStore((s) => s.activeChain)
@@ -58,7 +64,10 @@ export function WalletBalance() {
           {displayBalance}
         </p>
         <div className="flex items-center gap-2">
-          <p className="text-sm text-muted-foreground">{asset}</p>
+          <p className="text-sm text-muted-foreground">
+            {asset}
+            <span className="ml-1 text-[11px] font-medium opacity-70">· {chainNetwork[activeChain]}</span>
+          </p>
           {usdValue > 0 && (
             <p className="text-sm text-muted-foreground">
               ~${usdValue.toLocaleString(undefined, { maximumFractionDigits: 2 })}
