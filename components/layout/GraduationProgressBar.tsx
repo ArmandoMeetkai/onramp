@@ -1,5 +1,6 @@
 "use client"
 
+import Link from "next/link"
 import { motion } from "framer-motion"
 import { cn } from "@/lib/utils"
 import { useTestnetGraduation } from "@/hooks/useTestnetGraduation"
@@ -18,28 +19,36 @@ export function GraduationProgressBar() {
   const isFullyGraduated = isEligible && hasWallet
 
   return (
-    <div
-      className="h-1 w-full bg-muted"
-      role="progressbar"
-      aria-valuenow={Math.round(percentage)}
-      aria-valuemin={0}
-      aria-valuemax={100}
-      aria-label="Graduation progress"
+    <Link
+      href="/wallet"
+      aria-label={`Graduation progress: ${Math.round(percentage)}%. View milestones.`}
+      className="group block w-full"
     >
-      <motion.div
-        className={cn("h-full", isFullyGraduated ? "bg-primary" : "bg-accent")}
-        initial={{ width: 0 }}
-        animate={{
-          width: `${percentage}%`,
-          ...(isFullyGraduated && { opacity: [1, 0.6, 1] }),
-        }}
-        transition={{
-          width: { duration: 0.6, ease: "easeOut" },
-          ...(isFullyGraduated && {
-            opacity: { duration: 2, repeat: Infinity, ease: "easeInOut" },
-          }),
-        }}
-      />
-    </div>
+      {/* Expanded hit area (8px) wrapping a visually slim bar (1px). */}
+      <div className="w-full py-[3px]">
+        <div
+          className="h-[1px] w-full bg-muted transition-[height] duration-150 group-hover:h-[2px]"
+          role="progressbar"
+          aria-valuenow={Math.round(percentage)}
+          aria-valuemin={0}
+          aria-valuemax={100}
+        >
+          <motion.div
+            className={cn("h-full", isFullyGraduated ? "bg-primary" : "bg-accent")}
+            initial={{ width: 0 }}
+            animate={{
+              width: `${percentage}%`,
+              ...(isFullyGraduated && { opacity: [1, 0.6, 1] }),
+            }}
+            transition={{
+              width: { duration: 0.6, ease: "easeOut" },
+              ...(isFullyGraduated && {
+                opacity: { duration: 2, repeat: Infinity, ease: "easeInOut" },
+              }),
+            }}
+          />
+        </div>
+      </div>
+    </Link>
   )
 }

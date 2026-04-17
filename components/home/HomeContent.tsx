@@ -65,7 +65,10 @@ export function HomeContent() {
   const progress = useProgressStore((s) => s.progress)
   const testnetWallet = useTestnetWalletStore((s) => s.wallet)
   const testnetBalances = useTestnetWalletStore((s) => s.balances)
-  const { isEligible } = useTestnetGraduation()
+  const { isEligible, hasWallet, milestones } = useTestnetGraduation()
+  const milestonesDone = milestones.filter((m) => m.completed).length
+  const isLive = isEligible && hasWallet
+  const isReady = isEligible && !hasWallet
 
   if (!profile) return null
 
@@ -147,34 +150,34 @@ export function HomeContent() {
         </Link>
       </motion.div>
 
-      {/* Practice wallet CTA — shown when eligible */}
-      {isEligible && (
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4, delay: 0.55 }}
+      {/* Crypto wallet CTA — always visible, content adapts to graduation state */}
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4, delay: 0.55 }}
+      >
+        <Link
+          href="/wallet"
+          className="group mt-4 flex items-center gap-4 overflow-hidden rounded-2xl border border-primary/30 bg-gradient-to-r from-primary/10 via-primary/5 to-transparent p-5 transition-all duration-200 hover:border-primary/50 hover:shadow-md active:scale-[0.98]"
         >
-          <Link
-            href="/wallet"
-            className="group mt-4 flex items-center gap-4 overflow-hidden rounded-2xl border border-primary/30 bg-gradient-to-r from-primary/10 via-primary/5 to-transparent p-5 transition-all duration-200 hover:border-primary/50 hover:shadow-md active:scale-[0.98]"
-          >
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-primary/15">
-              <Wallet className="h-5 w-5 text-primary" />
-            </div>
-            <div className="flex-1">
-              <p className="font-semibold leading-snug">
-                {testnetWallet ? "Practice wallet" : "Your crypto wallet"}
-              </p>
-              <p className="mt-0.5 text-sm text-muted-foreground">
-                {testnetWallet && testnetBalances.ethereum !== null
-                  ? `${formatEthShort(testnetBalances.ethereum)} ETH`
-                  : "Get tokens for predictions"}
-              </p>
-            </div>
-            <ArrowRight className="h-4 w-4 text-primary transition-transform group-hover:translate-x-0.5" />
-          </Link>
-        </motion.div>
-      )}
+          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-primary/15">
+            <Wallet className="h-5 w-5 text-primary" />
+          </div>
+          <div className="flex-1">
+            <p className="font-semibold leading-snug">
+              {isLive ? "Your crypto wallet" : isReady ? "Ready — create your wallet" : "Unlock your crypto wallet"}
+            </p>
+            <p className="mt-0.5 text-sm text-muted-foreground">
+              {isLive && testnetBalances.ethereum !== null
+                ? `${formatEthShort(testnetBalances.ethereum)} ETH · Sepolia`
+                : isReady
+                  ? "Starter balance waiting — 0.05 ETH · 0.5 SOL · 0.002 BTC"
+                  : `${milestonesDone} of ${milestones.length} milestones completed`}
+            </p>
+          </div>
+          <ArrowRight className="h-4 w-4 text-primary transition-transform group-hover:translate-x-0.5" />
+        </Link>
+      </motion.div>
 
       {(progress?.confidenceScore ?? 0) >= 60 && !isEligible && (
         <div className="mt-8">
