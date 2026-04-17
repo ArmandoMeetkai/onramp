@@ -1,9 +1,27 @@
 import { create } from "zustand"
-import { db, type UserPrediction, type PriceSnapshot } from "@/lib/db"
+import { db, type UserPrediction, type PriceSnapshot, type TestnetChain } from "@/lib/db"
 import { getMarketById, allMarkets } from "@/data/predictionMarkets"
 import { usePriceStore } from "./usePriceStore"
 import { usePredictionWalletStore } from "./usePredictionWalletStore"
+import { useTestnetWalletStore } from "./useTestnetWalletStore"
 import { useProgressStore } from "./useProgressStore"
+import { WEI_PER_ETH, LAMPORTS_PER_SOL, SATS_PER_BTC } from "@/lib/testnet"
+
+type Asset = "BTC" | "ETH" | "SOL"
+const ASSET_TO_CHAIN: Record<Asset, TestnetChain> = { ETH: "ethereum", SOL: "solana", BTC: "bitcoin" }
+const BASE_UNITS_PER_ASSET: Record<Asset, number> = { ETH: WEI_PER_ETH, SOL: LAMPORTS_PER_SOL, BTC: SATS_PER_BTC }
+
+/** Mirrors useTestnetGraduation. Kept in sync so staking debits the wallet
+ *  whose balance the form just displayed. */
+function isUserGraduated(predictionsCount: number): boolean {
+  const testnetWallet = useTestnetWalletStore.getState().wallet
+  if (!testnetWallet) return false
+  const progress = useProgressStore.getState().progress
+  if (!progress) return false
+  return progress.confidenceScore >= 50
+    && progress.lessonsCompleted.length >= 3
+    && predictionsCount >= 2
+}
 
 export interface ResolvedMarketResult {
   marketId: string
@@ -79,20 +97,12 @@ export const usePredictionStore = create<PredictionState>((set, get) => ({
     const { userPredictions } = get()
     const market = getMarketById(marketId)
     if (!market) return false
-
-    const wallet = usePredictionWalletStore.getState().wallet
-    if (!wallet) return false
+    if (userPredictions.some((p) => p.marketId === marketId)) return false
 
     const price = usePriceStore.getState().getPrice(asset)
     if (price <= 0) return false
 
     const cryptoAmount = usdAmount / price
-
-    // Check user has enough of this asset in their prediction wallet
-    const holding = wallet.holdings.find((h) => h.asset === asset)
-    if (!holding || holding.amount < cryptoAmount) return false
-
-    if (userPredictions.some((p) => p.marketId === marketId)) return false
 
     const prediction: UserPrediction = {
       id: `${userId}-${marketId}`,
@@ -108,7 +118,34 @@ export const usePredictionStore = create<PredictionState>((set, get) => ({
       ...(reasoning ? { reasoning } : {}),
     }
 
-    // Debit from prediction wallet holdings
+    // Graduated users stake from the testnet wallet; non-graduated from the
+    // practice wallet. Must match usePredictionHoldings so we debit the same
+    // balance the user saw in the form.
+    if (isUserGraduated(userPredictions.length)) {
+      const chain = ASSET_TO_CHAIN[asset]
+      const rawUnits = Math.floor(cryptoAmount * BASE_UNITS_PER_ASSET[asset]).toString()
+      const success = await useTestnetWalletStore.getState().debitBalance(chain, rawUnits)
+      if (!success) return false
+
+      set({ userPredictions: [...userPredictions, prediction] })
+      try {
+        await db.userPredictions.put(prediction)
+      } catch {
+        // Prediction persistence failed — refund the testnet debit and roll back memory
+        await useTestnetWalletStore.getState().creditBalance(chain, rawUnits)
+        set({ userPredictions })
+        console.error("Failed to persist prediction — rolled back")
+        return false
+      }
+      return true
+    }
+
+    const wallet = usePredictionWalletStore.getState().wallet
+    if (!wallet) return false
+
+    const holding = wallet.holdings.find((h) => h.asset === asset)
+    if (!holding || holding.amount < cryptoAmount) return false
+
     const updatedHoldings = wallet.holdings
       .map((h) =>
         h.asset === asset
@@ -119,7 +156,6 @@ export const usePredictionStore = create<PredictionState>((set, get) => ({
 
     const updatedWallet = { ...wallet, holdings: updatedHoldings }
 
-    // Optimistic update — apply to memory first for instant UI response
     usePredictionWalletStore.setState({ wallet: updatedWallet })
     set({ userPredictions: [...userPredictions, prediction] })
 
@@ -129,7 +165,6 @@ export const usePredictionStore = create<PredictionState>((set, get) => ({
         await db.predictionWallets.put(updatedWallet)
       })
     } catch {
-      // Atomic transaction failed — rollback both stores
       usePredictionWalletStore.setState({ wallet })
       set({ userPredictions })
       console.error("Failed to persist prediction — rolled back")
@@ -166,19 +201,24 @@ export const usePredictionStore = create<PredictionState>((set, get) => ({
       p.id === prediction.id ? resolved : p
     )
 
-    // Build updated wallet if a payout is owed
+    const asset = prediction.asset as Asset
+    // Graduated users receive their payout in the testnet wallet; non-graduated
+    // in the practice wallet. Matches the wallet debited at placePrediction time
+    // (best-effort: uses current graduation state).
+    const graduated = isUserGraduated(userPredictions.length)
+
     let updatedWallet = null as ReturnType<typeof usePredictionWalletStore.getState>["wallet"]
-    if (payoutCrypto > 0) {
+    if (payoutCrypto > 0 && !graduated) {
       const wallet = usePredictionWalletStore.getState().wallet
       if (wallet) {
         const existingIndex = wallet.holdings.findIndex(
-          (h) => h.asset === prediction.asset
+          (h) => h.asset === asset
         )
         const holdings = [...wallet.holdings]
 
         if (existingIndex >= 0) {
           const existing = holdings[existingIndex]
-          const currentPrice = usePriceStore.getState().getPrice(prediction.asset)
+          const currentPrice = usePriceStore.getState().getPrice(asset)
           const payoutPrice = currentPrice > 0 ? currentPrice : prediction.priceAtPrediction
           const totalCost = existing.avgBuyPrice * existing.amount + payoutPrice * payoutCrypto
           const totalAmount = existing.amount + payoutCrypto
@@ -188,9 +228,9 @@ export const usePredictionStore = create<PredictionState>((set, get) => ({
             avgBuyPrice: totalAmount > 0 ? totalCost / totalAmount : payoutPrice,
           }
         } else {
-          const price = usePriceStore.getState().getPrice(prediction.asset)
+          const price = usePriceStore.getState().getPrice(asset)
           holdings.push({
-            asset: prediction.asset,
+            asset,
             amount: payoutCrypto,
             avgBuyPrice: price > 0 ? price : prediction.priceAtPrediction,
           })
@@ -200,7 +240,6 @@ export const usePredictionStore = create<PredictionState>((set, get) => ({
       }
     }
 
-    // Atomic Dexie transaction: both prediction and wallet are persisted together.
     try {
       if (updatedWallet) {
         await db.transaction("rw", db.userPredictions, db.predictionWallets, async () => {
@@ -215,10 +254,14 @@ export const usePredictionStore = create<PredictionState>((set, get) => ({
       return
     }
 
-    // DB write succeeded — safe to update memory
     set({ userPredictions: updatedPredictions })
     if (updatedWallet) {
       usePredictionWalletStore.setState({ wallet: updatedWallet })
+    }
+    if (payoutCrypto > 0 && graduated) {
+      const chain = ASSET_TO_CHAIN[asset]
+      const rawUnits = Math.floor(payoutCrypto * BASE_UNITS_PER_ASSET[asset]).toString()
+      await useTestnetWalletStore.getState().creditBalance(chain, rawUnits)
     }
 
     // Recalculate confidence score since prediction accuracy changed
