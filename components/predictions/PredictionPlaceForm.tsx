@@ -125,8 +125,11 @@ export function PredictionPlaceForm({ holdings, onPlace, onBuy, walletLink }: Pr
 
       {/* Coin selector — shows balance in crypto, not USD */}
       <div id="pred-coin-selector">
-        <p className="text-xs font-medium text-muted-foreground mb-2">
+        <p className="text-xs font-medium text-muted-foreground">
           Choose coin
+        </p>
+        <p className="mt-0.5 mb-2 text-[11px] text-muted-foreground/70 leading-snug">
+          Stake any coin you own — payouts come back in whatever you staked.
         </p>
         <div className="flex gap-2">
           {holdings.map((h) => {
@@ -141,6 +144,8 @@ export function PredictionPlaceForm({ holdings, onPlace, onBuy, walletLink }: Pr
                   setPosition(null)
                 }}
                 disabled={!hasFunds}
+                title={hasFunds ? undefined : `0 ${h.asset} — pick another coin or top up`}
+                aria-label={hasFunds ? `Use ${h.asset}` : `${h.asset}: 0 balance, top up to use`}
                 className={cn(
                   "flex-1 rounded-xl py-3 px-2 transition-all duration-200 flex flex-col items-center gap-1",
                   isSelected
@@ -153,7 +158,7 @@ export function PredictionPlaceForm({ holdings, onPlace, onBuy, walletLink }: Pr
                 <span className="text-[10px] font-medium opacity-80">
                   {hasFunds
                     ? `${formatCrypto(h.amount, h.asset)} ${h.asset}`
-                    : "0"}
+                    : "0 · top up"}
                 </span>
                 {isGraduated && isSelected && (
                   <span className="text-[9px] font-medium opacity-70 leading-none">
