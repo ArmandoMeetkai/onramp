@@ -92,8 +92,10 @@ export function WalletReceiveSheet({
           </Button>
 
           <WalletEducational title="How receiving works">
-            When someone sends tokens to your address, they appear in your
-            wallet automatically. It usually takes a few seconds on testnet.
+            This is a real {chainLabel} address. In this demo, Onramp
+            doesn&apos;t watch the chain for incoming transfers — use{" "}
+            <span className="font-semibold">Get coins</span> to fund your
+            balance in the app.
           </WalletEducational>
 
           <Button

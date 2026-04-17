@@ -2,7 +2,7 @@
 
 import { useState, useCallback } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { ArrowLeft, Check, Loader2, ExternalLink } from "lucide-react"
+import { ArrowLeft, Check, Loader2 } from "lucide-react"
 import {
   Sheet,
   SheetContent,
@@ -14,9 +14,9 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { WalletEducational } from "./WalletEducational"
 import { useTestnetWalletStore } from "@/store/useTestnetWalletStore"
-import { truncateAddress, getExplorerTxUrl, baseUnitsToAmount } from "@/lib/testnet"
-import { getSolExplorerTxUrl, isValidSolAddress } from "@/lib/solana"
-import { getBtcExplorerTxUrl, isValidBtcTestnetAddress } from "@/lib/bitcoin"
+import { truncateAddress, baseUnitsToAmount } from "@/lib/testnet"
+import { isValidSolAddress } from "@/lib/solana"
+import { isValidBtcTestnetAddress } from "@/lib/bitcoin"
 
 type SendStep = "address" | "amount" | "confirm" | "sending" | "success"
 
@@ -42,12 +42,6 @@ function isValidAddressForChain(value: string, chain: string): boolean {
   if (chain === "solana") return isValidSolAddress(value)
   if (chain === "bitcoin") return isValidBtcTestnetAddress(value)
   return false
-}
-
-function getExplorerUrl(hash: string, chain: string): string {
-  if (chain === "solana") return getSolExplorerTxUrl(hash)
-  if (chain === "bitcoin") return getBtcExplorerTxUrl(hash)
-  return getExplorerTxUrl(hash)
 }
 
 export function WalletSendSheet({ open, onOpenChange }: WalletSendSheetProps) {
@@ -289,7 +283,7 @@ export function WalletSendSheet({ open, onOpenChange }: WalletSendSheetProps) {
                 </motion.div>
                 <p className="mt-4 font-heading text-lg font-bold">Sending...</p>
                 <p className="mt-1 text-sm text-muted-foreground">
-                  Broadcasting your transaction to the network
+                  Processing your transaction
                 </p>
               </div>
             )}
@@ -306,25 +300,15 @@ export function WalletSendSheet({ open, onOpenChange }: WalletSendSheetProps) {
                 </motion.div>
                 <h3 className="mt-4 font-heading text-xl font-bold">Sent!</h3>
                 <p className="mt-1 text-sm text-muted-foreground">
-                  Your {chainLabel} is on its way.
+                  Transaction recorded. Your balance was updated.
                 </p>
 
-                {txHash && (
-                  <a
-                    href={getExplorerUrl(txHash, activeChain)}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="mt-3 flex items-center gap-1 text-xs text-primary hover:underline"
-                  >
-                    View transaction
-                    <ExternalLink className="h-3 w-3" />
-                  </a>
-                )}
-
                 <WalletEducational title="What just happened?">
-                  Your transaction was broadcast to the test network. Validators
-                  will confirm it within seconds. The tokens are deducted from
-                  your balance and sent to the recipient&apos;s address.
+                  In this demo, transactions are recorded locally — the hash
+                  looks real but isn&apos;t broadcast to the live testnet, so
+                  it won&apos;t show up on block explorers. In a production
+                  build, signing and broadcasting would use the installed
+                  chain SDKs.
                 </WalletEducational>
 
                 <Button
