@@ -33,7 +33,9 @@ function FaucetContent() {
   const [selectedNetwork, setSelectedNetwork] = useState<(typeof networks)[number]>(() =>
     getInitialNetwork(searchParams.get("chain"))
   )
-  const [address, setAddress] = useState("")
+  // Pre-fill the address when the wallet card opened this page with one
+  // (handleOpen in WalletFaucetCard passes ?address=... for the active chain).
+  const [address, setAddress] = useState(() => searchParams.get("address") ?? "")
   const [step, setStep] = useState<FaucetStep>("form")
   const [txHash, setTxHash] = useState("")
 

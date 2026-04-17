@@ -1,6 +1,6 @@
 "use client"
 
-import { useCallback, useEffect } from "react"
+import { useCallback } from "react"
 import { motion } from "framer-motion"
 import { Droplets } from "lucide-react"
 import { toast } from "sonner"
@@ -11,9 +11,6 @@ import { useTestnetWalletStore } from "@/store/useTestnetWalletStore"
 export function WalletFaucetCard() {
   const wallet = useTestnetWalletStore((s) => s.wallet)
   const activeChain = useTestnetWalletStore((s) => s.activeChain)
-  const addTransaction = useTestnetWalletStore((s) => s.addTransaction)
-  const creditBalance = useTestnetWalletStore((s) => s.creditBalance)
-  const setActiveChain = useTestnetWalletStore((s) => s.setActiveChain)
 
   const address =
     activeChain === "ethereum"
@@ -22,68 +19,16 @@ export function WalletFaucetCard() {
         ? wallet?.solana?.address
         : wallet?.bitcoin?.address
 
+  // Pending faucet drops are processed app-wide in useHydration — this card
+  // is purely the CTA that sends users to /faucet.
   const handleOpen = useCallback(async () => {
     if (!address) return
     try {
       await navigator.clipboard.writeText(address)
       toast.success("Address copied! Opening faucet...")
     } catch {}
-    window.open(`/faucet?chain=${activeChain}`, "_blank")
-  }, [address])
-
-  // Pick up faucet results when user returns to this tab
-  useEffect(() => {
-    const handleVisibility = async () => {
-      if (document.visibilityState !== "visible" || !wallet) return
-
-      try {
-        const raw = localStorage.getItem("onramp-faucet-pending")
-        if (!raw) return
-        // Clear immediately to prevent duplicate processing
-        localStorage.removeItem("onramp-faucet-pending")
-
-        const pending = JSON.parse(raw) as Array<{
-          chain: string
-          address: string
-          amount: string
-          hash: string
-          timestamp: number
-        }>
-
-        if (pending.length === 0) return
-
-        for (const p of pending) {
-          await addTransaction({
-            id: crypto.randomUUID(),
-            userId: wallet.userId,
-            chain: p.chain as "ethereum" | "solana" | "bitcoin",
-            type: "faucet",
-            hash: p.hash,
-            to: p.address,
-            from: "faucet",
-            amount: p.amount,
-            status: "confirmed",
-            timestamp: new Date(p.timestamp),
-          })
-
-          await creditBalance(
-            p.chain as "ethereum" | "solana" | "bitcoin",
-            p.amount,
-          )
-        }
-
-        // Switch to the chain of the last faucet transaction
-        const lastChain = pending[pending.length - 1].chain as "ethereum" | "solana" | "bitcoin"
-        setActiveChain(lastChain)
-
-        toast.success(`${pending.length} faucet transaction(s) received!`)
-      } catch {}
-    }
-
-    document.addEventListener("visibilitychange", handleVisibility)
-    handleVisibility()
-    return () => document.removeEventListener("visibilitychange", handleVisibility)
-  }, [wallet, addTransaction, creditBalance])
+    window.open(`/faucet?chain=${activeChain}&address=${encodeURIComponent(address)}`, "_blank")
+  }, [address, activeChain])
 
   return (
     <motion.div

@@ -32,6 +32,10 @@ interface TestnetWalletState {
   sendTransaction: (chain: TestnetChain, to: string, amount: string) => Promise<string | null>
   addTransaction: (tx: TestnetTransaction) => Promise<void>
   getActiveAddress: () => string | null
+  /** Drain any faucet results written to localStorage by /faucet. Returns the
+   *  number of items applied so callers can toast. Idempotent — localStorage is
+   *  cleared before credits are applied. */
+  processFaucetPending: () => Promise<number>
   resetWallet: () => Promise<void>
 }
 
@@ -293,6 +297,55 @@ export const useTestnetWalletStore = create<TestnetWalletState>((set, get) => ({
     } catch {
       set({ transactions: current })
     }
+  },
+
+  processFaucetPending: async () => {
+    const { wallet } = get()
+    if (!wallet) return 0
+
+    let raw: string | null = null
+    try {
+      raw = localStorage.getItem("onramp-faucet-pending")
+    } catch {
+      return 0
+    }
+    if (!raw) return 0
+
+    try { localStorage.removeItem("onramp-faucet-pending") } catch {}
+
+    let pending: Array<{
+      chain: TestnetChain
+      address: string
+      amount: string
+      hash: string
+      timestamp: number
+    }>
+    try {
+      pending = JSON.parse(raw)
+    } catch {
+      return 0
+    }
+    if (!Array.isArray(pending) || pending.length === 0) return 0
+
+    for (const p of pending) {
+      await get().addTransaction({
+        id: crypto.randomUUID(),
+        userId: wallet.userId,
+        chain: p.chain,
+        type: "faucet",
+        hash: p.hash,
+        to: p.address,
+        from: "faucet",
+        amount: p.amount,
+        status: "confirmed",
+        timestamp: new Date(p.timestamp),
+      })
+      await get().creditBalance(p.chain, p.amount)
+    }
+
+    // Switch to the chain of the last drop so the UI reflects what just arrived.
+    set({ activeChain: pending[pending.length - 1].chain })
+    return pending.length
   },
 
   resetWallet: async () => {
